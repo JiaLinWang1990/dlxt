@@ -1,0 +1,59 @@
+{
+    "chartBody": {
+        "title": "振荡波-局放-放电次数图谱",
+        "axisInfo": {
+            "xDesc": "位置",
+            "xUnit": "m",
+            "xRangeMax": 418,
+            "xRangeMin": 0,
+            "yDesc": "放电次数",
+            "nameLocation": "middle",
+            "yUnit": ""
+        },
+        "series": [
+            {
+                "name": "L1",
+                "color": "rgba(255, 150, 47,1)",
+                "dataList": [
+                    [
+                        232,
+                        18
+                    ],
+                    [
+                        248,
+                        2
+                    ]
+                ]
+            },
+            {
+                "name": "L2",
+                "color": "rgba(0, 255, 27,1)",
+                "dataList": [
+                    [
+                        232,
+                        0
+                    ],
+                    [
+                        248,
+                        0
+                    ]
+                ]
+            },
+            {
+                "name": "L3",
+                "color": "rgba(255, 20, 10,1)",
+                "dataList": [
+                    [
+                        232,
+                        19
+                    ],
+                    [
+                        248,
+                        3
+                    ]
+                ]
+            }
+        ]
+    },
+    "spectrumType": 88
+}

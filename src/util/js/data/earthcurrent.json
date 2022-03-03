@@ -1,0 +1,18 @@
+{
+    "chartBody": {
+        "title": "暂态地电压值",
+        "axisInfo": {
+            "desc": "电流值",
+            "unit": "dBmV",
+            "rangeMax": 500,
+            "rangeMin": 0,
+            "nomalMax": 100,
+            "nomalColor": "#1BA261",
+            "warningMax": 300,
+            "warningColor": "#FCAB53",
+            "alarmMax": 500,
+            "alarmColor": "#ff0000",
+            "value": 50.01
+        }
+    }
+}

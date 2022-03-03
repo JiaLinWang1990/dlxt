@@ -1,0 +1,116 @@
+.upload-demo{display: inline-block}
+.file-menu{width: 260px;display: inline-block;}
+.block-title{
+  height: 50px;line-height: 50px;border-bottom: solid 1px #000;padding:0 10px;font-size:16px;color:#000;font-weight: bold;
+}
+.menu-info{width: calc(100% - 280px);margin-left: 20px;background:#F0F2F5 !important}
+.z-body{
+  height:100%;
+  display: flex;
+}
+.z-aside{
+  width:200px;
+}
+.z-main{
+  width:calc(100% - 200px);background:#F0F2F5;
+}
+.z-header{
+  height:70px;background: #ccc;line-height: 70px;
+}
+.main-area{
+  /* width:100%; */
+}
+.search-content{
+  height: 100px;border-bottom:solid 1px #ccc;padding: 10px;
+}
+.sub-tabs{
+  height:50px;
+  margin: 0 auto;
+  border-bottom: solid 1px rgb(16,93,144);
+}
+.site-tabs{
+ width:100%;
+}
+.warning-tabs{
+ width:152px;
+}
+.z-block{
+  background: #fff;
+}
+.search-block{
+  padding:10px 20px;
+}
+.search-block .el-input{
+  width:150px;
+}
+.button-group{
+    position: absolute;
+    left:0;bottom:10px;
+}
+.left-tree{
+  height: 100%;border-right: solid 1px #ccc;padding:10px;background: #fff;margin-right: 15px;
+ width:280px;
+}
+.el-form-item{
+  margin-bottom:0;
+}
+.el-tabs__item{
+  color:#fff
+}
+.main-area .el-table{background: transparent;}
+.main-area .el-table tr{background: transparent;}
+.main-area .el-table th,.el-table td{text-align: center;}
+.main-area .el-table  thead{color:#000}
+/* .main-area .el-table th{background:#FAFAFA} */
+.main-area .el-table th.el-table__cell{
+  background: rgb(44,46,48);color:#fff;
+}
+.main-area .el-table th.is-leaf{
+  background: rgb(44,46,48);color:#fff;
+}
+.main-area .el-table td.el-table__cell{
+  border-bottom:solid 1px rgb(44,46,48);
+}
+.main-area .el-table td.el-table__cell, .el-table th.el-table__cell.is-leaf{
+  /* border-bottom: 1px solid rgb(44,46,48); */
+  height:38px;
+}
+.el-dialog__header{border-bottom:solid 1px #ccc;}
+.el-dialog__body{padding-bottom:0;}
+.el-button-group{
+  float:right;padding:10px 20px 10px 10px;
+}
+.dialog-box .el-form-item{
+      margin-bottom:20px;
+}
+.main-area .table-content{
+  color:#fff;
+}
+.main-area .el-table__body-wrapper{
+  color:#fff;
+}
+
+
+.site-form .el-input__inner{
+  background:rgb(44,46,48);
+  border:0;
+}
+.site-form .el-form-item__label{
+  color:#fff;
+}
+.anchorBL img{
+  display: none !important;
+}
+.BMap_noprint {
+  display: none;
+}
+.tree-box .el-tree-node__content:hover {
+  background-color: #212325;
+}
+.tree-box .el-tree-node.is-current > .el-tree-node__content{
+  background-color: #212325;
+}
+.el-table .el-table__cell{
+  text-align:center;
+  padding:0;
+}

@@ -1,0 +1,30 @@
+{
+    "chartBody": {
+        "title": "水位图谱",
+        "axisInfo": {
+            "desc": "水位",
+            "unit": "mm",
+            "rangeMax": 1000,
+            "rangeMin": 0,
+            "mode":0
+        },
+        "trigger": [
+            {
+                "desc": "预警值",
+                "value": 300,
+                "color": "#FCAB53"
+            },
+            {
+                "desc": "报警值",
+                "value":600,
+                "color": "#ff0000"
+            }
+        ],
+        "series": [
+            {
+                "color": "#008000",
+                "dataList": [100]
+            }
+        ]
+    }
+}
