@@ -1,4 +1,4 @@
-# vue-hight
+# 电力设备状态智能监测系统
 
 > A Vue.js project
 
