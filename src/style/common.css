@@ -48,7 +48,7 @@
     left:0;bottom:10px;
 }
 .left-tree{
-  height: 100%;border-right: solid 1px #ccc;padding:10px;background: #fff;margin-right: 15px;
+  height: 100%;padding:10px;background: #fff;margin-right: 15px;
  width:280px;
 }
 .el-form-item{

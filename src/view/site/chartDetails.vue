@@ -1,6 +1,9 @@
 <template>
    <div>
-       <el-dialog :visible.sync="dialogVisible" :width="dialogWidth">
+       <el-dialog :visible.sync="dialogVisible" :width="dialogWidth" :showClose="showClo">
+           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)" @click="dialogVisible=false">
+               <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
+           </div>
             <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: space-between;">
                 <div class="body-content" v-for="(item,idx) in dataDetails" :key="idx">
                     <div class="basic-box">
@@ -20,13 +23,17 @@
                             </el-col>
                         </el-row> 
                     </div>
-                    <el-tabs  type="border-card" v-model="activeTab[idx]" @tab-click="handleClick" class="chart-tabs">
+                    <el-tabs  type="border-card" v-model="activeTab1" @tab-click="handleClick" class="chart-tabs" v-if="item.type=='UHF'">
                         <el-tab-pane label="特征图谱" name="common">                            
                         </el-tab-pane>
                         <el-tab-pane label="PRPS" name="prps" v-if="item.type=='UHF'">
                         </el-tab-pane>
                         <el-tab-pane label="PRPD" name="prpd"  v-if="item.type=='UHF'">                            
                         </el-tab-pane>
+                    </el-tabs>
+                     <el-tabs  type="border-card" v-model="activeTab2" @tab-click="handleClick" class="chart-tabs"  v-if="item.type!=='UHF'">
+                        <el-tab-pane label="特征图谱" name="common">                            
+                        </el-tab-pane>                       
                     </el-tabs>
                     <div :id="item.point_id" class="chart-3d"></div> 
                                
@@ -55,7 +62,10 @@
        data(){
            return {
                dialogWidth:0,
-               activeTab:[]
+               activeTab:['common'],
+            activeTab1:'prps',
+            activeTab2:'common',
+            showClo:false,
            }
        },
         computed:{
@@ -145,17 +155,17 @@
 
 <style lang="less" scoped>
 /deep/.el-dialog{
-    margin-top: 0 !important;
+    // margin-top: 0 !important;
 }
 .chart-3d{
-   height: 500px;margin-top: 30px !important;position: relative !important;
-   border:solid 2px #0070C0;
+   height: 500px;position: relative !important;
+   border:solid 2px #0070C0;bottom:0 !important;
 }
 /deep/.chart-3d>div{
     width:100% !important;height:100% !important
 }
  /deep/.el-dialog__header{
-    padding: 8px 0;
+    padding: 0;
        background: #141E38;
        border:none;
        .el-dialog__headerbtn{
@@ -201,6 +211,9 @@
     .el-tabs__item.is-active{
         background: #D7D7D7;
     }
+}
+/deep/.chart-tabs .el-tabs__item.is-active{
+    color:#000;
 }
 </style>
 

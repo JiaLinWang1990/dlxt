@@ -15,7 +15,7 @@
                 </el-form-item>                                  
             </el-form>
             <div class="login-set">
-                <el-checkbox v-model="checked" style="float:left;">自动登录</el-checkbox>
+                <el-checkbox v-model="checked" label="自动登录" style="float:left;color:#468EFF;"></el-checkbox>
                 <span style="float:right;color:#468EFF;cursor:pointer;font-size:14px;">忘记密码</span>
             </div>
             <el-button class="login-btn"  style="width:100%;background:#5A5B5C;border:0;color:#fff;" @click="login">登录</el-button>

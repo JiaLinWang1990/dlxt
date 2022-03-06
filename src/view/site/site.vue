@@ -96,7 +96,7 @@
                             <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.snr:'--'}}</span>     
                         </template>
                     </el-table-column>
-                    <el-table-column prop="sensor_info" align="center" label="更新时间">
+                    <el-table-column prop="sensor_info" align="center" width="150" label="更新时间">
                         <template slot-scope="props">  
                             <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'--'}}</span>     
                         </template>
@@ -169,7 +169,7 @@ export default {
     methods: {
         toggle(){
             this.isFold = !this.isFold;
-            let style = this.isFold?{width:'35px'}:{width:'280px'}
+            let style = this.isFold?{width:'35px',height:'120px'}:{width:'280px',height:'100%'}
             this.isFoldClass = this.isFold?'el-icon-s-unfold':'el-icon-s-fold'
             $('.left-tree').animate(style);         
             this.isFold?$('.main-area').css({width:'100%'}):$('.main-area').css({width:'calc(100% - 300px)'})
@@ -323,6 +323,7 @@ export default {
 }
  .small-btn{
         width:80px;height:36px;background:rgb(32, 52, 49);border:solid 1px rgb(121,121,121);color:#fff;
+        border-radius: 5px;
     }
     /deep/.left-tree .el-tree{
     background: #3d3f44;color:#fff;

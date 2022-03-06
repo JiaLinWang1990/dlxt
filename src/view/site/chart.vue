@@ -1,6 +1,9 @@
 <template>
    <div>
-       <el-dialog :visible.sync="dialogVisible"  width="80%" >
+       <el-dialog :visible.sync="dialogVisible" :showClose="showClo"  width="80%" >
+           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)" @click="dialogVisible=false">
+               <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
+           </div>
             <div class="body-content">
                 <div class="select-box">
                     <div class="time-box">
@@ -104,6 +107,7 @@ import * as device from '@/data/device.js'
                    end_date:This.formatDate(new Date()),
                },
                timeArr:[],
+               showClo:false,
                chartsOption0:{
                     title: {
                         text: '趋势分析',
@@ -118,32 +122,30 @@ import * as device from '@/data/device.js'
                     grid: {
                         left: '3%',
                         right: '4%',
-                        bottom: '10%',
-                        top:'10%',
+                        bottom: '18%',
+                        top:'13%',
                         containLabel: true
                     },
                     dataZoom: [
-                        {
-                            type: 'slider',
-                            start: 0,
-                            end: 100
+                       {
+                            // type: 'inside',
+                            // start: 0,
                         },
                         {
-                            start: 0,
-                            end: 20
+                            type: 'inside',
                         }
                     ],
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
                         data: [],
-                        axisLabel:{
-                            color:'#ccc',
-                            interval:5,
-                            formatter:function(val){
-                                return val.substring(0,16)
-                            }
-                        },                                           
+                        // axisLabel:{
+                        //     color:'#ccc',
+                        //     interval:50,
+                        //     formatter:function(val){
+                        //         return val.substring(0,16)
+                        //     }
+                        // },                                           
                     },
                     yAxis: {
                         type: 'value',
@@ -175,32 +177,30 @@ import * as device from '@/data/device.js'
                     grid: {
                         left: '3%',
                         right: '4%',
-                        bottom: '10%',
-                        top:'10%',
+                        bottom: '18%',
+                        top:'13%',
                         containLabel: true
                     },
                     dataZoom: [
-                        {
-                            type: 'slider',
-                            start: 0,
-                            end: 100
+                       {
+                            // type: 'inside',
+                            // start: 0,
                         },
                         {
-                            start: 0,
-                            end: 20
+                            type: 'inside',
                         }
                     ],
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
                         data: [],
-                        axisLabel:{
-                            color:'#ccc',
-                            interval:5,
-                            formatter:function(val){
-                                return val.substring(0,16)
-                            }
-                        },                                           
+                        // axisLabel:{
+                        //     color:'#ccc',
+                        //     interval:5,
+                        //     formatter:function(val){
+                        //         return val.substring(0,16)
+                        //     }
+                        // },                                           
                     },
                     yAxis: {
                         type: 'value',
@@ -232,32 +232,30 @@ import * as device from '@/data/device.js'
                     grid: {
                         left: '3%',
                         right: '4%',
-                        bottom: '10%',
-                        top:'10%',
+                        bottom: '18%',
+                        top:'13%',
                         containLabel: true
                     },
                     dataZoom: [
-                        {
-                            type: 'slider',
-                            start: 0,
-                            end: 100
+                       {
+                            // type: 'inside',
+                            // start: 0,
                         },
                         {
-                            start: 0,
-                            end: 20
+                            type: 'inside',
                         }
                     ],
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
                         data: [],
-                        axisLabel:{
-                            color:'#ccc',
-                            interval:5,
-                            formatter:function(val){
-                                return val.substring(0,16)
-                            }
-                        },                                           
+                        // axisLabel:{
+                        //     color:'#ccc',
+                        //     interval:5,
+                        //     formatter:function(val){
+                        //         return val.substring(0,16)
+                        //     }
+                        // },                                           
                     },
                     yAxis: {
                         type: 'value',
@@ -374,67 +372,53 @@ import * as device from '@/data/device.js'
             //    this.chartsOption0.xAxis.data.splice(0,this.chartsOption0.xAxis.data.length);
             //    this.chartsOption0.series.splice(0,this.chartsOption0.series.length)
                 let templateObj = {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]};
-                let chartData = [templateObj];
-                let chartData1 = [
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]}
-                ]
-                let chartData2 =[templateObj]
-                let chartData3 =[
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                    {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]}
-                ];
-                let c = false
-                let c1 = false
-                let c2 = false
-                let c3 = false
-                let xAxisData = [];
+                
+                
 
                 let currentIndex;
                 let currentChartData = [];
                 arr.forEach((obj,index)=>{
+                    let xAxisData = [];
                     currentIndex = index;
                     let name = ''
+                    let tempData = [{name: 'Temp',type: 'line',stack: 'Total', symbol:'true',data:[]}];
+                    let aeData = [
+                        {name: '最大放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
+                        {name: '有效放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
+                        {name: '频率分量1',type: 'line',stack: 'Total', symbol:'true',data:[]},
+                        {name: '频率分量2',type: 'line',stack: 'Total', symbol:'true',data:[]}
+                    ]
+                    let tevData =[{name: 'TEV',type: 'line',stack: 'Total', symbol:'true',data:[]}]
+                    let uhfData =[
+                        {name: '最大放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
+                        {name: '平均放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]}, 
+                    ];
                     obj.point_data.forEach((item,idx)=>{
                         xAxisData.push(item.create_time.substring(0,item.create_time.length-7));
                         if(item.sensor_type=='Temp'){
-                            c=true;   
-                            currentChartData = chartData                      
-                            chartData[0].name = 'Temp'
-                            chartData[0].data.push(item.T)
+                            currentChartData = tempData
+                            currentChartData[0].data.push(item.T)
                         }else if(item.sensor_type=='AE'){
-                            c1=true;
-                            currentChartData = chartData1
-                            chartData1[0].name =  '最大放电幅值'
-                            chartData1[0].data.push(item.maxvalue)
-                            chartData1[1].name =  '有效放电幅值';
-                            chartData1[1].data.push(item.rmsvalue)
-                            chartData1[2].name = '频率分量1'
-                            chartData1[2].data.push(item.harmonic1)
-                            chartData1[3].name =  '频率分量2'
-                            chartData1[3].data.push(item.harmonic2) 
+                            currentChartData = aeData
+                            currentChartData[0].data.push(item.maxvalue)
+                            currentChartData[1].data.push(item.rmsvalue)
+                            currentChartData[2].data.push(item.harmonic1)
+                            currentChartData[3].data.push(item.harmonic2) 
                         }else if(item.sensor_type == 'TEV'){
-                            c2=true;
-                            currentChartData = chartData2
-                            chartData2[0].name = 'TEV'
-                            chartData2[0].data.push(item.amp)
+                            currentChartData = tevData
+                            currentChartData[0].data.push(item.amp)
                         }else if(item.sensor_type == 'UHF'){
-                            c3=true;
-                            currentChartData = chartData3
-                            chartData3[0].name = '最大放电幅值'
-                            chartData3[0].data.push(item.ampmax)
-
-                            chartData3[1].name = '平均放电幅值'
-                            chartData3[1].data.push(Number(item.ampmean).toFixed(2))
+                            currentChartData = uhfData
+                            currentChartData[0].data.push(item.ampmax)
+                            currentChartData[1].data.push(Number(item.ampmean).toFixed(2))
                         }
                     })
+                    this['chartsOption'+currentIndex].xAxis.data =xAxisData;
+                    this['chartsOption'+currentIndex].series = currentChartData
+                    this.initCharts(currentIndex);
                 })
                
                 // this.chartsOption.xAxis.data =this.timeArr // xAxisData;
-                this['chartsOption'+currentIndex].xAxis.data =xAxisData;
-                this['chartsOption'+currentIndex].series = currentChartData//[].concat(c?chartData:[],c1?chartData1:[],c2?chartData2:[],c3?chartData3:[]);
                 
                 
                 // this.chartsOption.series[0].data = new Array(this.timeArr.length).fill(0);
@@ -445,12 +429,13 @@ import * as device from '@/data/device.js'
                 //         }
                 //     }
                 // }
-                this.initCharts(currentIndex);
+               
            },
            initCharts(index){
                if(index==undefined)return;
                 this['myChart'+index] = echarts.init(this.$refs['state'+index]);
-               this['myChart'+index].setOption(this['chartsOption'+index]);
+                 this['myChart'+index].resize();
+               this['myChart'+index].setOption(this['chartsOption'+index],true);
                 //  this.myChart1 = echarts.init(this.$refs.state1);
                 // this.myChart1.setOption(this.chartsOption1);
                 //  this.myChart2 = echarts.init(this.$refs.state2);
@@ -466,7 +451,7 @@ import * as device from '@/data/device.js'
 
 <style lang='less' scoped>
     /deep/.el-dialog__header{
-       padding: 8px 0;
+       padding: 0;
        background: #141E38;
        border:none;
        .el-dialog__headerbtn{
@@ -481,9 +466,10 @@ import * as device from '@/data/device.js'
     }
     /deep/.el-dialog__body{
         padding:0;
+        background: #141E38;
     }
     .body-content{
-        display: flex;height:750px;background: #141E38;padding:10px 8px;
+        display: flex;height:750px;padding:10px 8px;
     }
     .select-box{
         width:330px;color:#fff;     

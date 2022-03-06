@@ -10,8 +10,17 @@
                     电力设备状态智能监测系统
                 </div>
                 <div class="header-right">
-                    <button @click="users"><i class="el-icon-open"></i></button>                      
-                    <button @click="trun()"><i class="el-icon-s-data"></i></button>
+                    <el-select v-model="language" size="mini" placeholder="请选择">
+                        <el-option 
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <span class="time">{{currentTime}}</span>
+                    <button @click="users"><i class="el-icon-user"></i></button>                      
+                    <button @click="trun()"><i class="el-icon-coin"></i></button>
                     <button @click="logOut()"><i class="el-icon-switch-button"></i></button>
                 </div>
                 <div style="clear:both;"></div>
@@ -35,11 +44,23 @@
                 tabs:[
                     {name:'综合统计',id:'sum'},
                     {name:'站点总览',id:'site'},
-                    {name:'报警管理',id:'warning'},
-                ]
+                    {name:'告警管理',id:'warning'},
+                ],                
+                language:1,
+                options:[
+                    {value:1,label:'简体中文'}
+                ],
+                currentTime:'',
             }
         },
+        mounted(){
+            setInterval(this.timeFormat,1000)
+        },
         methods:{
+            timeFormat(){
+                let date = new Date();
+                this.currentTime = date.getFullYear()+'-'+(date.getMonth() + 1)+'-'+date.getDate()+" "+date.getHours()+':'+date.getMinutes()
+            },
             trun(){
                  this.$router.push('file')
             },
@@ -93,10 +114,11 @@
 }
 .header-menu{
    height:100%;line-height: 54px;text-align: center;float: left;
+   position:absolute;font-size:20px;z-index: 999;left:0;top:0;
 }
-.menu-item{
-    float:left;font-size:20px;
-    width:120px;height:54px;line-height: 54px;
+.menu-item{ 
+    float:left;   
+    padding:0 15px;height:54px;line-height: 54px;
     border-right:solid 1px #fff;
 }
 .menu-item.active{
@@ -107,15 +129,33 @@
 }
 .header-logo{
     width:150px;
+    background: url("~@/assets/h-logo.png") no-repeat;
+    background-size: 94% 100%;
+    background-position: 10px 0;
 }
 .header-title{
     text-align: center;height:54px;line-height: 54px;font-size: 34px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 .header-right{
-    position: absolute;right:0;top:0;;
-    width:100px;float:right;height:54px;line-height: 54px;
+    position: absolute;right:10px;top:0;z-index: 1;
+    float:right;height:54px;line-height: 54px;
     i{
         font-size: 18px;
+        color:#fff;
+    }
+    button{
+        border:0;background:#3D3F44;cursor: pointer;padding-right:5px;
+    }
+    /deep/.el-select{width:120px;padding-right:10px;}
+    /deep/.el-input__inner{
+        background:#000;color:#fff;
+    }
+    .time{
+        padding-right:10px;font-size: 14px;;
     }
 }
 </style>
