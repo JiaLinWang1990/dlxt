@@ -1,8 +1,8 @@
 <template>
    <div>
-       <el-dialog :visible.sync="dialogVisible" :showClose="showClo"  width="80%" >
-           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)" @click="dialogVisible=false">
-               <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
+       <el-dialog :visible.sync="dialogVisible" :showClose="showClo"  width="80%" :close-on-click-modal="false">
+           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)">
+               <i class="el-icon-error" style="font-size:25px;color:#CA5051;" @click="dialogVisible=false"></i>
            </div>
             <div class="body-content">
                 <div class="select-box">
@@ -48,7 +48,7 @@
             </div>            
         </el-dialog>
         <div  v-if="showChartDetails" >
-            <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
+            <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails" :clickData="clickData"></chartDetails>
         </div> 
    </div>
 </template>
@@ -68,6 +68,10 @@ import * as device from '@/data/device.js'
            },
            tableData:{
                 type:Array,
+                default:()=>[]
+           },
+           selectData:{
+               type:Array,
                 default:()=>[]
            }
        },
@@ -160,7 +164,7 @@ import * as device from '@/data/device.js'
                         }                         
                     },
                     series: [
-                           {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]},                                      
+                           {name: '',type: 'line', symbol:'true',data:[]},                                      
                     ]
                 },
                 chartsOption1:{
@@ -275,27 +279,54 @@ import * as device from '@/data/device.js'
                 },
                 showChartDetails:false,
                 dataDetails:[],
+                currentSelectData:[],
+                clickData:{}
            }
        },
        mounted(){
            let This = this;
+           this.currentSelectData = this.selectData
+           this.checkedCities = this.getSelectedChecked()
+           if(this.checkedCities.length>3){
+                this.$message('最多同时展示三个图表');
+                this.checkedCities = this.checkedCities.slice(0,3)               
+            }      
+            this.queryPointTrend();      
            this.$nextTick(()=>{
                 // this.$refs.state.style.height = this.checkedCities.length==1?'100%':(this.checkedCities.length==2?'50%':'33.33%')              
-               this.initCharts();
-            //    this.myChart&&this.myChart.on('click', function (params) {
-            //         // 参数 params
-            //         console.log(params);
-            //         if (params.componentType === 'series') {
-            //                 This.showChartDetails = true;
-            //                 This.dataDetails  =This.filterArr(This.tableData,This.checkedCities)
-            //             // 点击到了 series 上
-            //         }
-
-            //     });
+               this.initCharts();              
            })
            
        },
        methods: {
+           bindClick(chart){
+               let This = this;
+               this[chart].on('click',(params)=> {
+                    // 参数 params
+                    console.log(this.checkedCities,params.name,This.selectData,'选中值');
+                    // device.queryTrendDetail({
+                    //     point_ids:this.checkedCities,
+                    //     start_date:params.name
+                    // }).then(res=>{
+                    //     console.log(res,'结果');
+                    //     This.showChartDetails = true;
+                    //     This.dataDetails = res.data//[This[chart]._data]
+                    // })
+                    This.showChartDetails = true;
+                    This.dataDetails = This.selectData//[This[chart]._data]
+                    This.clickData = {
+                        point_ids:this.checkedCities,
+                        start_date:params.name
+                    }
+                });
+           },
+           getSelectedChecked(){
+               let arr = [];
+               this.selectData.forEach(item=>{
+                   arr.push(item.point_id)
+                })
+                return arr;
+           },
            filterArr(arrA,arrB){//从A数组中找到B数组中有的值
                 let resultArr = [];
                 for(var i=0;i<arrB.length;i++){
@@ -315,9 +346,10 @@ import * as device from '@/data/device.js'
                  this.queryPointTrend();
            },
            queryPointTrend(){
+                this.clearCharts()
                if(!this.checkedCities.length) return;
                let params = Object.assign(this.timeVal,{point_ids:this.checkedCities})
-               device.queryPointTrend(params).then(res=>{
+               device.queryPointTrend(params).then(res=>{                  
                    this.redrawCharts(res.data)
                })
            },
@@ -358,12 +390,21 @@ import * as device from '@/data/device.js'
            timeFormat(v){
                return v<10?'0'+v:v
            },
+           clearCharts(){
+                this.myChart0&&this.myChart0.clear();
+                this.myChart1&&this.myChart1.clear();
+                this.myChart2&&this.myChart2.clear();
+           },
            handleChecked(val){
                if(val.length>3){
                    this.$message('最多同时展示三个图表');
                    return;
                }
+               this.getSelectTableData(val)
                this.queryPointTrend();
+           },
+           getSelectTableData(val){
+              this.currentSelectData = this.tableData.filter(item=>val.indexOf(item.point_id)!=-1)
            },
            handleChecked1(val){
 
@@ -372,26 +413,24 @@ import * as device from '@/data/device.js'
             //    this.chartsOption0.xAxis.data.splice(0,this.chartsOption0.xAxis.data.length);
             //    this.chartsOption0.series.splice(0,this.chartsOption0.series.length)
                 let templateObj = {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]};
-                
-                
-
+                                
                 let currentIndex;
                 let currentChartData = [];
                 arr.forEach((obj,index)=>{
                     let xAxisData = [];
                     currentIndex = index;
                     let name = ''
-                    let tempData = [{name: 'Temp',type: 'line',stack: 'Total', symbol:'true',data:[]}];
+                    let tempData = [{name: 'Temp',type: 'line', symbol:'true',data:[]}];
                     let aeData = [
-                        {name: '最大放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                        {name: '有效放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                        {name: '频率分量1',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                        {name: '频率分量2',type: 'line',stack: 'Total', symbol:'true',data:[]}
+                        {name: '最大放电幅值',type: 'line', symbol:'true',data:[]},
+                        {name: '有效放电幅值',type: 'line', symbol:'true',data:[]},
+                        {name: '频率分量1',type: 'line', symbol:'true',data:[]},
+                        {name: '频率分量2',type: 'line', symbol:'true',data:[]}
                     ]
-                    let tevData =[{name: 'TEV',type: 'line',stack: 'Total', symbol:'true',data:[]}]
+                    let tevData =[{name: 'TEV',type: 'line', symbol:'true',data:[]}]
                     let uhfData =[
-                        {name: '最大放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]},
-                        {name: '平均放电幅值',type: 'line',stack: 'Total', symbol:'true',data:[]}, 
+                        {name: '最大放电幅值',type: 'line', symbol:'true',data:[]},
+                        {name: '平均放电幅值',type: 'line', symbol:'true',data:[]}, 
                     ];
                     obj.point_data.forEach((item,idx)=>{
                         xAxisData.push(item.create_time.substring(0,item.create_time.length-7));
@@ -416,30 +455,16 @@ import * as device from '@/data/device.js'
                     this['chartsOption'+currentIndex].xAxis.data =xAxisData;
                     this['chartsOption'+currentIndex].series = currentChartData
                     this.initCharts(currentIndex);
-                })
-               
-                // this.chartsOption.xAxis.data =this.timeArr // xAxisData;
-                
-                
-                // this.chartsOption.series[0].data = new Array(this.timeArr.length).fill(0);
-                // for(var i=0;i<this.timeArr.length;i++){
-                //     for(var j=0;j<xAxisData.length;j++){
-                //         if(xAxisData[j] == this.timeArr[i]){
-                //              this.chartsOption.series[0].data[i] = chartData[j];
-                //         }
-                //     }
-                // }
-               
+                })                         
            },
            initCharts(index){
+               
                if(index==undefined)return;
                 this['myChart'+index] = echarts.init(this.$refs['state'+index]);
+                this['myChart'+index]._data = this.currentSelectData[index]
                  this['myChart'+index].resize();
-               this['myChart'+index].setOption(this['chartsOption'+index],true);
-                //  this.myChart1 = echarts.init(this.$refs.state1);
-                // this.myChart1.setOption(this.chartsOption1);
-                //  this.myChart2 = echarts.init(this.$refs.state2);
-                // this.myChart2.setOption(this.chartsOption2);
+                 this.bindClick('myChart'+index)
+               this['myChart'+index].setOption(this['chartsOption'+index],true);               
            },
            clearAllCharts(){
 
@@ -486,7 +511,7 @@ import * as device from '@/data/device.js'
         border: solid 1px #fff;background: #100B2B
     }
     /deep/.el-radio{display:block;margin-top:10px;color:#fff;}
-    /deep/.el-date-editor--daterange{width:250px;margin-top:10px;
+    /deep/.el-date-editor--daterange{width:250px !important;margin-top:10px;
         .el-range-separator{line-height: 24px;}
         .el-range__icon{line-height: 24px;}
     }

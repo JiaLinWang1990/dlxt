@@ -1,20 +1,27 @@
 <template>
     <div style="display:flex;height:100%;">
         <div class="left-tree">
-            <div style="background：#fff;">
+            <div style="background:#4A4C4F;padding:10px 5px;">
                 <span>站点导航</span>
+                <i class="el-icon-search" @click="showSearch" style="padding-left:15px;" v-if="!isFold"></i>
                 <span style="display:inline-block;float:right" @click="toggle">
                     <i :class="[isFoldClass]"></i>
                 </span>
             </div>
-            <tree :type="'site'" :data="treeData" @clickNode="clickNode"></tree>
+            <el-input v-if="showSearchBox" clearable
+                placeholder="输入关键字进行过滤"
+                v-model="filterText">
+            </el-input>
+            <div class="tree-div" style="">
+                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees"></tree>
+            </div>            
         </div>
         <div class="main-area">
             <div class="sub-tabs site-tabs">
                 <div>
                     <button class="small-btn" @click="showDialog(2)">实时</button>
                     <button class="small-btn" @click="showDialog(1)">趋势</button>
-                    <button class="small-btn">全选</button>
+                    <button class="small-btn" @click="selectAll(3)">全选</button>
                 </div>
                 <el-tabs v-model="activeTab" class="site-tabs-ul">
                     <el-tab-pane label="一次接线图" name="chart"></el-tab-pane>
@@ -27,20 +34,21 @@
                     <el-col :span="18">
                         <el-col :span="12">
                             <el-form-item label="测点名称">
-                                <el-input v-model="form.point_name" style="width:217px;"></el-input>
+                                <el-input v-model="form.point_name"  clearable style="width:217px;"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
-                            <el-form-item label="报警状态">
-                                <el-select v-model="form.status" placeholder="请选择">
+                            <el-form-item label="报警状态" >
+                                <el-select v-model="form.status" placeholder="请选择" clearable  popper-class="dark-style">
                                     <el-option label="正常" value="1"></el-option>
-                                    <el-option label="报警" value="2"></el-option>
+                                    <el-option label="预警" value="2"></el-option>
+                                    <el-option label="报警" value="3"></el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="连接状态">
-                                <el-select v-model="form.connectStatus" placeholder="请选择">
+                                <el-select v-model="form.connectStatus" placeholder="请选择" clearable popper-class="dark-style">
                                     <el-option label="连接" value="1"></el-option>
                                     <el-option label="断开" value="2"></el-option>
                                 </el-select>
@@ -48,7 +56,7 @@
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="数据类型">
-                                <el-select v-model="form.type" placeholder="请选择">
+                                <el-select v-model="form.type" placeholder="请选择" clearable popper-class="dark-style">
                                     <el-option label="AE" value="AE"></el-option>
                                     <el-option label="TEV" value="TEV"></el-option>
                                     <el-option label="Temp" value="Temp"></el-option>
@@ -66,7 +74,7 @@
                 </el-form>
             </div>
             <div class="table-content">
-                <el-table :data="tableData" style="width: 100%" @select="handleSelect" @select-all="selectAll">
+                <el-table :data="tableData" style="width: 100%" @select="handleSelect" @select-all="selectAll" ref="multipleTable">
                     <el-table-column
                         header-align="center"
                         align="center"
@@ -74,31 +82,31 @@
                         width="55"
                     ></el-table-column>
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                    <el-table-column prop="device_name" align="center"  label="设备名称" ></el-table-column>
-                    <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
+                    <el-table-column prop="device_name" align="center"  label="设备名称" width="150"></el-table-column>
+                    <el-table-column prop="point_name" align="center" label="测点名称" width="150"></el-table-column>
                     <el-table-column prop="type" align="center" label="数据类型"></el-table-column>
                     <el-table-column align="center" label="报警状态">正常</el-table-column>
                     <el-table-column prop="sensor_info" align="center" label="电池电量" >
                         <template slot-scope="props">
-                            <span>{{props.row.sensor_info.params?props.row.sensor_info.params.status.battery:'--'}}</span>        
+                            <span>{{props.row.sensor_info.params?props.row.sensor_info.params.status.battery:'/'}}</span>        
                         </template>
                     </el-table-column>                    
                     <el-table-column align="center" label="连接状态">连接</el-table-column>
                     <el-table-column prop="sensor_info" align="center" label="RSSI">
                         <template slot-scope="props">
                             <span v-if="props.row.type=='Temp'">/</span>   
-                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'--'}}</span>     
+                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'/'}}</span>     
                         </template>
                     </el-table-column>
                     <el-table-column prop="params" align="center" label="SNR">
                          <template slot-scope="props">
                             <span v-if="props.row.type=='Temp'">/</span>   
-                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.snr:'--'}}</span>     
+                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.snr:'/'}}</span>     
                         </template>
                     </el-table-column>
                     <el-table-column prop="sensor_info" align="center" width="150" label="更新时间">
                         <template slot-scope="props">  
-                            <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'--'}}</span>     
+                            <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'/'}}</span>     
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="100">
@@ -108,6 +116,16 @@
                     
                     </el-table-column>
                 </el-table>
+                <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5,10, 20, 50]"
+                    prev-text="上一页" next-text="下一页"
+                    :page-size="size"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
             </div>
             </div>
             <div v-if="activeTab == 'chart'" id="bigimg" style="text-align:center;position:relative;">    
@@ -116,7 +134,7 @@
             </div>
         </div>
         <div  v-if="showChart">
-             <chart :visible.sync="showChart" :tableData="tableData"></chart>
+             <chart :visible.sync="showChart" :tableData="tableData" :selectData="selectData"></chart>
         </div>
         <div  v-if="showChartDetails" >
             <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
@@ -143,6 +161,7 @@ export default {
              showChartDetails:false,
              treeData:[],
             tableData: [] ,
+            selectData:[],
             originTableData:[],
             form: {
                 point_name: '',
@@ -155,8 +174,18 @@ export default {
             selectedData:[], // 表格中选中的数据
             params:{
                 zoomVal:1,left:0,top:0,currentX:0,currentY:0,flag:false,
-            }
+            },
+            filterText:'',
+            showSearchBox:false,
+             currentPage:1,
+            size:5,
+            total:0,
         };
+    },
+    watch: {
+      filterText(val) {
+        this.$refs.trees.filterData(val);
+      }
     },
     mounted() {
         this.getTreeData();
@@ -167,11 +196,25 @@ export default {
     },
 
     methods: {
+         handleSizeChange(val){
+             this.size = val;
+            this.getUserList();
+        },
+        handleCurrentChange(val){
+            this.currentPage = val;
+            this.getUserList();
+        },
+        showSearch(){
+            this.showSearchBox = !this.showSearchBox ;
+        },
         toggle(){
             this.isFold = !this.isFold;
-            let style = this.isFold?{width:'35px',height:'120px'}:{width:'280px',height:'100%'}
+            let style = this.isFold?{width:'25px',height:'120px'}:{width:'280px'}//calc(100% - 160px)
+            let treeStyle = this.isFold?{height:0}:{height:"calc(100% - 40px)"}
             this.isFoldClass = this.isFold?'el-icon-s-unfold':'el-icon-s-fold'
-            $('.left-tree').animate(style);         
+            $('.left-tree').animate(style);
+            $('.left-tree').css({height:'calc(100% - 160px)'});    
+             $('.tree-div').css(treeStyle)      
             this.isFold?$('.main-area').css({width:'100%'}):$('.main-area').css({width:'calc(100% - 300px)'})
         },
         queryData(){
@@ -192,12 +235,21 @@ export default {
             this.tableData = this.originTableData;
         },
         selectAll(val){
-            console.log(val,'val');
+            console.log(val.length,'val');
             this.selectedData = val;
+            if(val===3){
+                 this.tableData.forEach(row => {
+                    this.$refs.multipleTable.toggleRowSelection(row,true);
+                });
+                 this.selectedData =  this.tableData
+            }
         },
         handleSelect(val,row){
             console.log(val,row);
             this.selectedData = val;
+            if(val){
+
+            }
         },
         getTreeData(){
             let This = this;
@@ -208,25 +260,34 @@ export default {
             })
         },
         getEquipmentSensor(id){
-            let params = {equipments:id}
+            let params = {equipments:id,page:this.currentPage,limit:this.size}
             device.queryEquipmentSensor(params).then(res=>{
                 if(!res) return;
                 console.log(res,'equipment');
                 this.originTableData = JSON.parse(JSON.stringify(res.data))
-                this.tableData = res.data;               
+                this.tableData = res.data;                          
             })
         },
          getSiteSensor(id){             
-            let params = {sites:id}
+            let params = {sites:id,page:this.currentPage,limit:this.size}
             device.querySiteSensor(params).then(res=>{
                 if(!res) return;
                 console.log(res,'site');
                 this.originTableData = JSON.parse(JSON.stringify(res.data))
                 this.tableData = res.data;
+                 this.total = res.data.length;     
             })
         },
         showDialog(val){
             if(val==1){
+                if(!this.selectedData.length) {
+                    this.$message({
+                        message: '请先选择',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                this.selectData = this.selectedData
                 this.showChart = true
             }else{
                 if(!this.selectedData.length) {
@@ -240,7 +301,8 @@ export default {
                 this.showChartDetails = true;
             }
         },
-        clickNode(v){        
+        clickNode(v){  
+            this.selectedData = [];
             if(v.type=="site"){
                 this.getSiteSensor(v.id)
             }else if(v.type=="equipment"){
@@ -307,7 +369,14 @@ export default {
 
 <style lang='less' scoped>
 .left-tree{
-    background: #3d3f44;color:#fff;float:left;
+    background: #3d3f44;color:#fff;float:left;height:calc(100% - 160px);
+    .el-input{
+        text-align: center;
+        padding:5px 0;
+    }
+    /deep/.el-input__inner{
+        background-color: rgb(44,46,48);
+    }
 }
 .site-tabs{
     position: relative;
@@ -326,7 +395,7 @@ export default {
         border-radius: 5px;
     }
     /deep/.left-tree .el-tree{
-    background: #3d3f44;color:#fff;
+    background: #2C2E30;color:#fff;
 }
 /deep/.site-tabs-ul .el-tabs__item{
     font-size: 18px;;
@@ -345,5 +414,34 @@ export default {
 /deep/.el-button+.el-button{
     margin-left:0;
 }
-
+.table-content{
+    height:calc(100% - 100px);
+    position: relative;
+    .device-name,.point-name{
+        width:150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    /deep/.cell {
+        white-space: nowrap;
+    }
+}
+/deep/.el-pagination {
+    position: absolute;text-align: center;
+    bottom: 0;left:0;right:0;margin:0 auto;
+    .el-input__inner{
+        background: #2C2E30;
+        border:0;color:#fff;
+    }
+    .btn-prev,.btn-next{
+        background: #2C2E30;
+    }
+    .el-pager li{
+         background: #2C2E30;
+    }
+}
+.tree-div{
+    height:calc(100% - 40px)
+}
 </style>

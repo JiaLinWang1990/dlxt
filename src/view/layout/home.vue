@@ -10,7 +10,7 @@
                     电力设备状态智能监测系统
                 </div>
                 <div class="header-right">
-                    <el-select v-model="language" size="mini" placeholder="请选择">
+                    <el-select v-model="language" size="mini" placeholder="请选择" popper-class="dark-style">
                         <el-option 
                         v-for="item in options"
                         :key="item.value"
@@ -37,13 +37,14 @@
     export default {
         data(){
             return {
+                userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
                 activeTab:'site',
                 showChart:false,
                 currentView:'file',
                 number:1,
                 tabs:[
                     {name:'综合统计',id:'sum'},
-                    {name:'站点总览',id:'site'},
+                    {name:'站点详情',id:'site'},
                     {name:'告警管理',id:'warning'},
                 ],                
                 language:1,
@@ -62,7 +63,15 @@
                 this.currentTime = date.getFullYear()+'-'+(date.getMonth() + 1)+'-'+date.getDate()+" "+date.getHours()+':'+date.getMinutes()
             },
             trun(){
-                 this.$router.push('file')
+                let level = this.userInfo.role_level
+                if(level==30){
+                    this.$message({
+                        message: '普通用户无权限',
+                        type: 'warning'
+                    });
+                }else{
+                    this.$router.push('file')
+                }                
             },
             logOut(){
                 account.logout().then(res=>{
@@ -94,7 +103,7 @@
     // background:#091335;
 }
 .b-main{
-    width:100%;height:calc(100% - 54px);background: rgb(33,35,37);padding:10px;
+    width:100%;height:calc(100% - 54px);background: rgb(33,35,37);padding:40px 50px 10px 10px;
 }
 .el-button--primary{
     margin-top: 15px;
@@ -119,7 +128,7 @@
 .menu-item{ 
     float:left;   
     padding:0 15px;height:54px;line-height: 54px;
-    border-right:solid 1px #fff;
+    border-right:solid 1px #fff;cursor: pointer;
 }
 .menu-item.active{
     color:#409EFF;
@@ -152,7 +161,7 @@
     }
     /deep/.el-select{width:120px;padding-right:10px;}
     /deep/.el-input__inner{
-        background:#000;color:#fff;
+        background:#212325;color:#fff;
     }
     .time{
         padding-right:10px;font-size: 14px;;

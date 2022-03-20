@@ -1263,7 +1263,9 @@ import 'echarts/extension/bmap/bmap'
         height:36px;line-height:36px;padding-left:20px;color:#fff;font-size: 14px;;
     }
     .notify-table{
-        
+        /deep/.el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell{
+            background:#2C2E30
+        }
         width:calc(100% - 60px);
         margin:0 auto;height:calc(100% - 50px);
         .el-table{

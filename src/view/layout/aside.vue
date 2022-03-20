@@ -1,6 +1,6 @@
 <template>
     <div class='aside-style'>
-        <div class="logo">logo</div>
+        <div class="logo"></div>
         <div class='menu'>
             <el-menu 
                 @select="handleSelect"
@@ -60,10 +60,10 @@
 
     .aside-style{
         height:100%;
+        background:#2B4C6A;
          .logo{
             height:70px;line-height: 70px;text-align: center;
-            border-bottom:solid 1px #ccc;background:#2B4C6A;
-            color:#fff;font-size: 34px;;
+            background: url("~@/assets/h-logo.png") no-repeat center center;
         }
     }
     .menu{

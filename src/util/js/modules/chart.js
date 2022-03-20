@@ -225,7 +225,8 @@ export default class Chart {
             dataZoom: [{
                 type: 'inside',
                 xAxisIndex: 0,
-                minSpan: 1
+                minSpan: 1,
+                zoomOnMouseWheel:false,
             }],
             textStyle: {
                 fontFamily: 'Arial'

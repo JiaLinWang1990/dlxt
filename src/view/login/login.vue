@@ -31,8 +31,8 @@ export default {
   data(){
    return {
        formModel:{
-           username:"super admin",
-           password:'1234567890',
+           username:"",
+           password:'',
        },
        checked:false,
        rules:{
@@ -69,7 +69,7 @@ export default {
         display: flex;    justify-content:center;align-items:center;
     }
     .left-bg{
-        width:530px;height: 350px;background:url("~@/assets/login-bg.png");
+        width:562px;height: 330px;background:url("~@/assets/login-bg.png");
         background-size:100% 100%;border-radius: 10px;;
     }
     .login-box{

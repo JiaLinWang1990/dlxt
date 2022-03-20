@@ -1,6 +1,6 @@
 <template>
    <div class="header-box">
-        <i class="el-icon-menu"></i>
+        <!-- <i class="el-icon-menu"></i> -->
         <span class="header-title">电力设备智能监测系统管理后台</span>
         <div class="header-right">
             <el-select v-model="language" size="mini" placeholder="请选择">
@@ -73,7 +73,7 @@ import * as account from '@/data/api.js'
     }
     /deep/.el-select{width:120px;padding-right:10px;}
     /deep/.el-input__inner{
-        background:#000;color:#fff;
+        // background:#000;color:#fff;
     }
     .time{
         padding-right:10px;font-size: 14px;;

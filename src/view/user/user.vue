@@ -34,10 +34,10 @@
         </div>
         <div>
             <el-button-group>
-                <el-button type="primary" @click="handleUsers(0)">新建</el-button>
+                <el-button size="small" type="primary" @click="handleUsers(0)">新建</el-button>
             </el-button-group>
             <el-table :data="tableData" style="width: 100%">
-
+                <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                 <el-table-column prop="username" label="用户名"></el-table-column>
                 <el-table-column prop="role_level" label="角色">
                     <template slot-scope="scope">
@@ -62,6 +62,16 @@
                    
                 </el-table-column>
             </el-table>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                 :current-page="currentPage"
+                :page-sizes="[10, 20, 50, 100]"
+                prev-text="上一页" next-text="下一页"
+                :page-size="size"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+            </el-pagination>
         </div>
         <el-dialog :title="dialogTitle" :visible.sync="addUserDialog" class="dialog-box" width="500px" :close-on-click-modal="false">
             <el-form :model="userForm" :rules="userRules" label-width="70px" ref="userForm"> 
@@ -177,7 +187,10 @@ export default {
                { level:10,label:'超级管理员'},
                { level:20,label:'管理员'},
                { level:30,label:'普通用户'},
-            ]
+            ],
+            currentPage:1,
+            size:10,
+            total:0,
         };
     },
     mounted() {
@@ -187,6 +200,14 @@ export default {
     },
 
     methods: {
+        handleSizeChange(val){
+             this.size = val;
+            this.getUserList();
+        },
+        handleCurrentChange(val){
+            this.currentPage = val;
+            this.getUserList();
+        },
         setRoleOption(){
             let role = this.userInfo.role_level;
             if(role == 0){
@@ -227,8 +248,9 @@ export default {
             })
         },
         getUserList(obj={}){
-             account.usersQuery(Object.assign(this.userForm,obj),'get').then(res=>{
+             account.usersQuery(Object.assign(this.userForm,obj,{page:this.currentPage,limit:this.size}),'get').then(res=>{
                 this.tableData = res.data.users;
+                this.total = res.data.total;
             })
         },
         getCustomerList(){
@@ -355,10 +377,16 @@ export default {
         }
    }
    .el-button-group{
-       float:right;padding:10px 20px 10px 10px;
+       float:right;padding:10px 30px 10px 10px;
    }
    .item-button{float:right;}
    /deep/.el-table th{
        text-align: center;
+   }
+   .el-pagination{
+       text-align: center;
+   }
+   /deep/.el-table th.el-table__cell.is-leaf{
+       background:#FAFAFA
    }
 </style>

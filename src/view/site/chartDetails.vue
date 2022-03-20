@@ -1,6 +1,6 @@
 <template>
    <div>
-       <el-dialog :visible.sync="dialogVisible" :width="dialogWidth" :showClose="showClo">
+       <el-dialog :visible.sync="dialogVisible" :width="dialogWidth" :showClose="showClo" :close-on-click-modal="false">
            <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)" @click="dialogVisible=false">
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
            </div>
@@ -24,11 +24,11 @@
                         </el-row> 
                     </div>
                     <el-tabs  type="border-card" v-model="activeTab1" @tab-click="handleClick" class="chart-tabs" v-if="item.type=='UHF'">
-                        <el-tab-pane label="特征图谱" name="common">                            
+                        <el-tab-pane label="特征图谱" name="common" disabled>                            
                         </el-tab-pane>
-                        <el-tab-pane label="PRPS" name="prps" v-if="item.type=='UHF'">
+                        <el-tab-pane label="PRPS" name="prps">
                         </el-tab-pane>
-                        <el-tab-pane label="PRPD" name="prpd"  v-if="item.type=='UHF'">                            
+                        <el-tab-pane label="PRPD" name="prpd" disabled>                            
                         </el-tab-pane>
                     </el-tabs>
                      <el-tabs  type="border-card" v-model="activeTab2" @tab-click="handleClick" class="chart-tabs"  v-if="item.type!=='UHF'">
@@ -47,6 +47,7 @@
 
 <script>
     import * as pdcharts  from '@/util/js/index.js'
+    import * as device from '@/data/device.js'
    export default {
        name:'',
         props:{
@@ -56,6 +57,10 @@
            },
            dataDetails:{
                type:Array,
+               default:[]
+           },
+           clickData:{
+               type:Object,
                default:{}
            },
        },
@@ -80,8 +85,13 @@
        },
        created(){
            this.setDialogWidth();
+          
        },
        mounted(){
+           if(JSON.stringify(this.clickData) != "{}"){
+               this.getTrendDetail();
+           }
+            
            this.$nextTick(()=>{
                 this.initChart(); 
             })  
@@ -93,11 +103,17 @@
        },
 
        methods: {
+           getTrendDetail(){
+                device.queryTrendDetail(this.clickData).then(res=>{
+                    console.log(res,'结果');
+                    This.dataDetails = res.data//[This[chart]._data]
+                })
+           },
             open(){
-            this.$nextTick(()=>{
-                this.initChart(); 
-            })                   
-        },
+                this.$nextTick(()=>{
+                    this.initChart(); 
+                })                   
+            },
         setDialogWidth(){
             let len = this.dataDetails.length;
             this.dialogWidth = (len==1?1:(len>4?3:2))*353 + 'px';
@@ -109,6 +125,10 @@
         },
         initChart(){
             let This = this;
+            if(this.dataDetails.length>6){
+                this.dataDetails =this.dataDetails.slice(0,6);
+                this.$message('最多同时展示六个');
+            }
             this.dataDetails.forEach((item,idx)=>{
                 //    let item = this.dataDetails[i];
                 let data ; 
@@ -132,6 +152,7 @@
                     else{
                         This.activeTab[idx] =  'prps'
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
+                        data.chartBody.axisInfo.zMaxValue = "Max="+item.sensor_info.params.UHF.ampmax
                         actualType = 'prps3d';
                         var  _data = item.sensor_info.params.UHF.prps;
                         var  temp = data.chartBody.series[0].dataList
@@ -158,7 +179,7 @@
     // margin-top: 0 !important;
 }
 .chart-3d{
-   height: 500px;position: relative !important;
+   height: 346px;position: relative !important;
    border:solid 2px #0070C0;bottom:0 !important;
 }
 /deep/.chart-3d>div{

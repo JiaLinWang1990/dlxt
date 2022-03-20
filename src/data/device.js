@@ -26,6 +26,7 @@ export function querySiteSensor(params={},callback){
     return axios.request({
       "url" : baseUrl+urlParams,
       "method" : "get",
+      params:params
     },callback)
 }
 
@@ -102,5 +103,16 @@ export function getSensorList(params={},callback){
     "url" : baseUrl+'/gateways/'+params.gateway_id+"/sensor_info/",
     "method" : "get",
     "params":_params
+  },callback)
+}
+
+
+/*趋势详情*/
+
+export function queryTrendDetail(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/points-graph/',
+    "method" : "post",
+    "data":params
   },callback)
 }

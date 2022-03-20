@@ -1,7 +1,7 @@
 <template>
-   <div style="overflow: auto;height: 98%" class="tree-box">
+   <div style="overflow: auto;height: 100%" class="tree-box">
        <el-tree ref="tree"  default-expand-all :data="data" :props="defaultProps" @node-click="handleNodeClick"
-       @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current>
+       @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node}">
                 <span :title="node.label">{{node.label}}</span>
             </span>
@@ -43,6 +43,14 @@
        },
 
        methods: {
+           filterData(val){
+               this.$refs.tree.filter(val);
+           },
+            filterNode(value, data) {
+                console.log(value,data);
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
+            },
            handleNodeClick(obj,node,e){
                console.log(obj,node,e);
                this.$emit('clickNode',obj)

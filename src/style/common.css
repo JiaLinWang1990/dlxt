@@ -21,7 +21,7 @@
   /* width:100%; */
 }
 .search-content{
-  height: 100px;border-bottom:solid 1px #ccc;padding: 10px;
+  height: 100px;padding: 10px;
 }
 .sub-tabs{
   height:50px;
@@ -33,6 +33,12 @@
 }
 .warning-tabs{
  width:152px;
+}
+.el-input__inner{
+  border:1px solid #797979
+}
+.el-popper{
+  margin-top: 8px !important;
 }
 .z-block{
   background: #fff;
@@ -48,7 +54,7 @@
     left:0;bottom:10px;
 }
 .left-tree{
-  height: 100%;padding:10px;background: #fff;margin-right: 15px;
+  height: 100%;background: #fff;margin-right: 15px;
  width:280px;
 }
 .el-form-item{
@@ -61,12 +67,16 @@
 .main-area .el-table tr{background: transparent;}
 .main-area .el-table th,.el-table td{text-align: center;}
 .main-area .el-table  thead{color:#000}
+.el-table--border::after, .el-table--group::after, .el-table::before{
+  background-color: transparent;
+}
 /* .main-area .el-table th{background:#FAFAFA} */
 .main-area .el-table th.el-table__cell{
   background: rgb(44,46,48);color:#fff;
+  border-bottom: transparent;
 }
 .main-area .el-table th.is-leaf{
-  background: rgb(44,46,48);color:#fff;
+  background: rgb(44,46,48);color:#fff;height:40px !important;font-weight: normal;
 }
 .main-area .el-table td.el-table__cell{
   border-bottom:solid 1px rgb(44,46,48);
@@ -106,6 +116,7 @@
 }
 .tree-box .el-tree-node__content:hover {
   background-color: #212325;
+  color:#fff;
 }
 .tree-box .el-tree-node.is-current > .el-tree-node__content{
   background-color: #212325;
@@ -113,4 +124,25 @@
 .el-table .el-table__cell{
   text-align:center;
   padding:0;
+}
+
+.dark-style.el-select-dropdown{
+  border:0;
+  background-color: #2C2E30;
+}
+.dark-style .el-select-dropdown__item.hover, .dark-style .el-select-dropdown__item:hover{
+  background-color: #212325;
+}
+.dark-style .el-select-dropdown__item{
+  color:#fff;
+}
+.dark-style .el-select-dropdown__item.selected{
+  color:#409EFF;
+  background: #2C2E30;;
+}
+.dark-style .el-select-dropdown__list{
+  padding:0;
+}
+.dark-style.el-popper .popper__arrow{
+  display: none;
 }
