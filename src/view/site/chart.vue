@@ -289,7 +289,8 @@ import * as device from '@/data/device.js'
            this.checkedCities = this.getSelectedChecked()
            if(this.checkedCities.length>3){
                 this.$message('最多同时展示三个图表');
-                this.checkedCities = this.checkedCities.slice(0,3)               
+                this.checkedCities = this.checkedCities.slice(0,3)      
+                This.currentSelectData = this.currentSelectData.slice(0,3)              
             }      
             this.queryPointTrend();      
            this.$nextTick(()=>{
@@ -313,7 +314,7 @@ import * as device from '@/data/device.js'
                     //     This.dataDetails = res.data//[This[chart]._data]
                     // })
                     This.showChartDetails = true;
-                    This.dataDetails = This.selectData//[This[chart]._data]
+                    This.dataDetails = This.currentSelectData//[This[chart]._data]
                     This.clickData = {
                         point_ids:This.checkedCities,
                         start_date:params.name

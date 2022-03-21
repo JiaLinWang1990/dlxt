@@ -71,7 +71,7 @@
                 activeTab1:'prps',
                 activeTab2:'common',
                 showClo:false,
-                DataDetails:[]
+                DataDetails:[]//区别于直接传过来的值，该值表示趋势详情的数组
             }
        },
         computed:{
