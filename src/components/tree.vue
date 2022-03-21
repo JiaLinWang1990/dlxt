@@ -46,13 +46,28 @@
            filterData(val){
                this.$refs.tree.filter(val);
            },
-            filterNode(value, data) {
-                console.log(value,data);
-                if (!value) return true;
-                return data.label.indexOf(value) !== -1;
+
+            filterNode(value,data,node) {
+                if(!value){
+                    return true;
+                }
+                let _array = [];//这里使用数组存储 只是为了存储值。
+                this.getReturnNode(node,_array,value);
+                let result = false;
+                _array.forEach((item)=>{
+                    result = result || item;
+                });
+                return result;
+            },
+            getReturnNode(node,_array,value){
+                let isPass = node.data &&  node.data.label && node.data.label.indexOf(value) !== -1;
+                isPass?_array.push(isPass):'';
+                this.index++;
+                if(!isPass && node.parent){
+                    this.getReturnNode(node.parent,_array,value);
+                }
             },
            handleNodeClick(obj,node,e){
-               console.log(obj,node,e);
                this.$emit('clickNode',obj)
            },
            rightClick(MouseEvent, object, Node, element){

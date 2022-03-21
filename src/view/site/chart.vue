@@ -315,7 +315,7 @@ import * as device from '@/data/device.js'
                     This.showChartDetails = true;
                     This.dataDetails = This.selectData//[This[chart]._data]
                     This.clickData = {
-                        point_ids:this.checkedCities,
+                        point_ids:This.checkedCities,
                         start_date:params.name
                     }
                 });
@@ -491,7 +491,7 @@ import * as device from '@/data/device.js'
     }
     /deep/.el-dialog__body{
         padding:0;
-        background: #141E38;
+        background: #2C2E30;
     }
     .body-content{
         display: flex;height:750px;padding:10px 8px;
@@ -500,7 +500,7 @@ import * as device from '@/data/device.js'
         width:330px;color:#fff;     
     }
     .time-box,.point-box,.param-box{
-         background: #1A284A;border-radius: 3px;border:solid 1px #fff;padding:10px;
+         background: #2C2E30;border-radius: 3px;border:solid 1px #fff;padding:10px;
     }
     .time-box{
         height:210px;
@@ -508,7 +508,7 @@ import * as device from '@/data/device.js'
     .point-box{height:340px;margin-top: 15px}
     .param-box{height:150px;margin-top: 15px}
     .chart-box{margin-left:10px;width:calc(100% - 340px);height:100%;
-        border: solid 1px #fff;background: #100B2B
+        border: solid 1px #fff;background: #141414
     }
     /deep/.el-radio{display:block;margin-top:10px;color:#fff;}
     /deep/.el-date-editor--daterange{width:250px !important;margin-top:10px;

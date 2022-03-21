@@ -7,7 +7,7 @@
             <div class="z-header">
                 <layout-header></layout-header>
             </div>
-            <div style="padding:20px;height: calc(100% - 70px);overflow:scroll">
+            <div style="padding:20px;height: calc(100% - 70px);">
                 <router-view />
             </div>
         </div>

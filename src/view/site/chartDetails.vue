@@ -5,21 +5,21 @@
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
            </div>
             <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: space-between;">
-                <div class="body-content" v-for="(item,idx) in dataDetails" :key="idx">
+                <div class="body-content" v-for="(item,idx) in DataDetails" :key="idx">
                     <div class="basic-box">
                         <el-row class="basic-info">
                             <el-col :span="12">
-                                <p>测点名称:{{item.point_name}}</p>
-                                <p>传感器类型:{{item.type}}</p>
+                                <p>测点名称:{{dataDetails[idx].point_name}}</p>
+                                <p>传感器类型:{{dataDetails[idx].type}}</p>
                                                         
                             </el-col>
                             <el-col :span="12">
-                                <p>设备名称:{{item.device_name}}</p> 
+                                <p>设备名称:{{dataDetails[idx].device_name}}</p> 
                             </el-col>
                         </el-row>
                         <el-row class="basic-info">
                             <el-col :span="24">
-                                <p>采样时间:{{item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):''}}</p>  
+                                <p>采样时间:{{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time:(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>  
                             </el-col>
                         </el-row> 
                     </div>
@@ -57,21 +57,22 @@
            },
            dataDetails:{
                type:Array,
-               default:[]
+               default:()=>[]
            },
            clickData:{
                type:Object,
-               default:{}
+               default:()=>{}
            },
        },
        data(){
-           return {
-               dialogWidth:0,
-               activeTab:['common'],
-            activeTab1:'prps',
-            activeTab2:'common',
-            showClo:false,
-           }
+            return {
+                dialogWidth:0,
+                activeTab:['common'],
+                activeTab1:'prps',
+                activeTab2:'common',
+                showClo:false,
+                DataDetails:[]
+            }
        },
         computed:{
            dialogVisible:{
@@ -88,7 +89,8 @@
           
        },
        mounted(){
-           if(JSON.stringify(this.clickData) != "{}"){
+           this.DataDetails = this.dataDetails
+           if(this.clickData){
                this.getTrendDetail();
            }
             
@@ -106,7 +108,7 @@
            getTrendDetail(){
                 device.queryTrendDetail(this.clickData).then(res=>{
                     console.log(res,'结果');
-                    This.dataDetails = res.data//[This[chart]._data]
+                    this.DataDetails = res.data//[This[chart]._data]
                 })
            },
             open(){
@@ -161,12 +163,12 @@
                         }
                     }
                     pdcharts.draw(document.getElementById(item.point_id), {
-                        width: '350px',
-                        height: '350px',
+                        width: '352px',
+                        height: '352px',
                         type: pdcharts.chartType[actualType],
                         // type:14,
                         data: data.chartBody,
-                        background: "#100C2A"
+                        background: "#141414"
                     });
                })           
            }
@@ -180,7 +182,8 @@
 }
 .chart-3d{
    height: 346px;position: relative !important;
-   border:solid 2px #0070C0;bottom:0 !important;
+   border:solid 1px #DCDFE6;bottom:0 !important;
+   border-top: 0;;
 }
 /deep/.chart-3d>div{
     width:100% !important;height:100% !important
@@ -214,6 +217,7 @@
 }
 /deep/.el-tabs--border-card{
     background:transparent;
+    border-width:0 1px;
 }
 /deep/.chart-tabs .el-tabs__content{
     // height:350px;
