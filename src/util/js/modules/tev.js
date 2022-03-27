@@ -29,7 +29,7 @@ class TEV extends Chart {
                 left: "50%",
                 text: chartBody.title,
                 top: 10,
-            },
+            },          
             legend: { show: false },
             xAxis: [{ show: false }],
             yAxis: [{ show: false }],
@@ -103,7 +103,9 @@ class TEV extends Chart {
                   },
                   detail: {
                     valueAnimation: true,
-                    formatter: '{value} dBmV',
+                    formatter: function (value) {
+                      return value.toFixed(2)+"dBmV";
+                    },
                     color: 'auto'
                   },
                   data: [

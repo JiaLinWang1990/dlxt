@@ -115,11 +115,12 @@
   display: none;
 }
 .tree-box .el-tree-node__content:hover {
-  background-color: #212325;
+  background-color: rgb(74, 76, 79);
   color:#fff;
 }
 .tree-box .el-tree-node.is-current > .el-tree-node__content{
-  background-color: #212325;
+  background-color: rgb(74, 76, 79);font-weight: bold;
+  color:#409EFF
 }
 .el-table .el-table__cell{
   text-align:center;

@@ -129,7 +129,7 @@
             </div>
             </div>
             <div v-if="activeTab == 'chart'" id="bigimg" style="text-align:center;position:relative;">    
-                <img ref="bigImage" src="../../assets/1.svg"  @mousewheel="bagimg(this)"  @mousedown="move($event)"  alt="" style="position:relative;"> 
+                <img ref="bigImage" src="../../assets/2.svg"  @mousewheel="bagimg(this)"  @mousedown="move($event)"  alt="" style="position:relative;"> 
                 <!-- <embed type="image/svg+xml" src="../../assets/1.svg" id="my-embed"/>            -->
             </div>
         </div>
@@ -178,8 +178,9 @@ export default {
             filterText:'',
             showSearchBox:false,
              currentPage:1,
-            size:5,
+            size:10,
             total:0,
+            currentNode:{},//操作分页组件时需要知道之前点击的是哪个node
         };
     },
     watch: {
@@ -198,7 +199,8 @@ export default {
     methods: {
          handleSizeChange(val){
              this.size = val;
-            this.getUserList();
+             this.clickNode(this.currentNode)
+            // this.getUserList();
         },
         handleCurrentChange(val){
             this.currentPage = val;
@@ -209,11 +211,11 @@ export default {
         },
         toggle(){
             this.isFold = !this.isFold;
-            let style = this.isFold?{width:'25px',height:'120px'}:{width:'280px'}//calc(100% - 160px)
+            let style = this.isFold?{width:'25px'}:{width:'280px'}
+            let heightStyle = this.isFold?{height:'120px'}:{height:'calc(100% - 160px)'}
             let treeStyle = this.isFold?{height:0}:{height:"calc(100% - 40px)"}
             this.isFoldClass = this.isFold?'el-icon-s-unfold':'el-icon-s-fold'
-            $('.left-tree').animate(style);
-            $('.left-tree').css({height:'calc(100% - 160px)'});    
+            $('.left-tree').css(heightStyle).animate(style);    
              $('.tree-div').css(treeStyle)      
             this.isFold?$('.main-area').css({width:'100%'}):$('.main-area').css({width:'calc(100% - 300px)'})
         },
@@ -264,8 +266,9 @@ export default {
             device.queryEquipmentSensor(params).then(res=>{
                 if(!res) return;
                 console.log(res,'equipment');
-                this.originTableData = JSON.parse(JSON.stringify(res.data))
-                this.tableData = res.data;                          
+                this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
+                this.tableData = res.data.sensor_list; 
+                 this.total = res.data.total;                         
             })
         },
          getSiteSensor(id){             
@@ -273,9 +276,9 @@ export default {
             device.querySiteSensor(params).then(res=>{
                 if(!res) return;
                 console.log(res,'site');
-                this.originTableData = JSON.parse(JSON.stringify(res.data))
-                this.tableData = res.data;
-                 this.total = res.data.length;     
+                this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
+                this.tableData = res.data.sensor_list;
+                 this.total = res.data.total;     
             })
         },
         showDialog(val){
@@ -302,6 +305,7 @@ export default {
             }
         },
         clickNode(v){  
+            this.currentNode = v;
             this.selectedData = [];
             if(v.type=="site"){
                 this.getSiteSensor(v.id)
@@ -395,7 +399,7 @@ export default {
         border-radius: 5px;
     }
     /deep/.left-tree .el-tree{
-    background: #2C2E30;color:#fff;
+    background: #2C2E30;color:#fff;user-select: none;
 }
 /deep/.site-tabs-ul .el-tabs__item{
     font-size: 18px;;

@@ -1,25 +1,31 @@
 <template>
-   <div>
+   <div v-if="dialogVisible">
        <el-dialog :visible.sync="dialogVisible" :width="dialogWidth" :showClose="showClo" :close-on-click-modal="false">
-           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px)" @click="dialogVisible=false">
+           <!-- <div class="refresh" style="width:25px;height:25px;cursor:pointer;margin-left:5px;display:inline-block" @click="dialogVisible=false">
+               <i class="el-icon-refresh-left" style="font-size:25px;font-weight:bold;color:#CA5051;"></i>
+           </div> -->
+           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px);display:inline-block" @click="dialogVisible=false">
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
            </div>
-            <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: space-between;">
+            <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: start;">
                 <div class="body-content" v-for="(item,idx) in DataDetails" :key="idx">
                     <div class="basic-box">
                         <el-row class="basic-info">
                             <el-col :span="12">
-                                <p>测点名称:{{dataDetails[idx].point_name}}</p>
-                                <p>传感器类型:{{dataDetails[idx].type}}</p>
+                                <p>测点名称 : {{dataDetails[idx].point_name}}</p>
+                                <p>传感器类型 : {{dataDetails[idx].type}}</p>
                                                         
                             </el-col>
                             <el-col :span="12">
-                                <p>设备名称:{{dataDetails[idx].device_name}}</p> 
+                                <p>设备名称 : {{dataDetails[idx].device_name}}</p> 
                             </el-col>
                         </el-row>
                         <el-row class="basic-info">
                             <el-col :span="24">
-                                <p>采样时间:{{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time:(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>  
+                                <p>采样时间 : {{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time.substring(0,item.sensor_info.create_time.length-7):(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>  
+                            </el-col>
+                            <el-col :span="24">
+                                <p>诊断结果 : 正常</p>  
                             </el-col>
                         </el-row> 
                     </div>
@@ -48,7 +54,7 @@
 <script>
     import * as pdcharts  from '@/util/js/index.js'
     import * as device from '@/data/device.js'
-   export default {
+    export default {
        name:'',
         props:{
            visible:{
@@ -95,6 +101,10 @@
            }
             
            this.$nextTick(()=>{
+                if(this.dataDetails.length>6){
+                    this.DataDetails =this.DataDetails.slice(0,6);
+                    this.$message('最多同时展示六个');
+                }
                 this.initChart(); 
             })  
             window.onresize = () => {
@@ -104,45 +114,44 @@
             }
        },
 
-       methods: {
-           getTrendDetail(){
+        methods: {
+            getTrendDetail(){
                 device.queryTrendDetail(this.clickData).then(res=>{
                     console.log(res,'结果');
                     this.DataDetails = res.data//[This[chart]._data]
                 })
-           },
+            },
             open(){
                 this.$nextTick(()=>{
                     this.initChart(); 
                 })                   
             },
-        setDialogWidth(){
-            let len = this.dataDetails.length;
-            this.dialogWidth = (len==1?1:(len>4?3:2))*353 + 'px';
-        },
-        handleClick(tab){
-            // if(tab.name=='common'){
+            setDialogWidth(){
+                let len = this.dataDetails.length;
+                this.dialogWidth = (len==1?1:(len>4?3:2))*353 + 'px';
+            },
+            handleClick(tab){
+                // if(tab.name=='common'){
 
-            // }
-        },
-        initChart(){
-            let This = this;
-            if(this.dataDetails.length>6){
-                this.dataDetails =this.dataDetails.slice(0,6);
-                this.$message('最多同时展示六个');
-            }
-            this.dataDetails.forEach((item,idx)=>{
-                //    let item = this.dataDetails[i];
-                let data ; 
-                This.activeTab[idx] = 'common'
-                let actualType = item.type.toLowerCase()             
+                // }
+            },
+            initChart(){
+                let This = this;               
+                this.dataDetails.forEach((item,idx)=>{
+                    //    let item = this.dataDetails[i];
+                    if(JSON.stringify(item.sensor_info)=='{}'){
+                        throw Error();
+                    }
+                    let data ; 
+                    This.activeTab[idx] = 'common'
+                    let actualType = item.type.toLowerCase()             
                     if(item.type=='Temp'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/temperature.js').data));
                         actualType = 'temperature'
-                        data.chartBody.series[0].dataList[0] = item.sensor_info.params?item.sensor_info.params.Temp.T:'';
+                        data.chartBody.series[0].dataList = item.sensor_info.params?Number(item.sensor_info.params.Temp.T):'';
                     }else if(item.type=='TEV'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/tev.js').data));
-                         data.chartBody.axisInfo.value = item.sensor_info.params.TEV.amp;
+                            data.chartBody.axisInfo.value = item.sensor_info.params.TEV.amp;
                     }else if(item.type=='AE'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/ae.js').data));
                         let maxvalue = item.sensor_info.params.AE.maxvalue;
@@ -170,9 +179,9 @@
                         data: data.chartBody,
                         background: "#141414"
                     });
-               })           
-           }
-       }
+                })           
+            }
+        }
    }
 </script>
 
@@ -237,8 +246,18 @@
         background: #D7D7D7;
     }
 }
+/deep/.chart-tabs .el-tabs__item{
+    height:32px;line-height: 32px;;
+}
 /deep/.chart-tabs .el-tabs__item.is-active{
     color:#000;
+}
+.refresh{
+    transition:transform;
+    animation: rotate 3s linear infinite;
+}
+@keyframes rotate{from{transform: rotate(0deg)}
+    to{transform: rotate(359deg)}
 }
 </style>
 

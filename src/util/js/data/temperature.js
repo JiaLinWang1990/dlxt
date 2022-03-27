@@ -23,7 +23,7 @@ export let data = {
         "series": [
             {
                 "color": "#008000",
-                "dataList": [25.5]
+                "dataList": 25.5
             }
         ]
     }

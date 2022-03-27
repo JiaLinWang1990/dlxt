@@ -46,7 +46,7 @@ class Temperature extends Chart {
                 feature: {
                     saveAsImage: {}
                 }
-            },
+            },           
             legend: { show: false },
             xAxis: [{show: false}],
             yAxis: [{show: false}],
@@ -58,7 +58,7 @@ class Temperature extends Chart {
                 {
                   type: 'gauge',
                   min: -40,
-                max: 200,
+                  max: 200,
                   axisLine: {
                     lineStyle: {
                       width: 10,
@@ -70,6 +70,7 @@ class Temperature extends Chart {
                     }
                   },
                   pointer: {
+                    show: true,
                     itemStyle: {
                       color: 'auto'
                     }
@@ -93,11 +94,13 @@ class Temperature extends Chart {
                   axisLabel: {
                     color: 'auto',
                     distance: 20,
-                    fontSize: 20
-                  },
+                    fontSize: 18
+                  },                         
                   detail: {
                     valueAnimation: true,
-                    formatter: '{value} °C',
+                    formatter: function (value) {
+                        return value.toFixed(2)+"°C";
+                      },
                     color: 'auto'
                   },
                   data: [

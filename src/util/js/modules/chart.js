@@ -231,7 +231,7 @@ export default class Chart {
             textStyle: {
                 fontFamily: 'Arial'
             },
-            animation: false,
+            animation: true,
         }
         return option;
     }
