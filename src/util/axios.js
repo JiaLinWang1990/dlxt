@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import axios from 'axios';
-import router from '@/router'
-import {Message} from 'element-ui';
+// import router from '@/router'
+import Router from '@/router/index'
+import {Message,MessageBox} from 'element-ui';
 function getCookie(cookName){
 
     var cookieStr = document.cookie.split(";");
@@ -15,6 +16,15 @@ function getCookie(cookName){
     }
     return null;
 }
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+function delCookie(name){
+    setCookie(name, "", -1);
+} 
 axios.interceptors.request.use(config => {
     let {isLogin, header = {}, params = {}, data = {}, url} = config;
     // config.url += basePath;
@@ -22,7 +32,7 @@ axios.interceptors.request.use(config => {
     if(cookie){
         config.headers['X-AUTH-TOKEN'] = cookie;
     }else{
-
+        // Router.push('login')
     }
 
 //    config.data = Object.assign(config.data,authConfig)
@@ -39,16 +49,19 @@ axios.interceptors.response.use((response) => {
     }
     return response.data;
 }, (error) => {    
-    Message({
-        message: error.response.data.msg,
-        type: 'error',
-        showClose: true,
-        center: true
+    // console.log(Router,'router');
+    MessageBox.alert('登录已失效，请重新登录','提示', {
+        confirmButtonText: '确定',
+        callback: function () {
+            delCookie('cloud_token');
+            Router.push({path:'/'},()=>{})
+        }
     })
-    if(error.response.status == '401'){
-        window.router.push({path:'/'})
-    }
-    return Promise.reject(error);
+    // if(error.response.status == '401'){
+    //     Router.push('login')
+    // }
+    
+    return Promise.reject(new Error('登录失效'));
     
 })
 

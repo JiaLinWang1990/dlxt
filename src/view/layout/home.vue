@@ -74,12 +74,24 @@
                 }                
             },
             logOut(){
-                account.logout().then(res=>{
-                    if(res.code==0){
-                        sessionStorage.removeItem('userInfo')
-                        this.$router.push('login')
-                    }
-                })                        
+                let This = this;
+                this.$confirm('是否退出系统?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    account.logout().then(res=>{
+                        if(res.code==0){
+                            sessionStorage.removeItem('userInfo')
+                            This.$router.push('login')
+                        }
+                    }) 
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消退出'
+                    });          
+                });                   
             },
             users(){},
             handleClickTab(tab,idx){

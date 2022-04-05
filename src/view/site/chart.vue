@@ -23,9 +23,9 @@
                         </el-radio-group>
                     </div>
                     <div class="point-box">
-                        <div class="box-title">测点</div>
+                        <div class="box-title">测点 <span style="font-size:14px;color:rgb(245, 154, 35);">（ 最多选择三个 ）</span></div>
                         <div>                            
-                            <el-checkbox-group v-model="checkedCities" @change="handleChecked">  
+                            <el-checkbox-group v-model="checkedCities" @change="handleChecked" :max="3">  
                                 <div  v-for="(point,i) in tableData" :key="point.id" class="point-line">
                                     <div class="point-color"><span :style="{background:color[i]}" class="line-color"></span></div>
                                     <el-checkbox :label="point.point_id"> {{point.point_name}} </el-checkbox>
@@ -35,8 +35,8 @@
                     </div>
                     <div class="param-box">
                         <div class="box-title">参数</div>
-                        <el-checkbox-group v-model="checkedCities" @change="handleChecked1">  
-                            <el-checkbox v-for="param in params" :key="param.id">{{param.label}}</el-checkbox>                                                                                              
+                        <el-checkbox-group v-model="checkedParams" @change="handleChecked1">  
+                            <el-checkbox v-for="param in params" :checked="param.checked" :label="param" :key="param.id" :disabled="param.disable">{{param.label}}</el-checkbox>                                                                                              
                         </el-checkbox-group>  
                     </div>
                 </div>
@@ -97,13 +97,13 @@ import * as device from '@/data/device.js'
                checkedCities:[],
                color:['#D9001B','#F59A23','#FFFF00','#95F204','#00FFFF','#0000FF','8400FF', '#6D000E','#7B4D12','#808000','#4B7902', '#00BFBF','#000080','#420080','#000000','#555555', '#AAAAAA','#F2F2F2','#FFFFFF','#C280FF'],
                params:[
-                   {id:1,label:'最大放电峰值'},
-                   {id:5,label:'频率分量1'},
-                   {id:2,label:'平均放电幅值'},
-                   {id:6,label:'频率分量1'},
-                   {id:3,label:'放电次数'},
-                   {id:7,label:'温度值'},
-                   {id:4,label:'有效放电幅值'},
+                   {id:1,checked:true,label:'最大放电幅值',disable:true,toType:['UHF','AE','TEV']},
+                   {id:5,checked:true,label:'频率分量1',disable:true,toType:['AE']},
+                   {id:2,checked:true,label:'平均放电幅值',disable:true,toType:['UHF']},
+                   {id:6,checked:true,label:'频率分量2',disable:true,toType:['AE']},
+                   {id:3,checked:true,label:'放电次数',disable:false,toType:[]},
+                   {id:7,checked:true,label:'温度值',disable:true,toType:['Temp']},
+                   {id:4,checked:true,label:'有效放电幅值',disable:true,toType:['AE']},
                ],
                nowDate:new Date(),
                timeVal:{
@@ -280,17 +280,24 @@ import * as device from '@/data/device.js'
                 showChartDetails:false,
                 dataDetails:[],
                 currentSelectData:[],
-                clickData:{}
+                clickData:{},
+                selectTypeArr:[],//选中的类型数组
+                checkedParams:[],
+                currentTrendData:[],//查询到的趋势数据，参数筛选时会用到，不用再请求了
+                firstIn:true,
+                originData:[],//趋势结果的缓存数组，在参数筛选时选择性选取该显示的
            }
        },
        mounted(){
            let This = this;
-           this.currentSelectData = this.selectData
-           this.checkedCities = this.getSelectedChecked()
+           this.currentSelectData = this.selectData           
+           this.checkedCities = this.getSelectedChecked()   
+           this.selectTypeArr =  this.selectTypeArr.slice(0,3)
+           this.setCheckParamsList();          
            if(this.checkedCities.length>3){
                 this.$message('最多同时展示三个图表');
                 this.checkedCities = this.checkedCities.slice(0,3)      
-                This.currentSelectData = this.currentSelectData.slice(0,3)              
+                This.currentSelectData = this.currentSelectData.slice(0,3)                        
             }      
             this.queryPointTrend();      
            this.$nextTick(()=>{
@@ -305,14 +312,6 @@ import * as device from '@/data/device.js'
                this[chart].on('click',(params)=> {
                     // 参数 params
                     console.log(this.checkedCities,params.name,This.selectData,'选中值');
-                    // device.queryTrendDetail({
-                    //     point_ids:this.checkedCities,
-                    //     start_date:params.name
-                    // }).then(res=>{
-                    //     console.log(res,'结果');
-                    //     This.showChartDetails = true;
-                    //     This.dataDetails = res.data//[This[chart]._data]
-                    // })
                     This.showChartDetails = true;
                     This.dataDetails = This.currentSelectData//[This[chart]._data]
                     This.clickData = {
@@ -325,8 +324,19 @@ import * as device from '@/data/device.js'
                let arr = [];
                this.selectData.forEach(item=>{
                    arr.push(item.point_id)
+                   this.selectTypeArr.push(item.type);
                 })
                 return arr;
+           },
+           setCheckParamsList(){
+               this.params.forEach(item=>{
+                   item.disable= true;
+                   this.selectTypeArr.forEach(n=>{
+                        if(item.toType.indexOf(n)>-1){
+                            item.disable = false;
+                        }
+                   })
+               })
            },
            filterArr(arrA,arrB){//从A数组中找到B数组中有的值
                 let resultArr = [];
@@ -350,7 +360,8 @@ import * as device from '@/data/device.js'
                 this.clearCharts()
                if(!this.checkedCities.length) return;
                let params = Object.assign(this.timeVal,{point_ids:this.checkedCities})
-               device.queryPointTrend(params).then(res=>{                  
+               device.queryPointTrend(params).then(res=>{ 
+                   this.currentTrendData = res.data               
                    this.redrawCharts(res.data)
                })
            },
@@ -401,16 +412,77 @@ import * as device from '@/data/device.js'
                    this.$message('最多同时展示三个图表');
                    return;
                }
+               this.checkedParams = this.params;
+               this.firstIn = true;
                this.getSelectTableData(val)
                this.queryPointTrend();
            },
            getSelectTableData(val){
-              this.currentSelectData = this.tableData.filter(item=>val.indexOf(item.point_id)!=-1)
+                this.currentSelectData = this.tableData.filter(item=>val.indexOf(item.point_id)!=-1)
+                //获取选中的数组的类型
+                this.selectTypeArr = [];
+                this.currentSelectData.forEach(item=>{
+                    this.selectTypeArr.push(item.type);
+                })
+                this.setCheckParamsList();
            },
-           handleChecked1(val){
+           handleChecked1(val){              
+               this.checkedParams = this.checkedParams.filter(item=>item.disable==false)   //剔除不可选的选项
+                console.log(this.checkedParams,'sss');
+                this.eRedrawCharts(this.currentTrendData)
+           },
+           eRedrawCharts(arr){
+               console.log(arr,'arr');
+               let currentIndex;
+                arr.forEach((obj,index)=>{
+                    currentIndex = index;
+                    let Data = []//JSON.parse(JSON.stringify(this['chartsOption'+currentIndex].series))
+                    if(obj.measure_type=='AE'){
+                        if(this.checkedParams.find(val=> val.label === '最大放电幅值')){
+                            let idx =  this.originData[index].find(val=>val.name === '最大放电幅值')
+                            Data.push(idx)
+                        }
+                        if(this.checkedParams.find(val=> val.label === '有效放电幅值')){
+                            let idx =  this.originData[index].find(val=>val.name === '有效放电幅值')
+                            Data.push(idx)
+                        }
+                        if(this.checkedParams.find(val=> val.label === '频率分量1')){
+                            let idx =  this.originData[index].find(val=>val.name === '频率分量1')
+                            Data.push(idx)
+                        }
+                        if(this.checkedParams.find(val=> val.label === '频率分量2')){
+                            let idx =  this.originData[index].find(val=>val.name === '频率分量2')
+                            Data.push(idx)
+                        }
+                    }else  if(obj.measure_type=='TEV'){
+                        if(this.checkedParams.find(val=> val.label === '最大放电幅值')){
+                            let idx =  this.originData[index].find(val=>val.name === 'TEV')
+                            Data.push(idx)
+                        }                        
+                    }else if(obj.measure_type=='UHF'){
+                        if(this.checkedParams.find(val=> val.label === '最大放电幅值')){
+                            let idx =  this.originData[index].find(val=>val.name === '最大放电幅值')
+                            Data.push(idx)
+                        } 
+                        if(this.checkedParams.find(val=> val.label === '平均放电幅值')){
+                            let idx =  this.originData[index].find(val=>val.name === '平均放电幅值')
+                            Data.push(idx)
+                        }                        
+                    }else  if(obj.measure_type=='Temp'){
+                        if(this.checkedParams.find(val=> val.label === '温度值')){
+                            let idx =  this.originData[index].find(val=>val.name === 'Temp')
+                            Data.push(idx)
+                        }                        
+                    }
 
+                    // console.log(this['chartsOption'+currentIndex].series,index)
+                    this['chartsOption'+currentIndex].series = Data;
+                    this['chartsOption'+currentIndex].title.text ='趋势分析-' +obj.measure_name;
+                    this.initCharts(currentIndex);
+                })
            },
            redrawCharts(arr){
+               console.log(this.checkedParams,'9999');
             //    this.chartsOption0.xAxis.data.splice(0,this.chartsOption0.xAxis.data.length);
             //    this.chartsOption0.series.splice(0,this.chartsOption0.series.length)
                 let templateObj = {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]};
@@ -437,26 +509,30 @@ import * as device from '@/data/device.js'
                         xAxisData.push(item.create_time.substring(0,item.create_time.length-7));
                         if(item.sensor_type=='Temp'){
                             currentChartData = tempData
-                            currentChartData[0].data.push(item.T)
+                            currentChartData[0].data.push(item.T.toFixed(2))
                         }else if(item.sensor_type=='AE'){
                             currentChartData = aeData
-                            currentChartData[0].data.push(item.maxvalue)
-                            currentChartData[1].data.push(item.rmsvalue)
-                            currentChartData[2].data.push(item.harmonic1)
-                            currentChartData[3].data.push(item.harmonic2) 
+                            currentChartData[0].data.push(item.maxvalue.toFixed(2))
+                            currentChartData[1].data.push(item.rmsvalue.toFixed(2))
+                            currentChartData[2].data.push(item.harmonic1.toFixed(2))
+                            currentChartData[3].data.push(item.harmonic2.toFixed(2))
                         }else if(item.sensor_type == 'TEV'){
                             currentChartData = tevData
-                            currentChartData[0].data.push(item.amp)
+                            currentChartData[0].data.push(item.amp.toFixed(2))
                         }else if(item.sensor_type == 'UHF'){
                             currentChartData = uhfData
-                            currentChartData[0].data.push(item.ampmax)
+                            currentChartData[0].data.push(item.ampmax.toFixed(2))
                             currentChartData[1].data.push(Number(item.ampmean).toFixed(2))
                         }
                     })
                     this['chartsOption'+currentIndex].xAxis.data =xAxisData;
                     this['chartsOption'+currentIndex].series = currentChartData
-                    this.initCharts(currentIndex);
-                })                         
+                    this['chartsOption'+currentIndex].title.text ='趋势分析-' +obj.measure_name;
+                    this.initCharts(currentIndex);   
+                    if(this.firstIn){
+                        this.originData[currentIndex] = currentChartData
+                    }                 
+                })                       
            },
            initCharts(index){
                
@@ -535,5 +611,8 @@ import * as device from '@/data/device.js'
     }
     .chart-box{
         padding:15px;
+    }
+    /deep/.param-box .el-checkbox__input.is-disabled+span.el-checkbox__label{
+        color:gray;
     }
 </style>

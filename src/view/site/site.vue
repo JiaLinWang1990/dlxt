@@ -129,7 +129,7 @@
             </div>
             </div>
             <div v-if="activeTab == 'chart'" id="bigimg" style="text-align:center;position:relative;">    
-                <img ref="bigImage" src="../../assets/2.svg"  @mousewheel="bagimg(this)"  @mousedown="move($event)"  alt="" style="position:relative;"> 
+                <img ref="bigImage" src="../../assets/3.svg"  @mousewheel="bagimg(this)"  @mousedown="move($event)"  alt="" style="position:relative;"> 
                 <!-- <embed type="image/svg+xml" src="../../assets/1.svg" id="my-embed"/>            -->
             </div>
         </div>
@@ -247,7 +247,6 @@ export default {
             }
         },
         handleSelect(val,row){
-            console.log(val,row);
             this.selectedData = val;
             if(val){
 
@@ -265,7 +264,6 @@ export default {
             let params = {equipments:id,page:this.currentPage,limit:this.size}
             device.queryEquipmentSensor(params).then(res=>{
                 if(!res) return;
-                console.log(res,'equipment');
                 this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
                 this.tableData = res.data.sensor_list; 
                  this.total = res.data.total;                         
@@ -275,7 +273,6 @@ export default {
             let params = {sites:id,page:this.currentPage,limit:this.size}
             device.querySiteSensor(params).then(res=>{
                 if(!res) return;
-                console.log(res,'site');
                 this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
                 this.tableData = res.data.sensor_list;
                  this.total = res.data.total;     

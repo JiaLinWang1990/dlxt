@@ -21,6 +21,7 @@
 
 <script>
 import * as account from '@/data/api.js'
+import {MessageBox} from 'element-ui';
    export default {
        name:'',
        data(){
@@ -47,13 +48,25 @@ import * as account from '@/data/api.js'
                this.$router.push('site')
            },
            logOut(){
-               account.logout().then(res=>{
-                   sessionStorage.removeItem('userInfo')
-                    if(res.code==0){
-                        this.$router.push('login')
-                    }
-                }) 
-           }
+                let This = this;
+                this.$confirm('是否退出系统?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    account.logout().then(res=>{
+                        if(res.code==0){
+                            sessionStorage.removeItem('userInfo')
+                            This.$router.push('login')
+                        }
+                    }) 
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消退出'
+                    });          
+                }); 
+           }    
        }
    }
 </script>

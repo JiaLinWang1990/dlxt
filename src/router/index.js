@@ -10,13 +10,14 @@ import file from '@/view/file/file.vue'
 import device from '@/view/device/device.vue'
 import user from '@/view/user/user.vue'
 import system from '@/view/system/system.vue'
+import {Message,MessageBox} from 'element-ui';
 Vue.use(Router)
 function getCookieById(id){
   let arr = document.cookie?document.cookie.split(';'):[];
   let result=''
   arr.forEach(item=>{
     let _arr = item.split('=');
-    if(_arr[0] === id){
+    if(_arr[0] === ' '+id){
       result = _arr[1]
     }
   })
@@ -85,36 +86,40 @@ function getCookieById(id){
 })
 
 
-const originalPush = Router.prototype.push
-Router.prototype.push = function push(location, onResolve, onReject) {
-  if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
-  return originalPush.call(this, location).catch(err => err)
-}
+// const originalPush = Router.prototype.push
+// Router.prototype.push = function push(location, onResolve, onReject) {
+//   if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+//   return originalPush.call(this, location).catch(err => err)
+// }
 router.beforeEach((to,from,next)=>{
-  // console.log(to);
-  // console.log(from);
-  // console.log(document.cookie.split(';'),'cookie');
   let token = getCookieById('cloud_token');
-  // if(!token){
-  //   next({path:'/login'})
-  // }
-  console.log(token,'token');
   let userinfo = JSON.parse(sessionStorage.getItem('userInfo'))
+  if(!token){
+    if(from.name =='login'||to.name=='login'){
+      next()
+      return;
+    }
+    MessageBox.alert('登录已失效，请重新登录','提示', {
+          confirmButtonText: '确定',
+          callback: function () {
+            sessionStorage.removeItem('userInfo')
+            next();
+          }
+      })   
+    return;
+  } 
+  console.log(token,'token');
+  
   if(!userinfo&&to.path!='/login'){
+    sessionStorage.removeItem('userInfo')
     next({path:'/login'})
   }else{
     if(to.path=='/login'&&userinfo){
       next({path:'/site'})
     }else{
       next();
-    }
-    
+    }    
   }
-  // if(!from.name){
-  //   next('/login')
-  // }else{
-  //   next();
-  // }
   
 })
 
