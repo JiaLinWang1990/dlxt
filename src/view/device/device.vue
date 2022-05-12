@@ -62,7 +62,10 @@
                             <el-button size="small" @click="reset">重置</el-button>
                         </el-form-item>
                     </el-form>
-                    <el-table :data="sensorData" style="width: 100%">
+                    <el-table :data="sensorData" style="width: 100%"  v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)" >
                         <el-table-column prop="name" label="传感器名称"></el-table-column>
                         <el-table-column prop="sensor_type" label="传感器类型"></el-table-column>
                         <el-table-column prop="sensor_id" label="传感器编号"></el-table-column>
@@ -233,6 +236,7 @@ export default {
             currentGatewayId:'',//当前点击的主机，查询其下传感器时用到
             showChartDetails:false,
             dataDetails:[],
+            loading:false
         };
     },
     mounted() {

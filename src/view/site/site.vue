@@ -74,7 +74,11 @@
                 </el-form>
             </div>
             <div class="table-content">
-                <el-table :data="tableData" style="width: 100%" @select="handleSelect" @select-all="selectAll" ref="multipleTable">
+                <el-table :data="tableData" style="width: 100%" @select="handleSelect" @select-all="selectAll"
+                    v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)" ref="multipleTable">
                     <el-table-column
                         header-align="center"
                         align="center"
@@ -181,6 +185,7 @@ export default {
             size:10,
             total:0,
             currentNode:{},//操作分页组件时需要知道之前点击的是哪个node
+            loading:false,
         };
     },
     watch: {
@@ -263,6 +268,7 @@ export default {
         getEquipmentSensor(id){
             let params = {equipments:id,page:this.currentPage,limit:this.size}
             device.queryEquipmentSensor(params).then(res=>{
+                this.loading = false;
                 if(!res) return;
                 this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
                 this.tableData = res.data.sensor_list; 
@@ -272,6 +278,7 @@ export default {
          getSiteSensor(id){             
             let params = {sites:id,page:this.currentPage,limit:this.size}
             device.querySiteSensor(params).then(res=>{
+                this.loading = false;
                 if(!res) return;
                 this.originTableData = JSON.parse(JSON.stringify(res.data.sensor_list))
                 this.tableData = res.data.sensor_list;
@@ -303,10 +310,12 @@ export default {
         },
         clickNode(v){  
             this.currentNode = v;
-            this.selectedData = [];
+            this.selectedData = [];            
             if(v.type=="site"){
+                this.loading = true;
                 this.getSiteSensor(v.id)
             }else if(v.type=="equipment"){
+                this.loading = true;
                 this.getEquipmentSensor(v.id);             
             }                        
         },
@@ -394,6 +403,7 @@ export default {
  .small-btn{
         width:80px;height:36px;background:rgb(32, 52, 49);border:solid 1px rgb(121,121,121);color:#fff;
         border-radius: 5px;
+        cursor: pointer;
     }
     /deep/.left-tree .el-tree{
     background: #2C2E30;color:#fff;user-select: none;
@@ -445,4 +455,5 @@ export default {
 .tree-div{
     height:calc(100% - 40px)
 }
+/deep/.el-loading-text{color:#fff;}
 </style>

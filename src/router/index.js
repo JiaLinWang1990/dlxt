@@ -17,7 +17,7 @@ function getCookieById(id){
   let result=''
   arr.forEach(item=>{
     let _arr = item.split('=');
-    if(_arr[0] === ' '+id){
+    if(_arr[0].trim() === id){
       result = _arr[1]
     }
   })
@@ -103,7 +103,7 @@ router.beforeEach((to,from,next)=>{
           confirmButtonText: '确定',
           callback: function () {
             sessionStorage.removeItem('userInfo')
-            next();
+            next({path:'/login'});
           }
       })   
     return;
@@ -111,7 +111,6 @@ router.beforeEach((to,from,next)=>{
   console.log(token,'token');
   
   if(!userinfo&&to.path!='/login'){
-    sessionStorage.removeItem('userInfo')
     next({path:'/login'})
   }else{
     if(to.path=='/login'&&userinfo){

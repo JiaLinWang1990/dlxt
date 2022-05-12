@@ -456,7 +456,7 @@ import * as device from '@/data/device.js'
                         }
                     }else  if(obj.measure_type=='TEV'){
                         if(this.checkedParams.find(val=> val.label === '最大放电幅值')){
-                            let idx =  this.originData[index].find(val=>val.name === 'TEV')
+                            let idx =  this.originData[index].find(val=>val.name === '最大放电幅值')
                             Data.push(idx)
                         }                        
                     }else if(obj.measure_type=='UHF'){
@@ -500,7 +500,7 @@ import * as device from '@/data/device.js'
                         {name: '频率分量1',type: 'line', symbol:'true',data:[]},
                         {name: '频率分量2',type: 'line', symbol:'true',data:[]}
                     ]
-                    let tevData =[{name: 'TEV',type: 'line', symbol:'true',data:[]}]
+                    let tevData =[{name: '最大放电幅值',type: 'line', symbol:'true',data:[]}]
                     let uhfData =[
                         {name: '最大放电幅值',type: 'line', symbol:'true',data:[]},
                         {name: '平均放电幅值',type: 'line', symbol:'true',data:[]}, 

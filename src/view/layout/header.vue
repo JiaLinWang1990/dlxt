@@ -13,7 +13,7 @@
             </el-select>
             <span class="time">{{currentTime}}</span>
             <button @click="users"><i class="el-icon-user"></i></button>                      
-            <button @click="trun()"><i class="el-icon-coin"></i></button>
+            <button @click="trun()"><i class="el-icon-s-home"></i></button>
             <button @click="logOut()"><i class="el-icon-switch-button"></i></button>
         </div>
    </div>
