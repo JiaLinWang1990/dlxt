@@ -496,11 +496,14 @@ export default {
             if(obj.type=='customer'){
                 file.companyDetails({customer_id:obj.id}).then(res=>{
                     this.valueAssign(this.companyForm,res.data)
+                    console.log(this.companyForm,'company');
+                    this.selectAreaData = this.companyForm.administrative_division
                     this.divisionArr =[this.companyForm.administrative_division.province,this.companyForm.administrative_division.city,this.companyForm.administrative_division.region]
                 })
             }else if(obj.type=='site'){
                 file.siteDetails({customer_id:obj.parent_id,site_id:obj.id}).then(res=>{
                     this.valueAssign(this.siteForm,res.data);
+                    this.selectAreaData = this.siteForm.administrative_division
                     this.divisionArr =[this.siteForm.administrative_division.province,this.siteForm.administrative_division.city,this.siteForm.administrative_division.region]                        
                 })
             }else if(obj.type=='equipment'){
@@ -524,7 +527,7 @@ export default {
                 this.delActhon(obj,true)
             }).catch((action) => {
                  if(action =='cancel'){
-                    this.deleteAction(obj,false)
+                    this.delActhon(obj,false)
                 }else{
                     this.$message({type:'info',message:'已取消删除'}); 
                 }          

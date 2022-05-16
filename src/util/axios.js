@@ -49,19 +49,25 @@ axios.interceptors.response.use((response) => {
     }
     return response.data;
 }, (error) => {    
-    // console.log(Router,'router');
-    MessageBox.alert('登录已失效，请重新登录','提示', {
-        confirmButtonText: '确定',
-        callback: function () {
-            delCookie('cloud_token');
-            Router.push({path:'/'},()=>{})
-        }
-    })
-    // if(error.response.status == '401'){
-    //     Router.push('login')
-    // }
-    
-    return Promise.reject(new Error('登录失效'));
+    if(error.response.status == 401){
+        MessageBox.alert('登录已失效，请重新登录','提示', {
+            confirmButtonText: '确定',
+            callback: function () {
+                delCookie('cloud_token');
+                Router.push({path:'/'},()=>{})
+            }
+        })
+    }else{
+        Message({
+            message: error.response.data.msg,
+            type: 'error',
+            showClose: true,
+            center: true
+        })
+        return Promise.reject(new Error(error.response.data.msg))
+        // console.error(error.response.statusText)
+    }         
+    // return Promise.reject(new Error('登录失效'));
     
 })
 

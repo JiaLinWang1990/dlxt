@@ -106,7 +106,7 @@
                this.currentType = object
                this.showMenu = true;
                let menu = document.querySelector("#menu");
-                menu.style.cssText = "position: fixed; left: " + (MouseEvent.clientX - 10) + 'px' + "; top: " + (MouseEvent.clientY - 25) + 'px; z-index: 999; cursor:pointer;';
+                menu.style.cssText = "position: fixed; left: " + (MouseEvent.clientX - 10) + 'px' + "; top: " + (MouseEvent.clientY - 95) + 'px; z-index: 999; cursor:pointer;';
            },
            operate(val){
                this.$emit(val,this.currentType)

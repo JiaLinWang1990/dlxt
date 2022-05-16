@@ -91,7 +91,7 @@
                 </div>            
             </div>
         </div>
-         <el-dialog title="主机详情" :visible.sync="showDetails" class="dialog-box" width="500px">
+         <el-dialog title="主机详情" :visible.sync="showDetails" class="dialog-box" width="500px" :close-on-click-modal="false">
             <div v-if="showDetails">
                 <el-row>
                     <el-col :span="5"><div class="grid-content bg-purple">公司名称：</div></el-col>
@@ -115,7 +115,7 @@
                 </el-row>
             </div>
         </el-dialog>
-         <el-dialog :title="dialogTitle+'主机'" :visible.sync="addDeviceDialog" class="dialog-box" width="500px">
+         <el-dialog :title="dialogTitle+'主机'" :visible.sync="addDeviceDialog" class="dialog-box" :before-close="handleClose" width="500px" :close-on-click-modal="false">
             <el-form :model="deviceForm" :rules="deviceRules" label-width="90px" ref="deviceForm"> 
                 <el-form-item label="主机名称" prop="name">
                     <el-input v-model="deviceForm.name"></el-input>
@@ -144,7 +144,13 @@
                     <el-input v-model="deviceForm.client_number"></el-input>                   
                 </el-form-item>
                 <el-form-item label="时间校准" prop="time_adjusting">
-                    <el-input v-model="deviceForm.time_adjusting"></el-input>                   
+                    <!-- <el-input v-model="deviceForm.time_adjusting"></el-input>     -->
+                    <el-date-picker
+                        v-model="deviceForm.time_adjusting"
+                        type="datetime"
+                        value-format='timestamp'
+                        placeholder="选择日期时间">
+                    </el-date-picker>               
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="deviceForm.remarks"></el-input>
@@ -353,18 +359,24 @@ export default {
             })
         },
         saveDevice(form){
+            console.log(this.deviceForm,'form');
              this.$refs[form].validate((valid) => {
                 if (valid) {
+                    this.deviceForm.time_adjusting = parseInt(Number(this.deviceForm.time_adjusting)/100)
                     if(this.actionType=='add'){
                         device.addDevice({site_id:this.deviceForm.sites,params:this.deviceForm}).then(res=>{
                             console.log(res,'device');
+                            this.clearForm()
                             this.addDeviceDialog = false;
                             this.$message({type: 'success',message: '添加成功'});  
                             this.getTreeData();
+                        },err=>{
+                            console.log(err,'errrr');
                         })
                     }else{
                         device.editDevice({gateway_id:this.detailsData._id,params:this.deviceForm}).then(res=>{
                             console.log(res,'device');
+                            this.clearForm()
                             this.addDeviceDialog = false;
                             this.$message({type: 'success',message: '修改成功'});  
                             this.getTreeData();
@@ -382,6 +394,20 @@ export default {
              this.dataDetails = [
                  {type:obj.sensor_type,sensor_info:obj.sensor_info,point_id:obj.sensor_id}
              ];
+        },
+        handleClose(done){
+            this.clearForm();
+            done();
+        },
+        clearForm(){
+            this.deviceForm = {
+                name:'',
+                customer:'',
+                site_id:'',
+                client_number:'',                
+                time_adjusting:'',
+                remarks:'',
+            }
         }
     },
 };
