@@ -59,12 +59,12 @@ axios.interceptors.response.use((response) => {
         })
     }else{
         Message({
-            message: error.response.data.msg,
+            message: error.response.statusText,
             type: 'error',
             showClose: true,
             center: true
         })
-        return Promise.reject(new Error(error.response.data.msg))
+        return Promise.reject(new Error(error.response.statusText))
         // console.error(error.response.statusText)
     }         
     // return Promise.reject(new Error('登录失效'));

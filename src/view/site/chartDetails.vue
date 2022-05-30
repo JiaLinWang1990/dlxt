@@ -171,13 +171,14 @@
                             temp[i][2] = _data[i];
                         }
                     }
+                    
                     pdcharts.draw(document.getElementById(item.point_id), {
                         width: '352px',
                         height: '352px',
                         type: pdcharts.chartType[actualType],
                         // type:14,
                         data: data.chartBody,
-                        background: "#141414"
+                        background: "#fff"
                     });
                 })           
             }

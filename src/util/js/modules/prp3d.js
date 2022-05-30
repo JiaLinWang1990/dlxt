@@ -45,13 +45,13 @@ class PRP3D extends Chart {
                 text: title,
                 left: "50%",
                 textStyle: {
-                    color: opts.color,
+                    color: '#000',//opts.color,
                     fontSize: opts.fontSize * 1.2,
                 },
                 subtext: subtext,
                 subtextStyle: {
                     align: "right",
-                    color: opts.color,
+                    color: '#000',//opts.color,
                     fontSize: opts.fontSize,
                 }
             },
@@ -123,10 +123,10 @@ class PRP3D extends Chart {
                 splitLine: {
                     lineStyle: {
                         type: 'dotted',
-                        color: opts.color,
+                        color: '#000',//opts.color,
                         opacity: 0.4,
                         width: opts.lineWidth
-                    },
+                    },                    
                 },
                 axisPointer: {
                     show: false,
@@ -160,7 +160,7 @@ class PRP3D extends Chart {
                     textStyle: {
                         color: "#FF7070",
                         fontSize: opts.fontSize
-                    }
+                    },
                 },
             },
             yAxis3D: {
@@ -177,13 +177,16 @@ class PRP3D extends Chart {
                 },
                 axisLabel: {
                     textStyle: {
-                        color: "#5D5DFD",
+                        color: "#000",
                         fontSize: opts.fontSize
-                    }
+                    },
+                    interval:0
                 },
                 splitArea: {
                     show: true,
-                    areaStyle: '#DDF4F6'
+                    areaStyle: {
+                        color:['#ccc','#ccc']
+                    },
                 },
             },
             zAxis3D: {
@@ -219,7 +222,7 @@ class PRP3D extends Chart {
                         color: color,
                     },
                 textStyle: {
-                    color: opts.color
+                    color: '#000'//opts.color
                 }
             },
             series: this.getSeries(opts, chartBody),
