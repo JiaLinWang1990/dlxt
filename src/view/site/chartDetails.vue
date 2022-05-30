@@ -178,7 +178,7 @@
                         type: pdcharts.chartType[actualType],
                         // type:14,
                         data: data.chartBody,
-                        background: "#fff"
+                         background: "#141414"
                     });
                 })           
             }
