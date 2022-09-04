@@ -603,8 +603,8 @@ import  amap  from './map.vue';
     .property,.state,.unusual{
         height:33%;background:#17191A;margin:10px;
     }
-    .map{height:80%;}
-    .notify{height:20%;}
+    .map{height:calc(100% - 170px);}
+    .notify{height:170px;}
     .point{height:50%}
     .online{height:25%}
     .unusual-deal{height:25%}

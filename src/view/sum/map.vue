@@ -1,5 +1,5 @@
 <template>
-    <div ref="map">
+    <div ref="map" id="map">
 
     </div>
 </template>
@@ -9,7 +9,8 @@ import 'echarts/extension/bmap/bmap'
 export default {
    data() {
       return {
-         myChart:null
+         myChart:null,
+         option:null
       }
    },
    created(){
@@ -19,7 +20,10 @@ export default {
    },
    methods:{
       initCharts(){
-                this.myChart = echarts.init(this.$refs.map);
+                this.myChart = echarts.init(document.getElementById('map'));
+                this.$nextTick(() => {
+                    this.myChart.resize();
+                });
                 var data = [
   { name: '海门', value: 9 },
   { name: '鄂尔多斯', value: 12 },
@@ -446,7 +450,7 @@ export default {
                      })
                   };
                 }
-                let option = {
+                this.option = {
                 backgroundColor: 'transparent',
                 title: {
                     left: 'center',
@@ -600,18 +604,16 @@ export default {
                     type: 'scatter',
                     coordinateSystem: 'bmap',
                     data: convertData(data),
-                    encode: {
-                        value: 2
-                    },
                     symbolSize: function (val) {
                         return val[2] / 10;
                     },
+                    encode: {
+                        value: 2
+                    },
                     label: {
                         formatter: '{b}',
-                        position: 'right'
-                    },
-                    itemStyle: {
-                        color: '#ddb926'
+                        position: 'right',
+                        show: false
                     },
                     emphasis: {
                         label: {
@@ -619,57 +621,51 @@ export default {
                         }
                     }
                     },
-                    // {
-                    // name: 'Top 5',
-                    // type: 'effectScatter',
-                    // coordinateSystem: 'bmap',
-                    // data: convertData(
-                    //     data
-                    //     .sort(function (a, b) {
-                    //         return b.value - a.value;
-                    //     })
-                    //     .slice(0, 6)
-                    // ),
-                    // encode: {
-                    //     value: 2
-                    // },
-                    // symbolSize: function (val) {
-                    //     return val[2] / 10;
-                    // },
-                    // showEffectOn: 'emphasis',
-                    // rippleEffect: {
-                    //     brushType: 'stroke'
-                    // },
-                    // hoverAnimation: true,
-                    // label: {
-                    //     formatter: '{b}',
-                    //     position: 'right',
-                    //     show: true
-                    // },
-                    // itemStyle: {
-                    //     color: '#f4e925',
-                    //     shadowBlur: 10,
-                    //     shadowColor: '#333'
-                    // },
-                    // zlevel: 1
-                    // },
                     {
-                    type: 'custom',
+                    name: 'Top 5',
+                    type: 'effectScatter',
                     coordinateSystem: 'bmap',
-                    renderItem: renderItem,
-                    itemStyle: {
-                        opacity: 0.5
+                    data: convertData(
+                        data
+                        .sort(function (a, b) {
+                            return b.value - a.value;
+                        })
+                        .slice(0, 6)
+                    ),
+                    symbolSize: function (val) {
+                        return val[2] / 10;
                     },
-                    animation: false,
-                    silent: true,
-                    data: [0],
-                    z: -10
+                    encode: {
+                        value: 2
+                    },
+                    showEffectOn: 'render',
+                    rippleEffect: {
+                        brushType: 'stroke'
+                    },
+                    label: {
+                        formatter: '{b}',
+                        position: 'right',
+                        show: true
+                    },
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: '#333'
+                    },
+                    emphasis: {
+                        scale: true
+                    },
+                    zlevel: 1
                     }
-                ]
+                ]               
                 };
               
 
-               this.myChart.setOption(option);
+               this.myChart.setOption(this.option,true);
+               setTimeout(() => {
+                    window.addEventListener("resize", () => {
+                        this.myChart.resize();
+                    });
+                });
            }
    },
 }

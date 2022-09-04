@@ -142,7 +142,10 @@
         </div>
         <div  v-if="showChartDetails" >
             <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
-        </div>        
+        </div>    
+        <div  v-if="showjx" >
+            <jx  :visible.sync="showjx" ></jx>
+        </div>     
     </div>
 </template>
 
@@ -155,6 +158,7 @@ export default {
         tree,
         chart:resolve => {require(['../site/chart.vue'], resolve)},
         chartDetails:resolve => {require(['../site/chartDetails.vue'], resolve)},
+        jx:resolve => {require(['../site/jx.vue'], resolve)},
     },
     data() {
         return {
@@ -186,6 +190,7 @@ export default {
             total:0,
             currentNode:{},//操作分页组件时需要知道之前点击的是哪个node
             loading:false,
+            showjx:false
         };
     },
     watch: {
@@ -295,7 +300,8 @@ export default {
                     return;
                 }
                 this.selectData = this.selectedData
-                this.showChart = true
+                // this.showChart = true
+                this.showjx = true
             }else{
                 if(!this.selectedData.length) {
                     this.$message({
