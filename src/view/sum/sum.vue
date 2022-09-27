@@ -10,7 +10,12 @@
             </el-col>
             <el-col class="grid-content content-box" :span="12">
                 <div class="content-box">
-                    <amap class="map"></amap>
+                    <div style="height: calc(100% - 170px);">
+                        <div class="map-tree">
+                            <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length"></tree>
+                        </div>
+                        <amap class="map"></amap>
+                    </div>                    
                     <!-- <div  ref="map" class="map"></div> -->
                     <div class="notify">
                         <div class="notify-title">最新异常通知</div>
@@ -68,9 +73,11 @@
 import * as echarts from 'echarts';
 import 'echarts/extension/bmap/bmap'
 import  amap  from './map.vue';
+ import tree from '@/components/tree.vue'
+ import * as device from '@/data/device.js'
    export default {
        name:'',
-       components:{amap},
+       components:{amap,tree},
        data(){
            return {
                myChart:null,
@@ -95,17 +102,27 @@ import  amap  from './map.vue';
                     pointName: '测点1',
                     deviceType:'UHF',
                     state:'预警'
-                    }]
+                    }],
+                treeData:[],
            }
        },
        mounted(){
             this.initCharts();
+            this.getTreeData();
             window.onresize = ()=>{
                 this.initCharts();
             }
        },
 
        methods: {
+            getTreeData(){
+                let This = this;
+                device.queryTree().then(res=>{
+                    if(!res) return;
+                    This.treeData = res.data;
+                })
+            },
+            clickNode(){},
            initCharts(){
                 this.initCharts1();
                 this.initCharts2();
@@ -595,7 +612,14 @@ import  amap  from './map.vue';
     height:100%;display:flex;
      .content-box{
          height:100%;width:100%;
-         display:flex;flex:1;flex-flow: column;
+         display:flex;flex:1;flex-flow: column;position:relative;
+         .map-tree{            
+            position:absolute;max-height:calc(100% - 200px);overflow:auto;
+            width:200px;top:10px;left:10px;background: #ccc;z-index: 1000;
+            /deep/.el-tree{
+                background:#2C2F32;color:#fff;
+            }
+         }
      }
     .property,.state,.unusual,.map,.notify,.point,.online,.unusual-deal{
        background:#17191A;margin:10px;
@@ -603,7 +627,7 @@ import  amap  from './map.vue';
     .property,.state,.unusual{
         height:33%;background:#17191A;margin:10px;
     }
-    .map{height:calc(100% - 170px);}
+    .map{height:100%;width: calc(100% - 20px);}
     .notify{height:170px;}
     .point{height:50%}
     .online{height:25%}

@@ -9,7 +9,7 @@ export let data = {
       {
         "name": "最大值",
         "min": -10,
-        "max": 60,
+        "max": 75,
         "dataList": [
           { "name": "测量值", "value": 7.5, "color": "jet" }
         ]
@@ -17,7 +17,7 @@ export let data = {
       {
         "name": "有效值",
         "min": -10,
-        "max": 60,
+        "max": 75,
         "dataList": [
           { "name": "测量值", "value": 10, "color": "jet" }
         ]
@@ -25,7 +25,7 @@ export let data = {
       {
         "name": "50Hz分量",
         "min": -10,
-        "max": 60,
+        "max": 75,
         "dataList": [
           { "name": "测量值", "value": 0.5, "color": "jet" }
         ]
@@ -33,7 +33,7 @@ export let data = {
       {
         "name": "100Hz分量",
         "min": -10,
-        "max": 60,
+        "max": 75,
         "dataList": [
           { "name": "测量值", "value": 55, "color": "jet" }
         ]

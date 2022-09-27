@@ -13,7 +13,7 @@
                 v-model="filterText">
             </el-input>
             <div class="tree-div" style="">
-                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees"></tree>
+                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length!=0"></tree>
             </div>            
         </div>
         <div class="main-area">
@@ -267,7 +267,7 @@ export default {
             device.queryTree().then(res=>{
                 if(!res) return;
                 This.treeData = res.data;
-                 res.data.length && this.getSiteSensor(res.data[0].children[0].id)
+                 res.data.length && res.data[0].children && this.getSiteSensor(res.data[0].children[0].id)
             })
         },
         getEquipmentSensor(id){

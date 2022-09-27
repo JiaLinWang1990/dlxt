@@ -1,6 +1,6 @@
 <template>
    <div style="overflow: auto;height: 100%" class="tree-box">
-       <el-tree ref="tree"  default-expand-all :data="data" :props="defaultProps" @node-click="handleNodeClick"
+       <el-tree ref="tree" :default-expanded-keys="defaultKeys" :data="data" :props="defaultProps" @node-click="handleNodeClick"
        @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node}">
                 <span :title="node.label">{{node.label}}</span>
@@ -32,14 +32,17 @@
                 },
                 showMenu:false,
                 currentType:'',
-                operateList:[]
+                operateList:[],
+                defaultKeys:[],
 
            }
        },
        mounted(){  
-        //    this.$nextTick(()=>{
-        //        this.$refs.tree.setCurrentKey(this.data[0].id);
-        //    })       
+            
+           this.$nextTick(()=>{
+                this.defaultKeys = this.data.length? [this.data[0].id]:[];
+                this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);
+           })       
        },
 
        methods: {
