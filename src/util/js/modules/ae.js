@@ -39,7 +39,7 @@ class Amplitude extends Chart {
             grid.push({
                 top: (22 * index + 20) + '%',
                 left: opts.fontSize * 2,
-                right: opts.fontSize * 4,
+                right: opts.fontSize * 6,
                 height: '10%'
             });
             //X轴
@@ -136,7 +136,7 @@ class Amplitude extends Chart {
                     barBorderRadius: 5,
                 },
                 label: {
-                    show: true,
+                    show: false,
                     position: 'right',
                     color: opts.color,
                     fontSize: opts.fontSize,
@@ -204,7 +204,17 @@ class Amplitude extends Chart {
                     borderColor: "#177DDC",
                     borderWidth: 1
                 },
-                data: [max - min]
+                data: [max - min],
+                label: {
+                    show: true,
+                    position: 'right',
+                    color: opts.color,
+                    fontSize: opts.fontSize,
+                    formatter: function (data) { 
+                        console.log(data,dataList, 'data');
+                        return dataList[index].dataList[0].value +axisInfo.unit;                     
+                    }
+                }
             });
 
         });
