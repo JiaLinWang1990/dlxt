@@ -86,32 +86,32 @@
                         width="55"
                     ></el-table-column>
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                    <el-table-column prop="device_name" align="center"  label="设备名称" width="150"></el-table-column>
+                    <el-table-column prop="equipment_name" align="center"  label="设备名称" width="150"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称" width="150"></el-table-column>
-                    <el-table-column prop="type" align="center" label="数据类型"></el-table-column>
+                    <el-table-column prop="sensor_type" align="center" label="数据类型"></el-table-column>
                     <el-table-column align="center" label="报警状态">正常</el-table-column>
-                    <el-table-column prop="sensor_info" align="center" label="电池电量" >
-                        <template slot-scope="props">
+                    <el-table-column prop="battery" align="center" label="电池电量" >
+                       <!-- <template slot-scope="props">
                             <span>{{props.row.sensor_info.params?props.row.sensor_info.params.status.battery:'/'}}</span>        
-                        </template>
+                        </template>   -->
                     </el-table-column>                    
                     <el-table-column align="center" label="连接状态">连接</el-table-column>
-                    <el-table-column prop="sensor_info" align="center" label="RSSI">
-                        <template slot-scope="props">
+                    <el-table-column prop="rssi" align="center" label="RSSI">
+                        <!-- <template slot-scope="props">
                             <span v-if="props.row.type=='Temp'">/</span>   
                             <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'/'}}</span>     
-                        </template>
+                        </template>-->
                     </el-table-column>
-                    <el-table-column prop="params" align="center" label="SNR">
-                         <template slot-scope="props">
+                    <el-table-column prop="snr" align="center" label="SNR">
+                         <!-- <template slot-scope="props">
                             <span v-if="props.row.type=='Temp'">/</span>   
                             <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.snr:'/'}}</span>     
-                        </template>
+                        </template>-->
                     </el-table-column>
-                    <el-table-column prop="sensor_info" align="center" width="150" label="更新时间">
-                        <template slot-scope="props">  
+                    <el-table-column prop="update_time" align="center" width="150" label="更新时间">
+                        <!-- <template slot-scope="props">  
                             <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'/'}}</span>     
-                        </template>
+                        </template>-->
                     </el-table-column>
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">

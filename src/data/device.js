@@ -116,3 +116,12 @@ export function queryTrendDetail(params={},callback){
     "data":params
   },callback)
 }
+
+
+/* 传感器详情 */
+export function sensorDetails(params={},callback){
+    return axios.request({
+      "url" : baseUrl+"/sensor/"+params.sensor_data_id+'/sensor_type/'+params.sensor_type+'/',
+      "method" : "get",
+    },callback)
+  }

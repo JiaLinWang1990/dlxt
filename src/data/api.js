@@ -81,3 +81,14 @@ export function siteRequest(params,type,callback){
     "method" : type,
   },callback)
 }
+
+
+
+//用户详情修改
+export function editUserInfo(params={},callback){
+    return axios.request({
+      "url" : baseUrl+"/user/"+params.userId+'/',
+      "method" : "put",
+      "data":params.data
+    },callback)
+  }

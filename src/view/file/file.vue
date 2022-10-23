@@ -2,7 +2,7 @@
     <div style="height: 100%">
         <div class="z-block search-block">
             <div v-if="[0,10].indexOf(userInfo.role_level)>-1">
-                一键导入
+                档案导入
                 <el-input
                     v-model="searchForm.siteName"
                     style="width: 300px;"
@@ -15,13 +15,14 @@
                 <!-- <el-button size="small" style="margin-left:20px;" @click="onSubmit">导出</el-button> -->
             </div>
             <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
-                <!-- <el-form-item label="站点名称">
+                <span style="height:40px;line-height: 40px;display:inline-block;">档案导出</span>
+                <el-form-item label="站点名称：">
                     <el-input v-model="searchForm.siteName" placeholder="请输入站点名称"></el-input>
                 </el-form-item>
-                <el-form-item label="公司">
+                <el-form-item label="公司名称：">
                     <el-input v-model="searchForm.company" placeholder="请输入公司名称"></el-input>
                 </el-form-item>
-                <el-form-item label="电压等级">
+                <el-form-item label="传感器类型：">
                     <el-select v-model="searchForm.degree" placeholder="电压等级">
                         <el-option label="10kV" value="10kV"></el-option>
                         <el-option label="20kV" value="20kV"></el-option>
@@ -32,10 +33,10 @@
                         <el-option label="330kV" value="330kV"></el-option>
                         <el-option label="500kV" value="500kV"></el-option>
                     </el-select>
-                </el-form-item> -->
+                </el-form-item>
                 <el-form-item>
-                    <!-- <el-button size="small" @click="onSubmit">查询</el-button> -->
-                     <!-- <el-button size="small" @click="onSubmit">导出</el-button> -->
+                    <!-- <el-button size="small" type="primary" @click="onSubmit">查询</el-button> -->
+                    <el-button size="small" type="primary" @click="onSubmit">导出</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -681,6 +682,6 @@ export default {
     width:100px !important;
 }
 /deep/.el-form-item__content{
-   margin-left:100px !important;
+//    margin-left:100px !important;
 }
 </style>

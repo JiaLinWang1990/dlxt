@@ -22,7 +22,8 @@
                         </el-row>
                         <el-row class="basic-info">
                             <el-col :span="24">
-                                <p>采样时间 : {{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time.substring(0,item.sensor_info.create_time.length-7):(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>  
+                                <!-- <p>采样时间 : {{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time.substring(0,item.sensor_info.create_time.length-7):(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>   -->
+                                <p>采样时间 : {{dataDetails[idx].update_time}}</p>
                             </el-col>
                             <el-col :span="24">
                                 <p>诊断结果 : 正常</p>  
@@ -95,7 +96,8 @@
           
        },
        mounted(){
-           this.DataDetails = this.dataDetails
+           //this.DataDetails = this.dataDetails
+           this.getSensorDetails();
            if(this.clickData){
                this.getTrendDetail();
            }
@@ -115,6 +117,12 @@
        },
 
         methods: {
+            getSensorDetails() { 
+                device.sensorDetails({sensor_data_id:this.dataDetails.sensor_data_id,sensor_type:this.dataDetails.sensor_type}).then(res => {
+                    console.log(res);
+                    this.DataDetails = res.data
+                })
+            },
             getTrendDetail(){
                 device.queryTrendDetail(this.clickData).then(res=>{
                     console.log(res,'结果');

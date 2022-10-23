@@ -12,8 +12,9 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api':{
-        target: 'http://81.69.56.189:7084/rest/v1/', //服务器
+        // target: 'http://81.69.56.189:7084/rest/v1/', //服务器
       //  target: 'http://208.64.228.73:7084/rest/v1/', //本地
+      target: 'http://9ff5-27-17-81-47.ngrok.io/rest/v1/', //服务器
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/'

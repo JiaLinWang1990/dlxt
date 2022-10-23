@@ -12,9 +12,33 @@
                 </el-option>
             </el-select>
             <span class="time">{{currentTime}}</span>
-            <button @click="users"><i class="el-icon-user"></i></button>                      
+            <el-dropdown  trigger="click" @command="handleCommand">
+                <button @click="users"><i class="el-icon-user"></i></button>  
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>修改信息</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>                    
             <button @click="trun()"><i class="el-icon-s-home"></i></button>
             <button @click="logOut()"><i class="el-icon-switch-button"></i></button>
+        </div>
+        <div v-if="editUserDialog">
+            <el-dialog title="修改信息" :visible.sync="editUserDialog">
+                <el-form :model="form">
+                    <el-form-item label="密码:" :label-width="formLabelWidth">
+                        <el-input v-model="form.password" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱:" :label-width="formLabelWidth">
+                        <el-input v-model="form.email" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="电话:" :label-width="formLabelWidth">
+                        <el-input v-model="form.phone" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="editUserDialog = false">取 消</el-button>
+                    <el-button type="primary" @click="editUserInfo">确 定</el-button>
+                </div>
+            </el-dialog>
         </div>
    </div>
 </template>
@@ -32,6 +56,13 @@ import {MessageBox} from 'element-ui';
                     {value:1,label:'简体中文'}
                 ],
                currentTime:'',
+               editUserDialog:false,
+               form:{
+                    password:'',
+                    email:'',
+                    phone:'',
+               },
+               formLabelWidth:"80px"
            }
        },
        mounted(){
@@ -66,7 +97,17 @@ import {MessageBox} from 'element-ui';
                         message: '已取消退出'
                     });          
                 }); 
-           }    
+           },
+           handleCommand(){
+                this.editUserDialog = true;                 
+           },
+           editUserInfo(){
+                account.editUserInfo({data:this.form,userId:this.userInfo.id}).then(res=>{
+                    console.log(res,'res')
+                    this.editUserDialog = false;
+                })
+                
+           } 
        }
    }
 </script>
