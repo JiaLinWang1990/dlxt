@@ -13,7 +13,7 @@
                 v-model="filterText">
             </el-input>
             <div class="tree-div" style="">
-                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees"></tree>
+                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length!=0"></tree>
             </div>            
         </div>
         <div class="main-area">
@@ -24,73 +24,141 @@
                 </el-tabs>
             </div>
             <div v-if="activeTab == 'list'">
-            <div class="search-content">
-                <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
-                    <el-col :span="14">
-                        <el-col :span="24">
-                            <el-form-item label="活动时间" required>
-                                <el-col :span="11">
-                                <el-form-item prop="date1">
-                                    <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-                                </el-form-item>
-                                </el-col>
-                                <el-col class="line" :span="2">-</el-col>
-                                <el-col :span="11">
-                                <el-form-item prop="date2">
-                                    <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-                                </el-form-item>
-                                </el-col>
-                            </el-form-item>                       
+                <div class="search-content">
+                    <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
+                        <el-col :span="14">
+                            <el-col :span="24">
+                                <el-form-item label="时间范围" required>
+                                    <el-date-picker  v-model="dataRange"     
+                                        @change="selectDate"                        
+                                        type="datetimerange" 
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期">
+                                    </el-date-picker>
+                                   <!--  <el-col :span="11">
+                                    <el-form-item prop="date1">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
+                                    </el-form-item>
+                                    </el-col>
+                                    <el-col class="line" :span="2">-</el-col>
+                                    <el-col :span="11">
+                                    <el-form-item prop="date2">
+                                        <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
+                                    </el-form-item>
+                                    </el-col> -->
+                                </el-form-item>                       
+                            </el-col>
                         </el-col>
-                    </el-col>
-                    <el-col :span="14">
-                        <el-col :span="12">
-                            <el-form-item label="报警状态">
+                        <el-col :span="14">
+                            <el-col :span="12">
+                                <el-form-item label="报警状态">
+                                    <el-select v-model="form.region" placeholder="请选择">
+                                        <el-option label="区域一" value="shanghai"></el-option>
+                                        <el-option label="区域二" value="beijing"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="处理情况">
                                 <el-select v-model="form.region" placeholder="请选择">
-                                    <el-option label="区域一" value="shanghai"></el-option>
-                                    <el-option label="区域二" value="beijing"></el-option>
-                                </el-select>
-                            </el-form-item>
+                                        <el-option label="区域一" value="shanghai"></el-option>
+                                        <el-option label="区域二" value="beijing"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>                        
+                        </el-col>                
+                        <el-form-item  class='btn-group'>
+                            <el-button size="small" type="primary">查询</el-button>
+                            <el-button size="small">重置</el-button>
+                            <el-button size="small">批量确认</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+                <div class="table-content">
+                    <el-table :data="tableData" style="width: 100%">
+                        <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+                        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
+                        <el-table-column align="center" prop="name"  width="200" label="设备名称" ></el-table-column>
+                        <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
+                        <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
+                        <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
+                        <el-table-column align="center" prop="state" label="报警状态" ></el-table-column>
+                        <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
+                        <el-table-column align="center" label="操作">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="mini" @click="details">确认</el-button>                       
+                                <el-button type="text" size="mini" @click="showChart">查看</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </div>
+            <div v-if="activeTab == 'chart'" style="font-size:30px;text-align:center;">
+                <div class="search-content">
+                    <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
+                        <el-col :span="14">
+                            <el-col :span="24">
+                                <el-form-item label="活动时间" required>
+                                    <el-col :span="11">
+                                    <el-form-item prop="date1">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
+                                    </el-form-item>
+                                    </el-col>
+                                    <el-col class="line" :span="2">-</el-col>
+                                    <el-col :span="11">
+                                    <el-form-item prop="date2">
+                                        <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
+                                    </el-form-item>
+                                    </el-col>
+                                </el-form-item>                       
+                            </el-col>
                         </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="处理情况">
-                               <el-select v-model="form.region" placeholder="请选择">
-                                    <el-option label="区域一" value="shanghai"></el-option>
-                                    <el-option label="区域二" value="beijing"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>                        
-                    </el-col>                
-                    <el-form-item  class='btn-group'>
-                        <el-button size="small" type="primary">查询</el-button>
-                        <el-button size="small">重置</el-button>
-                        <el-button size="small">批量确认</el-button>
-                    </el-form-item>
-                </el-form>
+                        <el-col :span="14">
+                            <el-col :span="12">
+                                <el-form-item label="报警状态">
+                                    <el-select v-model="form.region" placeholder="请选择">
+                                        <el-option label="区域一" value="shanghai"></el-option>
+                                        <el-option label="区域二" value="beijing"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="处理情况">
+                                <el-select v-model="form.region" placeholder="请选择">
+                                        <el-option label="区域一" value="shanghai"></el-option>
+                                        <el-option label="区域二" value="beijing"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>                        
+                        </el-col>                
+                        <el-form-item  class='btn-group'>
+                            <el-button size="small" type="primary">查询</el-button>
+                            <el-button size="small">重置</el-button>
+                            <el-button size="small">批量确认</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+                <div class="table-content">
+                    <el-table :data="tableData" style="width: 100%">
+                        <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+                        <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
+                        <el-table-column align="center" prop="name"  width="200" label="设备名称" ></el-table-column>
+                        <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
+                        <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
+                        <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
+                        <el-table-column align="center" prop="state" label="报警状态" ></el-table-column>
+                        <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
+                        <el-table-column align="center" label="操作">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="mini" @click="details">确认</el-button>                       
+                                <el-button type="text" size="mini" @click="showChart">查看</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>                        
             </div>
-            <div class="table-content">
-                <el-table :data="tableData" style="width: 100%">
-                    <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
-                    <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                    <el-table-column align="center" prop="name"  width="200" label="设备名称" ></el-table-column>
-                    <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
-                    <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
-                    <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
-                    <el-table-column align="center" prop="state" label="报警状态" ></el-table-column>
-                    <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
-                    <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
-                    <el-table-column align="center" label="操作">
-                        <template slot-scope="scope">
-                            <el-button type="text" size="mini" @click="details">确认</el-button>                       
-                            <el-button type="text" size="mini" @click="showChart">查看</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </div>
-        </div>
-        <div v-if="activeTab == 'chart'" style="font-size:30px;text-align:center;">
-            总览
-        </div>
         </div>
         <div v-if="showDetails">
             <Details :visible.sync="showDetails"></Details>
@@ -137,14 +205,27 @@
                     date2:'', 
                 },
                 activeTab:'list',
-                showDetails:false,
+               showDetails: false,
+               dataRange:[],
+               searchForm:{
+                    "alarm_type": 0,
+                    "sensor_type": "",
+                    "start_date": "",
+                    "end_data": "",
+                    "alarm_level": 1, 
+                    "is_processed": '',
+                }
            }
        },
        mounted(){
         this.getTreeData();
        },
 
-       methods: {
+    methods: {
+        selectDate() {
+            this.searchForm.start_date = this.formatDate(this.dataRange[0])
+            this.searchForm.end_date = this.formatDate(this.dataRange[1]);
+        },
         clickNode(v){},
         showSearch(){},
         toggle(v){},
@@ -153,6 +234,16 @@
                 if(!res) return;
                 this.treeData = res.data;
                 this.clickNode(res.data[0].children[0])                 
+            })
+        },
+        getSiteList() {
+            device.siteAlarmList().then(res => {
+                
+            })
+        },
+        getEquipmentList() { 
+            device.equipmentAlarmList().then(res => {
+                
             })
         },
         details(row){
@@ -170,7 +261,8 @@
         margin-bottom:0;
     }
     .left-tree{
-        background:#212325
+        background:#212325;
+        color:#fff;
     }
     .btn-group{
         float:right;

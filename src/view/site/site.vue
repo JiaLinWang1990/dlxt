@@ -86,33 +86,33 @@
                         width="55"
                     ></el-table-column>
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                    <el-table-column prop="equipment_name" align="center"  label="设备名称" width="150"></el-table-column>
-                    <el-table-column prop="point_name" align="center" label="测点名称" width="150"></el-table-column>
-                    <el-table-column prop="sensor_type" align="center" label="数据类型"></el-table-column>
-                    <el-table-column align="center" label="报警状态">正常</el-table-column>
-                    <el-table-column prop="battery" align="center" label="电池电量" >
-                       <!-- <template slot-scope="props">
-                            <span>{{props.row.sensor_info.params?props.row.sensor_info.params.status.battery:'/'}}</span>        
-                        </template>   -->
-                    </el-table-column>                    
-                    <el-table-column align="center" label="连接状态">连接</el-table-column>
-                    <el-table-column prop="rssi" align="center" label="RSSI">
+                    <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
+                    <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
+                    <el-table-column prop="sensor_type" align="center" label="传感器类型"></el-table-column>
+                    <el-table-column prop="battery" align="center" label="工作状态" width="200" show-overflow-tooltip>
+                       <template slot-scope="props">
+                            <p>{{(props.row.is_online?'在线:':'离线')+'电量'+props.row.battery+', RSSI '}}</p>        
+                            <p>{{props.row.rssi+'dBm, SNR:'+props.row.snr+'BM'}}</p>
+                        </template>  
+                    </el-table-column>
+                    <el-table-column prop="alarm_describe" align="center" label="报警状态" width="200" show-overflow-tooltip>
+                        <template slot-scope="props">
+                            <p>{{alarmLevel[props.row.alarm_level]}}</p>  
+                            <p>{{'状态描述：'+props.row.alarm_describe}}</p>      
+                        </template>
+                    </el-table-column>
+                                        
+                    <el-table-column prop="character_value" align="center" label="特征值"></el-table-column>
                         <!-- <template slot-scope="props">
                             <span v-if="props.row.type=='Temp'">/</span>   
                             <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'/'}}</span>     
                         </template>-->
-                    </el-table-column>
-                    <el-table-column prop="snr" align="center" label="SNR">
-                         <!-- <template slot-scope="props">
-                            <span v-if="props.row.type=='Temp'">/</span>   
-                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.snr:'/'}}</span>     
-                        </template>-->
-                    </el-table-column>
-                    <el-table-column prop="update_time" align="center" width="150" label="更新时间">
-                        <!-- <template slot-scope="props">  
-                            <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'/'}}</span>     
-                        </template>-->
-                    </el-table-column>
+                    <el-table-column prop="upload_interval" align="center" label="采集周期">
+                        <template slot-scope="props">
+                            <p>{{props.row.upload_interval/60 + 'min'}}</p>      
+                        </template>
+                    </el-table-column>                   
+                    <el-table-column prop="update_time" align="center" width="150" label="更新时间"></el-table-column>
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
                             <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
@@ -190,7 +190,8 @@ export default {
             total:0,
             currentNode:{},//操作分页组件时需要知道之前点击的是哪个node
             loading:false,
-            showjx:false
+            showjx: false,
+            alarmLevel:['正常','预警','报警']
         };
     },
     watch: {
@@ -300,8 +301,8 @@ export default {
                     return;
                 }
                 this.selectData = this.selectedData
-                // this.showChart = true
-                this.showjx = true
+                this.showChart = true
+                // this.showjx = true
             }else{
                 if(!this.selectedData.length) {
                     this.$message({

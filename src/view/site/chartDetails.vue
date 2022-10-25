@@ -8,12 +8,12 @@
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
            </div>
             <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: start;">
-                <div class="body-content" v-for="(item,idx) in DataDetails" :key="idx">
+                <div class="body-content" v-for="(item,idx) in queryDetails" :key="idx">
                     <div class="basic-box">
                         <el-row class="basic-info">
                             <el-col :span="12">
                                 <p>测点名称 : {{dataDetails[idx].point_name}}</p>
-                                <p>传感器类型 : {{dataDetails[idx].type}}</p>
+                                <p>传感器类型 : {{dataDetails[idx].sensor_type}}</p>
                                                         
                             </el-col>
                             <el-col :span="12">
@@ -30,7 +30,7 @@
                             </el-col>
                         </el-row> 
                     </div>
-                    <el-tabs  type="border-card" v-model="activeTab1" @tab-click="handleClick" class="chart-tabs" v-if="item.type=='UHF'">
+                    <el-tabs  type="border-card" v-model="activeTab1" @tab-click="handleClick" class="chart-tabs" v-if="item.data.sensor_type=='UHF'">
                         <el-tab-pane label="特征图谱" name="common" disabled>                            
                         </el-tab-pane>
                         <el-tab-pane label="PRPS" name="prps">
@@ -38,11 +38,11 @@
                         <el-tab-pane label="PRPD" name="prpd" disabled>                            
                         </el-tab-pane>
                     </el-tabs>
-                     <el-tabs  type="border-card" v-model="activeTab2" @tab-click="handleClick" class="chart-tabs"  v-if="item.type!=='UHF'">
+                     <el-tabs  type="border-card" v-model="activeTab2" @tab-click="handleClick" class="chart-tabs"  v-if="item.data.sensor_type!=='UHF'">
                         <el-tab-pane label="特征图谱" name="common">                            
                         </el-tab-pane>                       
                     </el-tabs>
-                    <div :id="item.point_id" class="chart-3d"></div> 
+                    <div :id="item.data.point_id" class="chart-3d"></div> 
                                
                 </div> 
                  
@@ -78,7 +78,9 @@
                 activeTab1:'prps',
                 activeTab2:'common',
                 showClo:false,
-                DataDetails:[]//区别于直接传过来的值，该值表示趋势详情的数组
+                DataDetails: [],//区别于直接传过来的值，该值表示趋势详情的数组
+                queryDetails: [],   //查询详情接口返回值的集合
+                tempArr:[],//临时数组
             }
        },
         computed:{
@@ -97,18 +99,26 @@
        },
        mounted(){
            //this.DataDetails = this.dataDetails
-           this.getSensorDetails();
+        //    this.getSensorDetails();
+          
            if(this.clickData){
                this.getTrendDetail();
            }
-            
-           this.$nextTick(()=>{
-                if(this.dataDetails.length>6){
-                    this.DataDetails =this.DataDetails.slice(0,6);
-                    this.$message('最多同时展示六个');
-                }
-                this.initChart(); 
-            })  
+           this.dataDetails.forEach((item, i) => {
+                this.tempArr[i]= device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type})
+            // this.queryDetails.push(this.getSensorDetails(item));            
+           })
+           Promise.all([...this.tempArr]).then(res => {
+               this.queryDetails = res   
+               this.$nextTick(() => {               
+                    if(this.dataDetails.length>6){
+                        this.DataDetails =this.DataDetails.slice(0,6);
+                        this.$message('最多同时展示六个');
+                    }
+                    this.initChart(this.queryDetails);
+                })                
+            })
+           
             window.onresize = () => {
                 return (() => {
                     this.setDialogWidth()
@@ -117,10 +127,11 @@
        },
 
         methods: {
-            getSensorDetails() { 
-                device.sensorDetails({sensor_data_id:this.dataDetails.sensor_data_id,sensor_type:this.dataDetails.sensor_type}).then(res => {
+            getSensorDetails(item) { 
+                console.log(this.dataDetails);
+                device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type}).then(res => {
                     console.log(res);
-                    this.DataDetails = res.data
+                    this.DataDetails.push(res.data)
                 })
             },
             getTrendDetail(){
@@ -143,37 +154,38 @@
 
                 // }
             },
-            initChart(){
+            initChart(res){
                 let This = this;               
-                this.dataDetails.forEach((item,idx)=>{
+                res.forEach((item,idx)=>{
                     //    let item = this.dataDetails[i];
+                    item = item.data;
                     if(JSON.stringify(item.sensor_info)=='{}'){
                         throw Error();
                     }
                     let data ; 
                     This.activeTab[idx] = 'common'
-                    let actualType = item.type.toLowerCase()             
-                    if(item.type=='Temp'){
+                    let actualType = item.sensor_type.toLowerCase()             
+                    if(item.sensor_type=='TEMP'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/temperature.js').data));
                         actualType = 'temperature'
-                        data.chartBody.series[0].dataList = item.sensor_info.params?Number(item.sensor_info.params.Temp.T):'';
-                    }else if(item.type=='TEV'){
+                        data.chartBody.series[0].dataList = Number(item.T);
+                    }else if(item.sensor_type=='TEV'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/tev.js').data));
-                            data.chartBody.axisInfo.value = item.sensor_info.params.TEV.amp;
-                    }else if(item.type=='AE'){
+                            data.chartBody.axisInfo.value = item.amp;
+                    }else if(item.sensor_type=='AE'){
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/ae.js').data));
-                        let maxvalue = item.sensor_info.params.AE.maxvalue;
+                        let maxvalue = item.maxvalue;
                         data.chartBody.series[0].dataList[0].value = Number(maxvalue).toFixed(2);//最大放电幅值
-                        data.chartBody.series[1].dataList[0].value = Number(item.sensor_info.params.AE.rmsvalue).toFixed(2);//有效放电幅值
-                        data.chartBody.series[2].dataList[0].value = Number(item.sensor_info.params.AE.harmonic1).toFixed(2);//频率分量1
-                        data.chartBody.series[3].dataList[0].value = Number(item.sensor_info.params.AE.harmonic2).toFixed(2);//频率分量2
+                        data.chartBody.series[1].dataList[0].value = Number(item.rmsvalue).toFixed(2);//有效放电幅值
+                        data.chartBody.series[2].dataList[0].value = Number(item.harmonic1).toFixed(2);//频率分量1
+                        data.chartBody.series[3].dataList[0].value = Number(item.harmonic2).toFixed(2);//频率分量2
                     }
                     else{
                         This.activeTab[idx] =  'prps'
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
-                        data.chartBody.axisInfo.zMaxValue = "Max="+item.sensor_info.params.UHF.ampmax
+                        data.chartBody.axisInfo.zMaxValue = "Max="+item.ampmax
                         actualType = 'prps3d';
-                        var  _data = item.sensor_info.params.UHF.prps;
+                        var  _data = item.prps;
                         var  temp = data.chartBody.series[0].dataList
                         for(var i=0;i<_data.length;i++){
                             temp[i][2] = _data[i];
