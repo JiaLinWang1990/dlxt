@@ -35,17 +35,6 @@
                                         start-placeholder="开始日期"
                                         end-placeholder="结束日期">
                                     </el-date-picker>
-                                   <!--  <el-col :span="11">
-                                    <el-form-item prop="date1">
-                                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-                                    </el-form-item>
-                                    </el-col>
-                                    <el-col class="line" :span="2">-</el-col>
-                                    <el-col :span="11">
-                                    <el-form-item prop="date2">
-                                        <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-                                    </el-form-item>
-                                    </el-col> -->
                                 </el-form-item>                       
                             </el-col>
                         </el-col>
@@ -75,16 +64,27 @@
                     </el-form>
                 </div>
                 <div class="table-content">
-                    <el-table :data="tableData" style="width: 100%">
+                    <el-table :data="tableData" style="width: 100%"  v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)">
                         <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
                         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                        <el-table-column align="center" prop="name"  width="200" label="设备名称" ></el-table-column>
-                        <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
-                        <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
-                        <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
-                        <el-table-column align="center" prop="state" label="报警状态" ></el-table-column>
-                        <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
-                        <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
+                        <el-table-column align="center" prop="equipment_name"  width="200" label="设备名称" ></el-table-column>
+                        <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
+                        <el-table-column align="center" prop="sensor_type" label="传感器类型" ></el-table-column>
+                        <el-table-column prop="update_time" align="center"  width="200"  label="报警时间"></el-table-column>
+                        <el-table-column align="center" label="报警状态" >
+                            <template slot-scope="props">
+                                <p>{{alarmLevel[props.row.alarm_level]}}</p>   
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="operator" align="center" label="处理情况">
+                            <template slot-scope="props">
+                                <p>{{props.row.is_processed?'已确认':'未确认'}}</p>   
+                            </template>
+                        </el-table-column>
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
                                 <el-button type="text" size="mini" @click="details">确认</el-button>                       
@@ -147,7 +147,11 @@
                         <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
                         <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
                         <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
-                        <el-table-column align="center" prop="state" label="报警状态" ></el-table-column>
+                        <el-table-column align="center" label="报警状态" >
+                            <template slot-scope="props">
+                            <p>{{alarmLevel[props.row.alarm_level]}}</p>   
+                        </template>
+                        </el-table-column>
                         <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
                         <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
                         <el-table-column align="center" label="操作">
@@ -169,8 +173,9 @@
 </template>
 
 <script>
- import tree from '@/components/tree.vue'
- import * as device from '@/data/device.js'
+import tree from '@/components/tree.vue'
+import * as warning from '@/data/warning.js'
+import * as device from '@/data/device.js'
    export default {
        name:'',
        components:{
@@ -183,21 +188,7 @@
                 showSearchBox:false,
                 isFold:false,
                 isFoldClass:'el-icon-s-fold',
-                tableData: [{
-                    state: '已确认',
-                    name:'长沙出线间隔A相刀闸',
-                    description: '描述',
-                    warningTime: '2021-09-11 01:50:20',
-                    ensureTime:'2021-09-11 01:52:20',
-                    operator:'张三',
-                },{
-                    state: '已确认',
-                    name:'长沙出线间隔A相刀闸',
-                    description: '描述',
-                    warningTime: '2021-09-11 01:50:20',
-                    ensureTime:'2021-09-11 01:52:20',
-                    operator:'张三',
-                },] ,
+                tableData: [] ,
                 form: {
                     name: '',
                     region: '', 
@@ -207,8 +198,10 @@
                 activeTab:'list',
                showDetails: false,
                dataRange:[],
+               loading: false,
+               alarmLevel:['正常','预警','报警'],
                searchForm:{
-                    "alarm_type": 0,
+                    "alarm_type": 2,
                     "sensor_type": "",
                     "start_date": "",
                     "end_data": "",
@@ -226,24 +219,33 @@
             this.searchForm.start_date = this.formatDate(this.dataRange[0])
             this.searchForm.end_date = this.formatDate(this.dataRange[1]);
         },
-        clickNode(v){},
+        clickNode(v) {
+            if(v.type=="site"){
+                this.loading = true;
+                this.getSiteList(v.id)
+            }else if(v.type=="equipment"){
+                this.loading = true;
+                this.getEquipmentList(v.id);             
+            }    
+        },
         showSearch(){},
         toggle(v){},
         getTreeData(){
-            device.queryDeviceTree().then(res=>{
+            device.queryTree().then(res=>{
                 if(!res) return;
                 this.treeData = res.data;
                 this.clickNode(res.data[0].children[0])                 
             })
         },
-        getSiteList() {
-            device.siteAlarmList().then(res => {
-                
+        getSiteList(id) {
+            warning.siteAlarmList({site_id:id,data:this.searchForm}).then(res => {
+                this.loading = false;
             })
         },
-        getEquipmentList() { 
-            device.equipmentAlarmList().then(res => {
-                
+        getEquipmentList(id) { 
+            warning.equipmentAlarmList({equipments_id:id,data:this.searchForm}).then(res => {
+                this.loading = false;
+                this.tableData = res.data.alarm_list;
             })
         },
         details(row){
@@ -291,6 +293,9 @@
     } 
     /deep/.el-tabs__item{
     font-size: 18px;background:#2C2E30;margin-right:2px;width:130px;padding:0;
-}  
+    }  
+    /deep/.el-table tbody tr:hover>td{
+        background: #3d3f44 !important;
+    }
 </style>
 
