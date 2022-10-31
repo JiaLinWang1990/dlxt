@@ -2,9 +2,10 @@
    <div style="overflow: auto;height: 100%" class="tree-box">
        <el-tree ref="tree" :default-expanded-keys="defaultKeys" :data="data" :props="defaultProps" @node-click="handleNodeClick"
        @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
-            <span class="span-ellipis" slot-scope="{node}">
-                <span :title="node.label">{{node.label}}</span>
-            </span>
+            <span class="span-ellipis" slot-scope="{node,data}">
+                <span :title="node.label">{{node.label }}</span>
+                <span v-if="data.type=='site'&&data.sensor_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.sensor_num?data.sensor_num:'')}}</span>
+            </span>            
        </el-tree>
        <div id="menu" v-show="showMenu" @mouseleave="showMenu =!showMenu" >
             <el-card class="box-card">

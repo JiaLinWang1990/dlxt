@@ -32,3 +32,15 @@ export function equipmentAlarmList(params = {}, callback) {
         "params":params.data
     },callback)
 }
+
+
+/* 处理告警 */
+export function handleAlarm(params = {}, callback) {
+    return axios.request({
+      "url" : baseUrl+'/alarms/'+params.alarm_id+"/",
+        "method": "put",
+        "data":params.data
+    },callback)
+}
+
+

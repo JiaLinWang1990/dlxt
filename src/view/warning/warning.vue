@@ -42,16 +42,18 @@
                             <el-col :span="12">
                                 <el-form-item label="报警状态">
                                     <el-select v-model="form.region" placeholder="请选择">
-                                        <el-option label="区域一" value="shanghai"></el-option>
-                                        <el-option label="区域二" value="beijing"></el-option>
+                                        <el-option label="全部" value=""></el-option>
+                                        <el-option label="预警" value="1"></el-option>
+                                        <el-option label="报警" value="2"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
                                 <el-form-item label="处理情况">
-                                <el-select v-model="form.region" placeholder="请选择">
-                                        <el-option label="区域一" value="shanghai"></el-option>
-                                        <el-option label="区域二" value="beijing"></el-option>
+                                    <el-select v-model="form.region" placeholder="请选择">
+                                        <el-option label="全部" value=""></el-option>
+                                        <el-option label="已确认" value="1"></el-option>
+                                        <el-option label="未确认" value="1"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>                        
@@ -82,12 +84,12 @@
                         <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
                         <el-table-column prop="operator" align="center" label="处理情况">
                             <template slot-scope="props">
-                                <p>{{props.row.is_processed?'已确认':'未确认'}}</p>   
+                                <p>{{props.row.is_processed?'已处理':'未处理'}}</p>   
                             </template>
                         </el-table-column>
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
-                                <el-button type="text" size="mini" @click="details">确认</el-button>                       
+                                <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
                                 <el-button type="text" size="mini" @click="showChart">查看</el-button>
                             </template>
                         </el-table-column>
@@ -156,7 +158,7 @@
                         <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
-                                <el-button type="text" size="mini" @click="details">确认</el-button>                       
+                                <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
                                 <el-button type="text" size="mini" @click="showChart">查看</el-button>
                             </template>
                         </el-table-column>
@@ -165,7 +167,7 @@
             </div>
         </div>
         <div v-if="showDetails">
-            <Details :visible.sync="showDetails"></Details>
+            <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode"></Details>
         </div>
        
         
@@ -199,7 +201,9 @@ import * as device from '@/data/device.js'
                showDetails: false,
                dataRange:[],
                loading: false,
-               alarmLevel:['正常','预警','报警'],
+               alarmLevel: ['正常', '预警', '报警'],
+               detailsInfo: {},
+               currentNodeInfo: {},
                searchForm:{
                     "alarm_type": 2,
                     "sensor_type": "",
@@ -220,12 +224,19 @@ import * as device from '@/data/device.js'
             this.searchForm.end_date = this.formatDate(this.dataRange[1]);
         },
         clickNode(v) {
-            if(v.type=="site"){
+            let obj;
+            if (!v) {
+                obj = this.currentNodeInfo
+            } else {
+                obj = v;
+                this.currentNodeInfo = v;
+            }
+            if(obj.type=="site"){
                 this.loading = true;
-                this.getSiteList(v.id)
-            }else if(v.type=="equipment"){
+                this.getSiteList(obj.id)
+            }else if(obj.type=="equipment"){
                 this.loading = true;
-                this.getEquipmentList(v.id);             
+                this.getEquipmentList(obj.id);             
             }    
         },
         showSearch(){},
@@ -248,7 +259,8 @@ import * as device from '@/data/device.js'
                 this.tableData = res.data.alarm_list;
             })
         },
-        details(row){
+        handle(row) {
+            this.detailsInfo = row;
             this.showDetails = true;
         },
         showChart(){

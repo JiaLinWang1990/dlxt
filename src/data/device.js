@@ -124,4 +124,15 @@ export function sensorDetails(params={},callback){
       "url" : baseUrl+"/sensor/"+params.sensor_data_id+'/sensor_type/'+params.sensor_type+'/',
       "method" : "get",
     },callback)
-  }
+}
+  
+
+
+//地图页面接口
+export function queryTrees(params={},callback){
+    return axios.request({
+      "url" : baseUrl+'/map/customer-tress/',
+      "method" : "get",
+      "params":params
+    },callback)
+}

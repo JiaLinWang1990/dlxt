@@ -74,7 +74,8 @@ import * as echarts from 'echarts';
 import 'echarts/extension/bmap/bmap'
 import  amap  from './map.vue';
  import tree from '@/components/tree.vue'
- import * as device from '@/data/device.js'
+import * as device from '@/data/device.js'
+import * as map from '@/data/map.js'
    export default {
        name:'',
        components:{amap,tree},
@@ -117,12 +118,41 @@ import  amap  from './map.vue';
        methods: {
             getTreeData(){
                 let This = this;
-                device.queryTree().then(res=>{
+                device.queryTrees().then(res=>{
                     if(!res) return;
                     This.treeData = res.data;
                 })
             },
-            clickNode(){},
+           clickNode(v) { 
+               if (v.type == "customer") {
+                   this.customerStatus(v.id)
+                   map.abnormalRatio({customer_id:v.id}).then(res => { 
+                    console.log(res,'公司异常电力设备异常趋势率');
+                   })
+                   map.customerAbnormal({customer_id:v.id}).then(res => { 
+                    console.log(res,'公司异常情况处理统计');
+                   })
+                }else if (v.type == "site") {
+                   this.siteStatus(v.id)
+                  /*  map.latestAlarms().then(res => { 
+                    console.log(res,'最新三条');
+                   }) */
+                   map.siteAbnormal({site_id:v.id}).then(res => { 
+                    console.log(res,'站点异常情况处理统计');
+                   })
+                    
+                }  
+           },
+           customerStatus(id) { 
+               map.companyStatus({ customer_id: id, data:{is_refresh: true} }).then(res => { 
+                console.log(res,'公司状态');
+               })
+           },
+           siteStatus(id) { 
+               map.siteStatus({ site_id: id, data:{is_refresh: true} }).then(res => { 
+                console.log(res,'站点状态');
+               })
+           },
            initCharts(){
                 this.initCharts1();
                 this.initCharts2();
@@ -614,10 +644,14 @@ import  amap  from './map.vue';
          height:100%;width:100%;
          display:flex;flex:1;flex-flow: column;position:relative;
          .map-tree{            
-            position:absolute;max-height:calc(100% - 200px);overflow:auto;
+            position:absolute;max-height:calc(100% - 200px); 
             width:200px;top:10px;left:10px;background: #ccc;z-index: 1000;
             /deep/.el-tree{
                 background:#2C2F32;color:#fff;
+                overflow:hidden;white-space: nowrap;text-overflow: ellipsis;
+                .span-ellipis{
+                    overflow:hidden;white-space: nowrap;text-overflow: ellipsis;
+                }
             }
          }
      }

@@ -7,42 +7,45 @@
                     <div style="display:table">
                         <el-col :span="24">
                             <el-col :span="5"> 报警时间：</el-col>
-                            <el-col :span="17">{{detailsInfo.warningTime}}</el-col>                        
+                            <el-col :span="17">{{detailsInfo.update_time}}</el-col>                        
                         </el-col>
                         <el-col :span="24">
                             <el-col :span="5"> 设备名称：</el-col>
-                            <el-col :span="17">{{detailsInfo.deviceName}}</el-col>                        
-                        </el-col>
+                            <el-col :span="17">{{detailsInfo.equipment_name}}</el-col>                        
+                        </el-col><!-- 
                         <el-col :span="24">
                             <el-col :span="5"> 站点名称：</el-col>
-                            <el-col :span="17">{{detailsInfo.siteName}}</el-col>                        
-                        </el-col>
+                            <el-col :span="17">{{detailsInfo.point_name}}</el-col>                        
+                        </el-col> -->
                         <el-col :span="24">
                             <el-col :span="5"> 测点名称：</el-col>
-                            <el-col :span="17">{{detailsInfo.pointName}}</el-col>                        
+                            <el-col :span="17">{{detailsInfo.point_name}}</el-col>                        
                         </el-col>
                         <el-col :span="24">
                             <el-col :span="5"> 传感器类型：</el-col>
-                            <el-col :span="17">{{detailsInfo.sensorType}}</el-col>                        
+                            <el-col :span="17">{{detailsInfo.sensor_type}}</el-col>                        
                         </el-col>
                         <el-col :span="24">
                             <el-col :span="5"> 报警状态：</el-col>
-                            <el-col :span="17">{{detailsInfo.state}}</el-col>                        
+                            <el-col :span="17">{{alarmLevel[detailsInfo.alarm_level]}}</el-col>                        
                         </el-col>
                         <el-col :span="24">
                             <el-col :span="5"> 报警描述：</el-col>
-                            <el-col :span="17">{{detailsInfo.description}}</el-col>                        
+                            <el-col :span="17">{{detailsInfo.alarm_describe}}</el-col>                        
                         </el-col>
                     </div>   
                     <div class="form-class">
                          <p class="info-title">报警处理</p>
                          <el-form :model="handleForm" label-position="left">
                            <el-form-item label="处理结果："  label-width="98px">
-                                <el-radio v-model="handleForm.result" label="1">已处理</el-radio>
-                                <el-radio v-model="handleForm.result" label="2">未处理</el-radio>
+                            <el-radio-group v-model="handleForm.is_processed">
+                                <el-radio label="true">已处理</el-radio>
+                                <el-radio label="false">未处理</el-radio>
+                            </el-radio-group>
+                                
                            </el-form-item>
                                 <el-form-item label="处理意见：" label-width="98px">
-                                    <el-input type="textarea" placeholder="请输入内容" v-model="handleForm.description">
+                                    <el-input type="textarea" placeholder="请输入内容" v-model="handleForm.processed_remarks">
                                 </el-input>
                            </el-form-item>
                          </el-form>
@@ -51,36 +54,33 @@
                 </div>
             </div>   
              <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                <el-button @click="showDetails = false">取 消</el-button>
+                <el-button type="primary" @click="handleAlarm">确 定</el-button>
             </span>         
         </el-dialog>
     </div>
 </template>
 <script>
+import * as warning from '@/data/warning.js'
 export default {
    data() {
       return {
-        showClo:false,
-        detailsInfo:{
-            warningTime:"2022-07-11 15:59:00",
-            deviceName:'长沙出线间隔A相刀闸',
-            siteName:'长沙站',
-            pointName:'测点1',
-            sensorType:'AE',
-            state:'告警',
-            description:'悬浮放电100%',
-        },
+        showClo:false,       
         handleForm:{
-            result:'',
-            description:'',
-        }
+            is_processed:'',
+            processed_remarks:'',
+          },
+          alarmLevel: ['正常', '预警', '报警'],
       }
    },
     props:{
         visible:{
             type:Boolean,
             default:false
+        },
+        detailsInfo: {
+            type: Object,
+            default: {}
         }
     },
    computed:{
@@ -95,9 +95,17 @@ export default {
        },
    created(){
    },
-   mounted(){
+    mounted() {
    },
-   methods:{
+    methods: {
+        handleAlarm(row) {            
+            warning.handleAlarm({data:this.handleForm,alarm_id:this.detailsInfo.alarm_id}).then(res => {
+                console.log(res,);
+                this.$message({ type: 'success', message: '修改成功' }); 
+                this.$emit("clickNode");
+                this.showDetails = false
+            })
+        }
    },
 }
 </script>

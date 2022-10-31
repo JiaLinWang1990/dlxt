@@ -1,6 +1,45 @@
 <template>
     <div  style="height: 100%">
-        <div style="display: flex;height: 100%;">
+        <div class="z-block search-block">
+                <div >
+                    主机档案导入
+                    <el-input
+                        v-model="searchForm.siteName"
+                        style="width: 300px;"
+                        placeholder="导入.CSV格式档案数据文件"
+                    ></el-input>
+                    <el-upload class="upload-demo" ref="upload"  :http-request="uploadFunction"
+                    :show-file-list="false" action="string" accept=".xls,.xlsx">
+                        <el-button size="small" type="primary">导入</el-button>
+                    </el-upload>
+                </div>
+                <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
+                    <span style="height:40px;line-height: 40px;display:inline-block;">主机档案导出</span>
+                    <el-form-item label="站点名称：">
+                        <el-input v-model="searchForm.siteName" placeholder="请输入站点名称"></el-input>
+                    </el-form-item>
+                    <el-form-item label="公司名称：">
+                        <el-input v-model="searchForm.company" placeholder="请输入公司名称"></el-input>
+                    </el-form-item>
+                    <el-form-item label="传感器类型：">
+                        <el-select v-model="searchForm.degree" placeholder="电压等级">
+                            <el-option label="10kV" value="10kV"></el-option>
+                            <el-option label="20kV" value="20kV"></el-option>
+                            <el-option label="35kV" value="35kV"></el-option>
+                            <el-option label="35kV" value="35kV"></el-option>
+                            <el-option label="110kV" value="110kV"></el-option>
+                            <el-option label="220kV" value="220kV"></el-option>
+                            <el-option label="330kV" value="330kV"></el-option>
+                            <el-option label="500kV" value="500kV"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button size="small" type="primary" @click="onExport">导出</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        <div style="display: flex;height: calc(100% - 141px);margin-top:10px;">
+            
             <div class="z-block file-menu">
                 <div class="block-title">设备导航</div>
                 <div style="height:calc(100% - 50px);position:relative">
@@ -251,6 +290,8 @@ export default {
     },
 
     methods: {
+        uploadFunction() { },
+        onExport() { },
         add(obj,n){
             this.addDevice();
             if(n==2){
