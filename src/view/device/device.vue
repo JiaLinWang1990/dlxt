@@ -290,7 +290,16 @@ export default {
     },
 
     methods: {
-        uploadFunction() { },
+        uploadFunction(item){
+            let formData = new FormData();
+            formData.append('file',item.file);
+            device.importFile({
+                data:formData
+            }).then(res=>{
+                this.$message({type:'success', message: '导入成功'});
+                this.getTreeData();
+            })
+        },
         onExport() { },
         add(obj,n){
             this.addDevice();

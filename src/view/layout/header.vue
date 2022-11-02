@@ -105,8 +105,7 @@ import {MessageBox} from 'element-ui';
                 account.editUserInfo({data:this.form,userId:this.userInfo.id}).then(res=>{
                     console.log(res,'res')
                     this.editUserDialog = false;
-                })
-                
+                })                
            } 
        }
    }
@@ -132,5 +131,8 @@ import {MessageBox} from 'element-ui';
     .time{
         padding-right:10px;font-size: 14px;;
     }
+    /deep/.el-dropdown-menu{
+        padding:0;
     }
+}
 </style>

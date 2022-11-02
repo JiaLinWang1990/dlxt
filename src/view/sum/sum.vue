@@ -208,7 +208,13 @@ import * as map from '@/data/map.js'
                         }
                     }
                 ];
-                let option = {
+               let option = {
+                    title: {
+                        text: '资产统计',
+                        textStyle:{
+                            color:'#fff'
+                        }
+                    },
                     series: [
                         {
                             type: 'gauge',

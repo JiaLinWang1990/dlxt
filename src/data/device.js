@@ -136,3 +136,16 @@ export function queryTrees(params={},callback){
       "params":params
     },callback)
 }
+
+
+
+/*导入网关*/ 
+export function importFile(params={},callback){
+    return axios.request({
+      "url" : baseUrl+"/gateway_file_import/",
+      "method" : "post",
+      "data":params.data
+    },callback)
+  }
+  
+
