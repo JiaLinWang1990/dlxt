@@ -41,7 +41,7 @@
                         <el-col :span="14">
                             <el-col :span="12">
                                 <el-form-item label="报警状态">
-                                    <el-select v-model="form.region" placeholder="请选择">
+                                    <el-select v-model="searchForm.alarm_level" placeholder="请选择">
                                         <el-option label="全部" value=""></el-option>
                                         <el-option label="预警" value="1"></el-option>
                                         <el-option label="报警" value="2"></el-option>
@@ -50,16 +50,16 @@
                             </el-col>
                             <el-col :span="12">
                                 <el-form-item label="处理情况">
-                                    <el-select v-model="form.region" placeholder="请选择">
+                                    <el-select v-model="searchForm.is_processed" placeholder="请选择">
                                         <el-option label="全部" value=""></el-option>
-                                        <el-option label="已确认" value="1"></el-option>
-                                        <el-option label="未确认" value="1"></el-option>
+                                        <el-option label="已处理" value="true"></el-option>
+                                        <el-option label="未处理" value="false"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>                        
                         </el-col>                
                         <el-form-item  class='btn-group'>
-                            <el-button size="small" type="primary">查询</el-button>
+                            <el-button size="small" type="primary" @click="queryList">查询</el-button>
                             <el-button size="small">重置</el-button>
                             <el-button size="small">批量确认</el-button>
                         </el-form-item>
@@ -209,7 +209,7 @@ import * as device from '@/data/device.js'
                     "sensor_type": "",
                     "start_date": "",
                     "end_data": "",
-                    "alarm_level": 1, 
+                    "alarm_level": "", 
                     "is_processed": '',
                 }
            }
@@ -219,9 +219,30 @@ import * as device from '@/data/device.js'
        },
 
     methods: {
+        queryList(){
+            if(this.activeTab =='list'){
+                if(this.currentNodeInfo.type=='site'){
+                    this.getSiteList(this.currentNodeInfo.id)
+                }else if(this.currentNodeInfo.type=='equipment'){
+                    this.getEquipmentList(this.currentNodeInfo.id)
+                }
+                
+            }
+        },
         selectDate() {
-            this.searchForm.start_date = this.formatDate(this.dataRange[0])
-            this.searchForm.end_date = this.formatDate(this.dataRange[1]);
+            if(this.dataRange){
+                this.searchForm.start_date = this.formatDate(this.dataRange[0])
+                this.searchForm.end_date = this.formatDate(this.dataRange[1]);
+            }else{
+                this.searchForm.start_date = this.searchForm.end_date = ""
+            }
+           },
+        formatDate(date){
+            //    if(!data) return;
+            return date.getFullYear()+'-'+this.timeFormat(date.getMonth()+1)+'-'+this.timeFormat(date.getDate())+' '+this.timeFormat(date.getHours())+':'+this.timeFormat(date.getMinutes())+':'+this.timeFormat(date.getSeconds());
+        },
+        timeFormat(v){
+            return v<10?'0'+v:v
         },
         clickNode(v) {
             let obj;
@@ -231,6 +252,7 @@ import * as device from '@/data/device.js'
                 obj = v;
                 this.currentNodeInfo = v;
             }
+            console.log(this.currentNodeInfo,666);
             if(obj.type=="site"){
                 this.loading = true;
                 this.getSiteList(obj.id)
@@ -251,6 +273,7 @@ import * as device from '@/data/device.js'
         getSiteList(id) {
             warning.siteAlarmList({site_id:id,data:this.searchForm}).then(res => {
                 this.loading = false;
+                this.tableData = res.data.alarm_list;
             })
         },
         getEquipmentList(id) { 

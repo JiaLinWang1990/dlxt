@@ -88,10 +88,10 @@
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                     <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
-                    <el-table-column prop="sensor_type" align="center" label="传感器类型"></el-table-column>
+                    <el-table-column prop="sensor_type" align="center"  width="90" label="传感器类型"></el-table-column>
                     <el-table-column prop="battery" align="center" label="工作状态" width="200" show-overflow-tooltip>
                        <template slot-scope="props">
-                            <p>{{(props.row.is_online?'在线:':'离线')+'电量'+props.row.battery+', RSSI '}}</p>        
+                            <p>{{(props.row.is_online?'在线:':'离线')+'电量'+props.row.battery+'%, RSSI '}}</p>        
                             <p>{{props.row.rssi+'dBm, SNR:'+props.row.snr+'BM'}}</p>
                         </template>  
                     </el-table-column>

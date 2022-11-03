@@ -21,12 +21,12 @@
                         <div class="notify-title">最新异常通知</div>
                         <div class="notify-table">
                             <el-table :data="tableData" style="width: 100%">
-                                <el-table-column prop="date" label="报警时间" width="100"></el-table-column>
-                                <el-table-column prop="deviceName" width="170" label="设备名称"></el-table-column>
-                                <el-table-column prop="siteName" label="站点名称"></el-table-column>
-                                <el-table-column prop="pointName" label="测点名称"></el-table-column>
-                                <el-table-column prop="deviceType" width="110" label="传感器类型"></el-table-column>
-                                <el-table-column prop="state" label="报警状态"></el-table-column>
+                                <el-table-column prop="create_date" label="报警时间" width="140"></el-table-column>
+                                <el-table-column prop="equipment_name" width="170" label="设备名称"></el-table-column>
+                                <el-table-column prop="site_name" label="站点名称"></el-table-column>
+                                <!--<el-table-column prop="pointName" label="测点名称"></el-table-column>-->
+                                <el-table-column prop="sensor_type" width="110" label="传感器类型"></el-table-column>
+                                <el-table-column prop="alarm_level" label="报警状态"></el-table-column>
                             </el-table>
                         </div>
                     </div>
@@ -82,29 +82,9 @@ import * as map from '@/data/map.js'
        data(){
            return {
                myChart:null,
-               tableData: [{
-                    date: '2021-10-02',
-                    deviceName: '长沙出线间隔A相刀闸',
-                    siteName:'站点1',
-                    pointName: '测点1',
-                    deviceType:'AE',
-                    state:'告警'
-                    }, {
-                    date: '2021-10-04',
-                    deviceName: '长沙出线间隔A相刀闸',
-                    siteName:'站点1',
-                    pointName: '测点1',
-                    deviceType:'TEV',
-                    state:'告警'
-                    }, {
-                    date: '2021-10-05',
-                    deviceName: '长沙出线间隔A相刀闸',
-                    siteName:'站点1',
-                    pointName: '测点1',
-                    deviceType:'UHF',
-                    state:'预警'
-                    }],
+               tableData: [],
                 treeData:[],
+                customerInfos:{}
            }
        },
        mounted(){
@@ -121,6 +101,9 @@ import * as map from '@/data/map.js'
                 device.queryTrees().then(res=>{
                     if(!res) return;
                     This.treeData = res.data;
+                    console.log(res.data,999);
+                    // This.clickNode()
+                    res.data.length && res.data[0] && This.clickNode(res.data[0])
                 })
             },
            clickNode(v) { 
@@ -134,9 +117,10 @@ import * as map from '@/data/map.js'
                    })
                 }else if (v.type == "site") {
                    this.siteStatus(v.id)
-                  /*  map.latestAlarms().then(res => { 
+                   map.latestAlarms().then(res => { 
+                    this.tableData = res.data;
                     console.log(res,'最新三条');
-                   }) */
+                   }) 
                    map.siteAbnormal({site_id:v.id}).then(res => { 
                     console.log(res,'站点异常情况处理统计');
                    })
@@ -146,6 +130,9 @@ import * as map from '@/data/map.js'
            customerStatus(id) { 
                map.companyStatus({ customer_id: id, data:{is_refresh: true} }).then(res => { 
                 console.log(res,'公司状态');
+                this.customerInfos = res.data;
+                this.initCharts1();
+                this.initCharts2();
                })
            },
            siteStatus(id) { 
@@ -154,8 +141,8 @@ import * as map from '@/data/map.js'
                })
            },
            initCharts(){
-                this.initCharts1();
-                this.initCharts2();
+                // this.initCharts1();
+                // this.initCharts2();
                 this.initCharts3();
                 this.initCharts4();
                 this.initCharts5();
@@ -165,7 +152,7 @@ import * as map from '@/data/map.js'
                this.myChart = echarts.init(this.$refs.property);
                const gaugeData = [
                     {
-                        value: 20,
+                        value: this.customerInfos.asset_info.site_num,
                         name: '站点',
                         title: {
                             offsetCenter: ['-35%', '-15%']
@@ -176,7 +163,7 @@ import * as map from '@/data/map.js'
                         }
                     },
                     {
-                        value: 40,
+                        value: this.customerInfos.asset_info.point_num,
                         name: '测点',
                         title: {
                             offsetCenter: ['-35%', '35%']
@@ -187,7 +174,7 @@ import * as map from '@/data/map.js'
                         }
                     },
                     {
-                        value: 60,
+                        value: this.customerInfos.asset_info.equipment_num,
                         name: '一次设备',
                         title: {
                             offsetCenter: ['35%', '-15%']
@@ -197,7 +184,7 @@ import * as map from '@/data/map.js'
                             offsetCenter: ['35%', '-35%']
                         }
                     },{
-                        value: 60,
+                        value: this.customerInfos.asset_info.sensor_num,
                         name: '传感器',
                         title: {
                             offsetCenter: ['35%', '35%']
@@ -218,7 +205,7 @@ import * as map from '@/data/map.js'
                     series: [
                         {
                             type: 'gauge',
-                            radius:'125',
+                            radius:'100%',
                             startAngle: 90,
                             endAngle: -270,
                             pointer: {
@@ -273,6 +260,16 @@ import * as map from '@/data/map.js'
                 this.myChart.setOption(option);
            },
            initCharts2(){
+                let statusList = this.customerInfos.equipment_status_info;
+                let alarmList=[],normalList=[],warningList=[],sumList=[],siteNameList=[];
+                statusList.forEach(item=>{
+                    alarmList.push(item.alarm_num)
+                    normalList.push(item.normal_num)
+                    warningList.push(item.warning_num)
+                    sumList.push(item.total)
+                    siteNameList.push(item.site_name)
+                })
+
                this.myChart = echarts.init(this.$refs.state);
                 var option = {
                      title: {
@@ -304,7 +301,7 @@ import * as map from '@/data/map.js'
                         {
                             type: 'category',
                             axisTick: {show: false},
-                            data: ['站点一', '站点二', '站点三', '站点四', '站点五'],
+                            data: siteNameList,
                             axisLabel:{
                                 color:'#fff'
                             }
@@ -320,22 +317,22 @@ import * as map from '@/data/map.js'
                             name: '测点总数',
                             type: 'bar',
                             barGap: 0,
-                            data: [320, 332, 301, 334, 390]
+                            data: sumList
                         },
                         {
                             name: '正常',
                             type: 'bar',
-                            data: [220, 182, 191, 234, 290]
+                            data: normalList
                         },
                         {
                             name: '预警',
                             type: 'bar',
-                            data: [150, 232, 201, 154, 190]
+                            data: warningList
                         },
                         {
                             name: '告警',
                             type: 'bar',
-                            data: [98, 77, 101, 99, 40]
+                            data: alarmList
                         }
                     ]
                     };

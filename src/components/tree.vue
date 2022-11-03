@@ -4,7 +4,7 @@
        @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node,data}">
                 <span :title="node.label">{{node.label }}</span>
-                <span v-if="data.type=='site'&&data.sensor_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.sensor_num?data.sensor_num:'')}}</span>
+                <span v-if="data.type=='site'&&data.unprocessed_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.unprocessed_num?data.unprocessed_num:'')}}</span>
             </span>            
        </el-tree>
        <div id="menu" v-show="showMenu" @mouseleave="showMenu =!showMenu" >

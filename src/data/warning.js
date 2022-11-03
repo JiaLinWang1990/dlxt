@@ -14,7 +14,7 @@ function handlerPaging(params={}){
 
 /* 站点下告警列表 */
 export function siteAlarmList(params = {}, callback) {
-    handlerPaging(params);
+    handlerPaging(params.data);
     return axios.request({
       "url" : baseUrl+'/sites/'+params.site_id+"/alarm_info/",
         "method": "get",
