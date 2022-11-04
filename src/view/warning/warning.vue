@@ -60,7 +60,7 @@
                         </el-col>                
                         <el-form-item  class='btn-group'>
                             <el-button size="small" type="primary" @click="queryList">查询</el-button>
-                            <el-button size="small">重置</el-button>
+                            <el-button size="small"  @click="reset">重置</el-button>
                             <el-button size="small">批量确认</el-button>
                         </el-form-item>
                     </el-form>
@@ -229,6 +229,14 @@ import * as device from '@/data/device.js'
                 
             }
         },
+        reset() { 
+            this.dataRange = [];
+            this.searchForm.alarm_level = '';
+            this.searchForm.is_processed = '';
+            this.searchForm.start_date = '';
+            this.searchForm.end_date = '';
+            this.queryList();
+        },
         selectDate() {
             if(this.dataRange){
                 this.searchForm.start_date = this.formatDate(this.dataRange[0])
@@ -331,6 +339,9 @@ import * as device from '@/data/device.js'
     }  
     /deep/.el-table tbody tr:hover>td{
         background: #3d3f44 !important;
+    }
+    /deep/.el-range-input{
+        background:transparent
     }
 </style>
 

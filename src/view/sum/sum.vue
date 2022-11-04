@@ -52,12 +52,12 @@
                                         <td>本月</td>
                                     </tr>
                                      <tr>
-                                        <td>0 / 4</td>
-                                        <td>3 / 10</td>
-                                        <td>12 / 24</td>
+                                        <td>{{countAbnormal.dayProcessedNum+' / '+countAbnormal.dayAlarmNum}}</td>
+                                        <td>{{countAbnormal.weekProcessedNum+' / '+countAbnormal.weekAlarmNum}}</td>
+                                        <td>{{countAbnormal.monthProcessedNum+' / '+countAbnormal.monthAlarmNum}}</td>
                                     </tr>
                                      <tr style="text-align:center;">
-                                        <td colspan="3">14 / 38</td>                                        
+                                        <td colspan="3">{{countAbnormal.sumProcessedNum+' / '+countAbnormal.sumAlarmNum}}</td>                                        
                                     </tr>
                                 </table>
                             </div>
@@ -84,12 +84,17 @@ import * as map from '@/data/map.js'
                myChart:null,
                tableData: [],
                 treeData:[],
-                customerInfos:{}
+                customerInfos:{},
+                abnormalInfos:{},
+                countAbnormal:{}
            }
        },
        mounted(){
-            this.initCharts();
-            this.getTreeData();
+            // this.initCharts();
+            this.$nextTick(()=>{
+                this.getTreeData();
+            })
+           
             window.onresize = ()=>{
                 this.initCharts();
             }
@@ -101,8 +106,6 @@ import * as map from '@/data/map.js'
                 device.queryTrees().then(res=>{
                     if(!res) return;
                     This.treeData = res.data;
-                    console.log(res.data,999);
-                    // This.clickNode()
                     res.data.length && res.data[0] && This.clickNode(res.data[0])
                 })
             },
@@ -111,38 +114,66 @@ import * as map from '@/data/map.js'
                    this.customerStatus(v.id)
                    map.abnormalRatio({customer_id:v.id}).then(res => { 
                     console.log(res,'公司异常电力设备异常趋势率');
+                    this.abnormalInfos = res.data;
+                    this.initCharts3();
                    })
+                   map.customerLatestAlarms({customer_id:v.id}).then(res => { 
+                    this.tableData = res.data;
+                    console.log(res,'公司最新三条');
+                   }) 
                    map.customerAbnormal({customer_id:v.id}).then(res => { 
+                    let tmp = res.data
+                    this.countAbnormal = {
+                        dayProcessedNum:tmp.customer_day_abnormal_info.processed_num,
+                        dayAlarmNum:tmp.customer_day_abnormal_info.alarm_num,
+                        weekProcessedNum:tmp.customer_week_abnormal_info.processed_num,
+                        weekAlarmNum:tmp.customer_week_abnormal_info.alarm_num,
+                        monthProcessedNum:tmp.customer_month_abnormal_info.processed_num,
+                        monthAlarmNum:tmp.customer_month_abnormal_info.alarm_num,
+                        sumProcessedNum:tmp.customer_month_abnormal_info.processed_num+tmp.customer_week_abnormal_info.processed_num+tmp.customer_day_abnormal_info.processed_num,
+                        sumAlarmNum:tmp.customer_month_abnormal_info.alarm_num+tmp.customer_week_abnormal_info.alarm_num+tmp.customer_day_abnormal_info.alarm_num
+                    };
                     console.log(res,'公司异常情况处理统计');
                    })
                 }else if (v.type == "site") {
                    this.siteStatus(v.id)
-                   map.latestAlarms().then(res => { 
+                   map.siteLatestAlarms({site_id:v.id}).then(res => { 
                     this.tableData = res.data;
-                    console.log(res,'最新三条');
+                    console.log(res,'站点最新三条');
                    }) 
                    map.siteAbnormal({site_id:v.id}).then(res => { 
                     console.log(res,'站点异常情况处理统计');
+                    let tmp = res.data
+                    this.countAbnormal = {
+                        dayProcessedNum:tmp.site_day_abnormal_info.processed_num,
+                        dayAlarmNum:tmp.site_day_abnormal_info.alarm_num,
+                        weekProcessedNum:tmp.site_week_abnormal_info.processed_num,
+                        weekAlarmNum:tmp.site_week_abnormal_info.alarm_num,
+                        monthProcessedNum:tmp.site_month_abnormal_info.processed_num,
+                        monthAlarmNum:tmp.site_month_abnormal_info.alarm_num,
+                        sumProcessedNum:tmp.site_month_abnormal_info.processed_num+tmp.site_week_abnormal_info.processed_num+tmp.site_day_abnormal_info.processed_num,
+                        sumAlarmNum:tmp.site_month_abnormal_info.alarm_num+tmp.site_week_abnormal_info.alarm_num+tmp.site_day_abnormal_info.alarm_num
+                    };
+                    // this.initCharts5();
                    })
                     
                 }  
            },
            customerStatus(id) { 
                map.companyStatus({ customer_id: id, data:{is_refresh: true} }).then(res => { 
-                console.log(res,'公司状态');
                 this.customerInfos = res.data;
                 this.initCharts1();
                 this.initCharts2();
+                this.initCharts4();
                })
            },
            siteStatus(id) { 
                map.siteStatus({ site_id: id, data:{is_refresh: true} }).then(res => { 
-                console.log(res,'站点状态');
                })
            },
            initCharts(){
-                // this.initCharts1();
-                // this.initCharts2();
+                this.initCharts1();
+                this.initCharts2();
                 this.initCharts3();
                 this.initCharts4();
                 this.initCharts5();
@@ -339,15 +370,7 @@ import * as map from '@/data/map.js'
                 this.myChart.setOption(option);
            },
            initCharts3(){
-               var data=[
-                    [ "2000-06-05", 116 ],
-                    [ "2000-06-06", 129 ],
-                    [ "2000-06-07", 135 ],
-                    [ "2000-06-08", 86 ],
-                    [ "2000-06-09", 73 ],
-                    [ "2000-06-10", 85 ],
-                    ["2000-06-11", 73 ], [ "2000-06-12", 68 ], [ "2000-06-13", 92 ], [ "2000-06-14", 130 ], [ "2000-06-15", 245 ], [ "2000-06-16", 139 ], [ "2000-06-17", 115 ], [ "2000-06-18", 111 ], [ "2000-06-19", 309 ], [ "2000-06-20", 206 ], [ "2000-06-21", 137 ], [ "2000-06-22", 128 ], [ "2000-06-23", 85 ], [ "2000-06-24", 94 ], [ "2000-06-25", 71 ], [ "2000-06-26", 106 ], [ "2000-06-27", 84 ], [ "2000-06-28", 93 ], [ "2000-06-29", 85 ], [ "2000-06-30", 73 ], [ "2000-07-01", 83 ], [ "2000-07-02", 125 ], [ "2000-07-03", 107 ], [ "2000-07-04", 82 ], [ "2000-07-05", 44 ], [ "2000-07-06", 72 ], [ "2000-07-07", 106 ], [ "2000-07-08", 107 ], [ "2000-07-09", 66 ], [ "2000-07-10", 91 ], [ "2000-07-11", 92 ], [ "2000-07-12", 113 ], [ "2000-07-13", 107 ], [ "2000-07-14", 131 ], [ "2000-07-15", 111 ],
-                ];
+               var data=this.abnormalInfos;
                this.myChart = echarts.init(this.$refs.unusual);
                 var option = {
                     title: {
@@ -438,6 +461,16 @@ import * as map from '@/data/map.js'
                 this.myChart.setOption(option);
            },
            initCharts4(){
+                let tmp = this.customerInfos.point_distribution_info;
+                let obj = {};
+                tmp.forEach(item=>{
+                    obj[item.sensor_type] = [
+                        { value: item.alarm_num+item.normal_num+item.warning_num, name: '总数' },
+                        { value: item.normal_num, name: '正常' },
+                        { value: item.warning_num, name: '预警' },
+                        { value: item.alarm_num, name: '告警' },
+                    ]
+                })
                 this.myChart = echarts.init(this.$refs.point);
                 var option = {
                     title:[
@@ -506,67 +539,46 @@ import * as map from '@/data/map.js'
                         {
                             name: '特高频传感器',
                             type: 'pie',
-                            radius: [10, 60],
+                            radius: [10, 40],
                             center: ['25%', '25%'],
                             roseType: 'radius',
                             label: {
                                 show: false
                             },
-                            data: [
-                                { value: 40, name: '总数' },
-                                { value: 23, name: '正常' },
-                                { value: 12, name: '预警' },
-                                { value: 5, name: '告警' },
-                            ]
+                            data: obj.UHF
                         },
                         {
                             name: '温度传感器',
                             type: 'pie',
-                            radius: [10, 60],
+                            radius: [10, 40],
                             center: ['75%', '25%'],
                             roseType: 'area',  
                             label: {
                                 show: false
                             },                      
-                            data: [
-                                { value: 30, name: '总数' },
-                                { value: 20, name: '正常' },
-                                { value: 8, name: '预警' },
-                                { value: 2, name: '告警' }
-                            ]
+                            data: obj.TEMP
                         },
                          {
                             name: '电压传感器',
                             type: 'pie',
-                            radius: [10, 60],
+                            radius: [10, 40],
                             center: ['25%', '75%'],
                             roseType: 'area',    
                             label: {
                                 show: false
                             },                      
-                            data: [
-                                { value: 40, name: '总数' },
-                                { value: 28, name: '正常' },                            
-                                { value: 10, name: '预警' },
-                                { value: 2, name: '告警' }
-                            ]
+                            data: obj.TEV
                         },
                          {
                             name: '超声波传感器',
                             type: 'pie',
-                            radius: [10, 60],
+                            radius: [10, 40],
                             center: ['75%', '75%'],
                             roseType: 'area',   
                             label: {
                                 show: false
                             },                        
-                            data: [
-                               
-                                { value: 62, name: '总数' },
-                                { value: 28, name: '正常' },
-                                { value: 18, name: '预警' },
-                                { value: 16, name: '告警' }
-                            ]
+                            data:obj.AE
                         }
                     ]
                     };

@@ -19,12 +19,20 @@ export function siteStatus(params={},callback){
     },callback)
 }
 
-//最新异常通知(最多只有3条)
-export function latestAlarms(params={},callback){
+//公司最新异常通知(最多只有3条)
+export function customerLatestAlarms(params={},callback){
     return axios.request({
-      "url" : baseUrl+'/latest/alarms/',
+      "url" : baseUrl+'/customers/'+params.customer_id+'/latest-alarms/',
       "method" : "get"
     },callback)
+}
+
+//站点最新异常通知(最多只有3条)
+export function siteLatestAlarms(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/sites/'+params.site_id+'/latest-alarms/',
+    "method" : "get"
+  },callback)
 }
 
 
