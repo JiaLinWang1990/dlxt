@@ -74,7 +74,7 @@
                                 <el-button type="text" @click.stop="add(scope.row,2)">配置</el-button>
                                 <el-button type="text" @click="details(scope.row,$event)">详情</el-button>
                                 <el-button type="text" @click="publishSensors(scope.row,$event)">传感器</el-button>
-                                <el-button type="text">刷新</el-button>
+                                <el-button type="text" @click="publishSensors(scope.row,$event)">刷新</el-button>
                             </template>
                             
                         </el-table-column>
@@ -112,16 +112,12 @@
                         <el-table-column prop="card" label="电量(%)" width="70px"></el-table-column>
                          <el-table-column prop="card" label="信号信噪比"  width="110px"></el-table-column>
                         <el-table-column prop="card" label="信号强度"></el-table-column> --> 
-                         <el-table-column width="160" prop="sensor_info" align="center" label="最后上传数据时间">
-                        <template slot-scope="props">  
-                            <span>{{props.row.sensor_info.update_time?props.row.sensor_info.update_time.substring(0,props.row.sensor_info.update_time.length-7):'--'}}</span>     
-                        </template>
-                    </el-table-column>                     
+                         <el-table-column width="160" prop="update_time" align="center" label="最后上传数据时间"></el-table-column>                     
                         <!-- <el-table-column prop="card" label="硬件版本"></el-table-column>
                         <el-table-column prop="card" label="固件版本"></el-table-column> -->
                         <el-table-column label="操作">
                             <template slot-scope="scope">
-                                <el-button type="text" @click="setSensor">配置</el-button>
+                                <el-button type="text" @click="setSensor(scope.row)">配置</el-button>
                                 <el-button type="text" @click="sensorDetails(scope.row)">详情</el-button>
                             </template>
                            
@@ -201,17 +197,17 @@
             </div>
         </el-dialog>
         <el-dialog title="参数配置" :visible.sync="setSensorDialog" class="dialog-box" width="500px">
-            <el-form :model="deviceForm" :rules="rules" label-width="90px"> 
+            <el-form :model="clientForm" :rules="rules" label-width="90px"> 
                 <el-form-item label="传感器名称" prop="name">
-                    <el-input v-model="deviceForm.userName"></el-input>
+                    <el-input v-model="clientForm.name"></el-input>
                 </el-form-item> 
                  <el-form-item label="传感器编号" prop="name">
-                    <el-input v-model="deviceForm.userName"></el-input>
+                    <el-input v-model="clientForm.client_number"></el-input>
                 </el-form-item> 
-                 <el-form-item label="上传间隔" prop="name">
-                    <el-input v-model="deviceForm.userName"></el-input>
+                 <el-form-item label="采集周期" prop="name">
+                    <el-input v-model="clientForm.acq_period"></el-input>
                 </el-form-item>               
-                <el-form-item label="时间设置" prop="name">
+                <!-- <el-form-item label="时间设置" prop="name">
                     <el-select v-model="deviceForm.userName" placeholder="请选择">
                         <el-option label="区域一" value="shanghai"></el-option>
                         <el-option label="区域二" value="beijing"></el-option>
@@ -219,7 +215,7 @@
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="deviceForm.desc"></el-input>
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="addUserDialog = false">取 消</el-button>
@@ -281,7 +277,13 @@ export default {
             currentGatewayId:'',//当前点击的主机，查询其下传感器时用到
             showChartDetails:false,
             dataDetails:[],
-            loading:false
+            loading: false,
+            selectSensorInfo: {},
+            clientForm: {
+                name: '',
+                client_number: '',
+                acq_period:0
+            }
         };
     },
     mounted() {
@@ -335,10 +337,12 @@ export default {
         },
         publishSensors(v,e){
             e.stopPropagation();
+            let This = this
             device.publishSensors({gateway_id:v.gateway_id}).then(res=>{
                 console.log(res,'res');
-                this.$message({type:'success', message: '获取传感器列表成功！'}); 
-                this.querySensorList(v.gateway_id)
+                this.$message({ type: 'success', message: '获取传感器列表成功！' }); 
+                setTimeout(This.querySensorList(v.gateway_id),1000)
+                // this.querySensorList(v.gateway_id)
                 // this.selectDevice(v);
             })
         },
@@ -375,8 +379,20 @@ export default {
         addDevice(){
             this.addDeviceDialog = true;
         },
-        setSensor(){
+        setSensor(row) {
+            this.selectSensorInfo = row
+            this.clientForm.name = row.name;
+            this.clientForm.client_number = row.client_number;
             this.setSensorDialog = true;
+            //获取采集时间间隔接口
+            this.getSensorTiming(row)
+        },
+        getSensorTiming(row) { 
+            let params = { client_number: row.client_number, sensor_id: row.sensor_id }
+            device.querySensorTiming(params).then(res => {
+                console.log(res, 121);
+                this.clientForm.acq_period = res.data.acq_period
+            })
         },
         selectDevice(row){
             this.currentGatewayId = row.gateway_id

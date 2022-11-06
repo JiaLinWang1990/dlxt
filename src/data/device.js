@@ -149,3 +149,11 @@ export function importFile(params={},callback){
   }
   
 
+/* 获取采集时间间隔接口 */
+export function querySensorTiming(params={},callback){
+    return axios.request({
+      "url" : baseUrl+'/gateway/'+params.client_number+'/sensor_id/'+params.sensor_id+'/',
+      "method" : "get",
+    },callback)
+}
+

@@ -42,7 +42,7 @@
             
            this.$nextTick(()=>{
                 this.defaultKeys = this.data.length? [this.data[0].id]:[];
-                this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);
+                this.data[0] && this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);
            })       
        },
 
