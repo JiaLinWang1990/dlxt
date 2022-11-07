@@ -73,7 +73,7 @@ export const initOption = {
     color: '#eee', //截图服务时'#000'
     lineWidth: 1,
     fontSize: 12,
-    autoCycle: false, //PRPS/PRPD是否自动播放相位偏移
+    autoCycle: true, //PRPS/PRPD是否自动播放相位偏移
     stopPropagation: true, //是否阻止父容器点击事件冒泡穿透
 }
 

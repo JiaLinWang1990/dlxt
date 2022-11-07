@@ -198,7 +198,8 @@
                         type: pdcharts.chartType[actualType],
                         // type:14,
                         data: data.chartBody,
-                         background: "#141414"
+                        background: "#141414",
+                        //  autoCycle:true
                     });
                 })           
             }

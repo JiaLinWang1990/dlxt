@@ -148,6 +148,14 @@ export function importFile(params={},callback){
     },callback)
   }
   
+  /* 导出网关 */
+export function exportData(params={},callback){
+    return axios.request({
+        "url" : baseUrl+'/gateway_file_export/',
+        "method": "get",
+        "params":params
+    },callback)
+}
 
 /* 获取采集时间间隔接口 */
 export function querySensorTiming(params={},callback){
@@ -156,4 +164,9 @@ export function querySensorTiming(params={},callback){
       "method" : "get",
     },callback)
 }
+
+
+
+
+
 
