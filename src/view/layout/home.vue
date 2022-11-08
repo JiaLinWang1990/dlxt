@@ -83,14 +83,18 @@
                     phone:'',
                },
                 formLabelWidth: "80px",
+                socket:null,
+                lockReconnect:false,
                 wsCfg: {
-                    url:'ws://114.116.8.127:8001/ws/cloud-user-id/'
+                    url:'ws://114.116.8.127:7084/ws/cloud-user-id/'
                }
             }
         },
         mounted(){
             setInterval(this.timeFormat, 1000);
             this.createWebSocket();
+            this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'site'
+            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:'site'
         },
         methods:{
             timeFormat(){
@@ -130,6 +134,7 @@
             },
             users(){},
             handleClickTab(tab,idx){
+                sessionStorage.setItem('activeTab',JSON.stringify({id:tab.id,number:idx}))
                 this.activeTab = tab.id;
                 this.number = idx;
                 this.$router.push(tab.id)
@@ -146,9 +151,9 @@
             createWebSocket() {
                 try {
                     // 创建Web Socket 连接
-                    socket = new WebSocket(this.wsCfg.url+this.userInfo.id+'/');
+                    this.socket = new WebSocket(this.wsCfg.url+this.userInfo.id+'/');
                     // 初始化事件
-                    this.initEventHandle(socket);
+                    this.initEventHandle(this.socket);
                 } catch (e) {
                     // 出错时重新连接
                     this.reconnect(this.wsCfg.url);
@@ -156,20 +161,21 @@
             },
             initEventHandle(socket) {
                 // 连接关闭时触发
-                socket.onclose = () => {
+                this.socket.onclose = () => {
                     console.log("连接关闭");
                 };
                 // 通信发生错误时触发
-                socket.onerror = () => {
+                this.socket.onerror = () => {
                     // 重新创建长连接
                     this.reconnect();
                 };
                 // 连接建立时触发
-                socket.onopen = () => {
+                this.socket.onopen = () => {
                     console.log("连接成功");
+                    this.test();
                 };
                 // 客户端接收服务端数据时触发
-                socket.onmessage = msg => {
+                this.socket.onmessage = msg => {
                     // 业务逻辑处理
                     console.log(msg.data, "ws:data");
                 };
@@ -191,7 +197,7 @@
             test() {
                 // 给服务器发送一个字符串:
                 // ws.send("Hello!");
-                socket.send("Hello!");
+                this.socket.send(JSON.stringify({data:"Hello!"}));
             }
         }
     }

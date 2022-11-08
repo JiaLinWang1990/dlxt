@@ -93,17 +93,27 @@
                 <div style="margin-top:20px;background:#fff;">
                     <div class="block-title">传感器详情</div>
                     <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
-                        <el-form-item label="传感器名称" prop="sensor_name">
-                            <el-input v-model="searchForm.sensor_name" placeholder="请输入"></el-input>
+                        <el-form-item label="传感器名称" prop="name">
+                            <el-input v-model="searchForm.name" placeholder="请输入"></el-input>
                         </el-form-item>
-                        <el-form-item label="传感器编号" prop="sensor_id">
-                            <el-input v-model="searchForm.sensor_id" placeholder="请输入"></el-input>
+                        <el-form-item label="传感器编号" prop="client_number">
+                            <el-input v-model="searchForm.client_number" placeholder="请输入"></el-input>
                         </el-form-item>
-                        <el-form-item label="网络状态" prop="status">
-                            <el-input v-model="searchForm.status" placeholder="请选择"></el-input>
+                        <el-form-item label="网络状态" prop="is_online">
+                            <el-select v-model="searchForm.is_online" placeholder="请选择" style="width:206px" clearable>
+                                <el-option label="在线" value="true"></el-option>
+                                <el-option label="离线" value="false"></el-option>
+                            </el-select>
+                            <!-- <el-input v-model="searchForm.is_online" placeholder="请选择"></el-input> -->
                         </el-form-item>
                          <el-form-item label="传感器类型" prop="sensor_type">
-                            <el-input v-model="searchForm.sensor_type" placeholder="请选择"></el-input>
+                            <!-- <el-input v-model="searchForm.sensor_type" placeholder="请选择"></el-input> -->
+                            <el-select v-model="searchForm.sensor_type" placeholder="传感器类型"  style="width:206px">
+                                <el-option label="AE" value="AE"></el-option>
+                                <el-option label="TEV" value="TEV"></el-option>
+                                <el-option label="TEMP" value="TEMP"></el-option>
+                                <el-option label="UHF" value="UHF"></el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button size="small" @click="search">查询</el-button>
@@ -117,8 +127,12 @@
                         <el-table-column prop="name" label="传感器名称"></el-table-column>
                         <el-table-column prop="sensor_type" label="传感器类型"></el-table-column>
                         <el-table-column prop="sensor_id" label="传感器编号"></el-table-column>
-                         <!-- <el-table-column prop="card" label="网络状态" ></el-table-column>
-                        <el-table-column prop="card" label="电量(%)" width="70px"></el-table-column>
+                        <el-table-column prop="is_online" label="网络状态" >
+                            <template slot-scope="props">
+                                <p>{{props.row.is_online?'在线':'离线'}}</p>        
+                            </template>  
+                        </el-table-column>
+                         <!-- <el-table-column prop="card" label="电量(%)" width="70px"></el-table-column>
                          <el-table-column prop="card" label="信号信噪比"  width="110px"></el-table-column>
                         <el-table-column prop="card" label="信号强度"></el-table-column> --> 
                          <el-table-column width="160" prop="update_time" align="center" label="最后上传数据时间"></el-table-column>                     
@@ -208,10 +222,10 @@
         <el-dialog title="参数配置" :visible.sync="setSensorDialog" class="dialog-box" width="500px">
             <el-form :model="clientForm" :rules="rules" label-width="90px"> 
                 <el-form-item label="传感器名称" prop="name">
-                    <el-input v-model="clientForm.name"></el-input>
+                    <el-input v-model="clientForm.name" disabled></el-input>
                 </el-form-item> 
                  <el-form-item label="传感器编号" prop="name">
-                    <el-input v-model="clientForm.client_number"></el-input>
+                    <el-input v-model="clientForm.client_number" disabled></el-input>
                 </el-form-item> 
                  <el-form-item label="采集周期" prop="name">
                     <el-input v-model="clientForm.acq_period"></el-input>
@@ -235,8 +249,9 @@
                 </el-form-item> -->
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="addUserDialog = false">取 消</el-button>
-                <el-button type="primary" @click="addUserDialog = false">保 存</el-button>
+                <el-button @click="saveBatch">同种批量应用</el-button>
+                <el-button @click="setSensorDialog = false">取 消</el-button>
+                <el-button type="primary" @click="saveSetSensorDialog">保 存</el-button>
             </div>
         </el-dialog>
          <div  v-if="showChartDetails" >
@@ -288,8 +303,8 @@ export default {
             actionType:'',
             searchForm: {
                 name: "",
-                client_id: "",
-                status: "",
+                client_number: "",
+                is_online: "",
                 sensor_type:""
             },
             currentGatewayId:'',//当前点击的主机，查询其下传感器时用到
@@ -307,11 +322,11 @@ export default {
                 site_id:'',
             },
             periodOptions: [
-                { value: 's', label: 's' },
-                { value: 'min', label: 'min' },
-                { value: 'h', label: 'h' },                
+                { value: 0, label: 'S' },
+                { value: 1, label: 'Min' },
+                { value: 2, label: 'H' },                
             ],
-            acqPeriod:'',
+            acqPeriod:0,
         };
     },
     mounted() {
@@ -321,6 +336,28 @@ export default {
 
     methods: {
         changePeriod() { },
+        saveSetSensorDialog(){
+            let timeStep = [1,60,3600]
+            let acqPeriodValue = this.clientForm.acq_period * timeStep[this.acqPeriod]
+            console.log(acqPeriodValue,999);
+            let params = {client_number:this.clientForm.client_number,sensor_id:this.clientForm.sensor_id,params:{acq_period:acqPeriodValue}}
+            device.setSensorTiming(params).then(res=>{
+                this.$message({type:'success', message: '修改成功'});
+                this.setSensorDialog = false;
+            })
+        },
+        saveBatch(){
+            let timeStep = [1,60,3600]
+            let acqPeriodValue = this.clientForm.acq_period * timeStep[this.acqPeriod]
+            let params = {
+                sensor_id:this.clientForm.sensor_id,
+                sensor_type:this.clientForm.sensor_type,
+                acq_period:acqPeriodValue
+            }
+            device.setBatch(params).then(res=>{
+                console.log(res,'同种批量');
+            })
+        },
         uploadFunction(item){
             let formData = new FormData();
             formData.append('file',item.file);
@@ -424,6 +461,8 @@ export default {
             this.selectSensorInfo = row
             this.clientForm.name = row.name;
             this.clientForm.client_number = row.client_number;
+            this.clientForm.sensor_id = row.sensor_id;
+            this.clientForm.sensor_type = row.sensor_type;
             this.setSensorDialog = true;
             //获取采集时间间隔接口
             this.getSensorTiming(row)

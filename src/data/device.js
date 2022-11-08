@@ -1,6 +1,19 @@
 import { axios } from '@/util/axios.js';
 const baseUrl = '/api'
 
+function handlerPaging(params={}){
+  let {page,limit} = params;
+  let pn = parseInt(page),ps = parseInt(limit);
+  if(isNaN(pn) || pn < 0 ){
+    pn = 1;
+  }
+  if(isNaN(ps) || ps < 1 ){
+    ps = 10;
+  }
+  return Object.assign(params,{page:pn,limit:ps})
+}
+
+
 //query sensor_infos from company
 export function queryTree(params={},callback){
     return axios.request({
@@ -99,6 +112,7 @@ export function publishSensors(params={},callback){
 /*主机下传感器列表*/ 
 export function getSensorList(params={},callback){
   let _params = params.searchForm || {};
+  handlerPaging(_params);
   return axios.request({
     "url" : baseUrl+'/gateways/'+params.gateway_id+"/sensor_info/",
     "method" : "get",
@@ -165,8 +179,24 @@ export function querySensorTiming(params={},callback){
     },callback)
 }
 
+/* 修改采集时间间隔接口 */
+export function setSensorTiming(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/gateway/'+params.client_number+'/sensor_id/'+params.sensor_id+'/',
+    "method" : "put",
+    "data":params.params
+  },callback)
+}
 
 
+/* 同种批量应用 */
+export function setBatch(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/sensor-upload-intervals/',
+    "method" : "put",
+    "data":params
+  },callback)
+}
 
 
 

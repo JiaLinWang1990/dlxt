@@ -18,12 +18,12 @@
         </div>
         <div class="main-area">
             <div class="sub-tabs warning-tabs">
-                <el-tabs v-model="activeTab"  class="site-tabs-ul">
+                <el-tabs v-model="activeTab"  class="site-tabs-ul" @tab-click="clickTabs">
                     <el-tab-pane label="测点报警" name="chart"></el-tab-pane>
                     <el-tab-pane label="传感器报警" name="list"></el-tab-pane>
                 </el-tabs>
             </div>
-            <div v-if="activeTab == 'list'">
+            <div v-if="activeTab == 'list'" >
                 <div class="search-content">
                     <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
                         <el-col :span="14">
@@ -96,40 +96,37 @@
                     </el-table>
                 </div>
             </div>
-            <div v-if="activeTab == 'chart'" style="font-size:30px;text-align:center;">
+            <div v-if="activeTab == 'chart'" style="font-size:30px">
                 <div class="search-content">
                     <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
                         <el-col :span="14">
                             <el-col :span="24">
-                                <el-form-item label="活动时间" required>
-                                    <el-col :span="11">
-                                    <el-form-item prop="date1">
-                                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-                                    </el-form-item>
-                                    </el-col>
-                                    <el-col class="line" :span="2">-</el-col>
-                                    <el-col :span="11">
-                                    <el-form-item prop="date2">
-                                        <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-                                    </el-form-item>
-                                    </el-col>
-                                </el-form-item>                       
+                                <el-form-item label="时间范围" required>
+                                    <el-date-picker  v-model="dataRange"     
+                                        @change="selectDate"                        
+                                        type="datetimerange" 
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期">
+                                    </el-date-picker>
+                                </el-form-item>                   
                             </el-col>
                         </el-col>
                         <el-col :span="14">
                             <el-col :span="12">
                                 <el-form-item label="报警状态">
-                                    <el-select v-model="form.region" placeholder="请选择">
-                                        <el-option label="区域一" value="shanghai"></el-option>
-                                        <el-option label="区域二" value="beijing"></el-option>
+                                    <el-select v-model="searchForm.alarm_level" placeholder="请选择">
+                                        <el-option label="全部" value=""></el-option>
+                                        <el-option label="预警" value="1"></el-option>
+                                        <el-option label="报警" value="2"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
                                 <el-form-item label="处理情况">
-                                <el-select v-model="form.region" placeholder="请选择">
-                                        <el-option label="区域一" value="shanghai"></el-option>
-                                        <el-option label="区域二" value="beijing"></el-option>
+                                    <el-select v-model="searchForm.is_processed" placeholder="请选择">
+                                        <el-option label="全部" value=""></el-option>
+                                        <el-option label="已处理" value="true"></el-option>
+                                        <el-option label="未处理" value="false"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>                        
@@ -145,16 +142,16 @@
                     <el-table :data="tableData" style="width: 100%">
                         <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
                         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
-                        <el-table-column align="center" prop="name"  width="200" label="设备名称" ></el-table-column>
-                        <el-table-column prop="description" align="center" label="测点名称"></el-table-column>
-                        <el-table-column align="center" prop="state" label="传感器类型" ></el-table-column>
-                        <el-table-column prop="warningTime" align="center"  width="200"  label="报警时间"></el-table-column>
+                        <el-table-column align="center" prop="equipment_name"  width="200" label="设备名称" ></el-table-column>
+                        <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
+                        <el-table-column align="center" prop="sensor_type" label="传感器类型" ></el-table-column>
+                        <el-table-column prop="update_time" align="center"  width="200"  label="报警时间"></el-table-column>
                         <el-table-column align="center" label="报警状态" >
                             <template slot-scope="props">
                             <p>{{alarmLevel[props.row.alarm_level]}}</p>   
                         </template>
                         </el-table-column>
-                        <el-table-column prop="description" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
                         <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
@@ -219,6 +216,9 @@ import * as device from '@/data/device.js'
        },
 
     methods: {
+        clickTabs(tab){
+            console.log(tab.label,tab.name,555);
+        },
         queryList(){
             if(this.activeTab =='list'){
                 if(this.currentNodeInfo.type=='site'){
