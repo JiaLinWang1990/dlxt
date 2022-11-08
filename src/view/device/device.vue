@@ -4,7 +4,6 @@
                 <div >
                     主机档案导入
                     <el-input
-                        v-model="searchForm.siteName"
                         style="width: 300px;"
                         placeholder="导入.CSV格式档案数据文件"
                     ></el-input>
@@ -216,6 +215,14 @@
                 </el-form-item> 
                  <el-form-item label="采集周期" prop="name">
                     <el-input v-model="clientForm.acq_period"></el-input>
+                    <el-select v-model="acqPeriod" placeholder="请选择" @change="changePeriod">
+                        <el-option
+                        v-for="item in periodOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>               
                 <!-- <el-form-item label="时间设置" prop="name">
                     <el-select v-model="deviceForm.userName" placeholder="请选择">
@@ -299,7 +306,12 @@ export default {
                 customer_id: '',
                 site_id:'',
             },
-            customerList:[]
+            periodOptions: [
+                { value: 's', label: 's' },
+                { value: 'min', label: 'min' },
+                { value: 'h', label: 'h' },                
+            ],
+            acqPeriod:'',
         };
     },
     mounted() {
@@ -308,6 +320,7 @@ export default {
     },
 
     methods: {
+        changePeriod() { },
         uploadFunction(item){
             let formData = new FormData();
             formData.append('file',item.file);
@@ -528,5 +541,17 @@ export default {
 }
 /deep/.dialog-box .el-form-item__content{
    margin-left:100px !important;
+}
+/deep/.el-form-item:last-child .el-form-item__content>.el-input{
+    width:calc(100% - 100px)
+}
+/deep/.el-form-item:last-child .el-form-item__content .el-select{
+    width:90px;
+    .el-input__suffix{
+        right:-24px;width:100%;
+        input{
+            width:90px;
+        }
+    }
 }
 </style>

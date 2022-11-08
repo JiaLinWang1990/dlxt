@@ -84,7 +84,7 @@
                },
                 formLabelWidth: "80px",
                 wsCfg: {
-                    url:'ws://114.116.8.127:8000/ws/cloud-user-id/'
+                    url:'ws://114.116.8.127:8001/ws/cloud-user-id/'
                }
             }
         },
@@ -186,7 +186,7 @@
                 setTimeout(() => {
                     this.lockReconnect = false;
                     this.createWebSocket(this.wsCfg.url+this.userInfo.id+'/');
-                }, 2000);
+                }, 5000);
             },
             test() {
                 // 给服务器发送一个字符串:
