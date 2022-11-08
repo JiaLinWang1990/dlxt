@@ -94,7 +94,7 @@
             setInterval(this.timeFormat, 1000);
             this.createWebSocket();
             this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'site'
-            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:'site'
+            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:1
         },
         methods:{
             timeFormat(){
@@ -172,7 +172,7 @@
                 // 连接建立时触发
                 this.socket.onopen = () => {
                     console.log("连接成功");
-                    this.test();
+                    // this.test();
                 };
                 // 客户端接收服务端数据时触发
                 this.socket.onmessage = msg => {

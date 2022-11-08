@@ -90,7 +90,7 @@
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
                                 <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
-                                <el-button type="text" size="mini" @click="showChart">查看</el-button>
+                                <!-- <el-button type="text" size="mini" @click="showChart">查看</el-button> -->
                             </template>
                         </el-table-column>
                     </el-table>
@@ -132,7 +132,7 @@
                             </el-col>                        
                         </el-col>                
                         <el-form-item  class='btn-group'>
-                            <el-button size="small" type="primary">查询</el-button>
+                            <el-button size="small" type="primary"  @click="queryList">查询</el-button>
                             <el-button size="small">重置</el-button>
                             <el-button size="small">批量确认</el-button>
                         </el-form-item>
@@ -152,11 +152,15 @@
                         </template>
                         </el-table-column>
                         <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
-                        <el-table-column prop="operator" align="center" label="处理情况"></el-table-column>
+                        <el-table-column prop="operator" align="center" label="处理情况">
+                            <template slot-scope="props">
+                                <p>{{props.row.is_processed?'已处理':'未处理'}}</p>   
+                            </template>
+                        </el-table-column>
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
                                 <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
-                                <el-button type="text" size="mini" @click="showChart">查看</el-button>
+                                <el-button type="text" size="mini" @click="showChart(scope.row)">查看</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -166,7 +170,9 @@
         <div v-if="showDetails">
             <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode"></Details>
         </div>
-       
+        <div  v-if="showChartDetails" >
+            <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
+        </div>
         
    </div>
 </template>
@@ -178,8 +184,9 @@ import * as device from '@/data/device.js'
    export default {
        name:'',
        components:{
-        tree,
-        Details:resolve => {require(['./details.vue'], resolve)},
+            tree,
+            Details: resolve => { require(['./details.vue'], resolve) },
+            chartDetails:resolve => {require(['../site/chartDetails.vue'], resolve)},
        },
        data(){
            return {
@@ -202,13 +209,15 @@ import * as device from '@/data/device.js'
                detailsInfo: {},
                currentNodeInfo: {},
                searchForm:{
-                    "alarm_type": 2,
+                    "alarm_type": 1,
                     "sensor_type": "",
                     "start_date": "",
                     "end_data": "",
                     "alarm_level": "", 
                     "is_processed": '',
-                }
+               },
+               showChartDetails: false,
+               dataDetails:{}               
            }
        },
        mounted(){
@@ -217,17 +226,23 @@ import * as device from '@/data/device.js'
 
     methods: {
         clickTabs(tab){
-            console.log(tab.label,tab.name,555);
+            console.log(tab.label, tab.name, 555);
+            if (tab.name == 'chart') {
+                this.searchForm.alarm_type = 2;                
+            } else {
+                this.searchForm.alarm_type = 1;                
+            }
+            this.clickNode(this.currentNodeInfo)
         },
         queryList(){
-            if(this.activeTab =='list'){
+            // if(this.activeTab =='list'){
                 if(this.currentNodeInfo.type=='site'){
                     this.getSiteList(this.currentNodeInfo.id)
                 }else if(this.currentNodeInfo.type=='equipment'){
                     this.getEquipmentList(this.currentNodeInfo.id)
                 }
                 
-            }
+            // }
         },
         reset() { 
             this.dataRange = [];
@@ -294,8 +309,11 @@ import * as device from '@/data/device.js'
             this.detailsInfo = row;
             this.showDetails = true;
         },
-        showChart(){
-            
+        showChart(row){
+            this.dataDetails = [row];
+            this.showChartDetails = true;
+            console.log(row,'row')
+
         }
        }
    }
@@ -325,7 +343,7 @@ import * as device from '@/data/device.js'
     /deep/.warning-tabs{
         width:100%;text-align: center;position:relative
     }
-     /deep/.el-tabs{
+     /deep/.site-tabs-ul.el-tabs{
         width:270px;position: absolute;left:0;right:0;margin:auto;top:0;
     }
     /deep/.el-tabs__nav-wrap::after{
@@ -334,7 +352,7 @@ import * as device from '@/data/device.js'
     /deep/.el-tabs__active-bar{
         height: 0;;
     } 
-    /deep/.el-tabs__item{
+    /deep/.site-tabs-ul .el-tabs__item{
     font-size: 18px;background:#2C2E30;margin-right:2px;width:130px;padding:0;
     }  
     /deep/.el-table tbody tr:hover>td{
@@ -342,6 +360,9 @@ import * as device from '@/data/device.js'
     }
     /deep/.el-range-input{
         background:transparent
+    }
+    /deep/.el-date-editor .el-range__close-icon{
+        line-height:25px;
     }
 </style>
 

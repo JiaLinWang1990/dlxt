@@ -14,7 +14,7 @@
                         <div class="map-tree">
                             <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length"></tree>
                         </div>
-                        <amap class="map"></amap>
+                        <amap class="map" :mapData="mapData"></amap>
                     </div>                    
                     <!-- <div  ref="map" class="map"></div> -->
                     <div class="notify">
@@ -86,7 +86,8 @@ import * as map from '@/data/map.js'
                 treeData:[],
                 customerInfos:{},
                 abnormalInfos:{},
-                countAbnormal:{}
+               countAbnormal: {},
+               mapData:[]
            }
        },
        mounted(){
@@ -107,10 +108,12 @@ import * as map from '@/data/map.js'
                     if(!res) return;
                     This.treeData = res.data;
                     res.data.length && res.data[0] && This.clickNode(res.data[0])
+                    this.mapData = res.data[0].children;
                 })
             },
            clickNode(v) { 
                if (v.type == "customer") {
+                   this.mapData = v.children;
                    this.customerStatus(v.id)
                    map.abnormalRatio({customer_id:v.id}).then(res => { 
                     console.log(res,'公司异常电力设备异常趋势率');
@@ -160,7 +163,7 @@ import * as map from '@/data/map.js'
                 }  
            },
            customerStatus(id) { 
-               map.companyStatus({ customer_id: id, data:{is_refresh: true} }).then(res => { 
+               map.companyStatus({ customer_id: id, data:{is_refresh: false} }).then(res => { 
                 this.customerInfos = res.data;
                 this.initCharts1();
                 this.initCharts2();
@@ -168,7 +171,7 @@ import * as map from '@/data/map.js'
                })
            },
            siteStatus(id) { 
-               map.siteStatus({ site_id: id, data:{is_refresh: true} }).then(res => { 
+               map.siteStatus({ site_id: id, data:{is_refresh: false} }).then(res => { 
                })
            },
            initCharts(){
