@@ -1,5 +1,6 @@
 <template>
-   <div style="height:100%" :gutter="20">
+   <div style="height:100%;position: relative;" :gutter="20">
+        <div class="refresh" @click="refreshData"><i class="el-icon-refresh"></i></div>
         <el-row style="height:100%;">
             <el-col class="grid-content" :span="6">
                 <div class="bg-purple content-box">
@@ -45,7 +46,7 @@
                                 <p>累计总数</p>
                             </div>
                             <div class="deal-num">
-                                <table style="width:80%;margin-top:20px;">
+                                <table style="width:80%;margin-top:2px;">
                                     <tr>
                                         <td>本日</td>
                                         <td>本周</td>
@@ -87,7 +88,8 @@ import * as map from '@/data/map.js'
                 customerInfos:{},
                 abnormalInfos:{},
                countAbnormal: {},
-               mapData:[]
+               mapData:[],
+               currentNode:{},
            }
        },
        mounted(){
@@ -102,6 +104,9 @@ import * as map from '@/data/map.js'
        },
 
        methods: {
+            refreshData(){
+                this.clickNode(this.currentNode);
+            },
             getTreeData(){
                 let This = this;
                 device.queryTrees().then(res=>{
@@ -112,9 +117,10 @@ import * as map from '@/data/map.js'
                 })
             },
            clickNode(v) { 
+                this.currentNode = v;
                if (v.type == "customer") {
                    this.mapData = v.children;
-                   this.customerStatus(v.id)
+                   this.customerStatus(v.id,v.type)
                    map.abnormalRatio({customer_id:v.id}).then(res => { 
                     console.log(res,'公司异常电力设备异常趋势率');
                     this.abnormalInfos = res.data;
@@ -139,11 +145,16 @@ import * as map from '@/data/map.js'
                     console.log(res,'公司异常情况处理统计');
                    })
                 }else if (v.type == "site") {
-                   this.siteStatus(v.id)
+                   this.siteStatus(v.id,v.type)
                    map.siteLatestAlarms({site_id:v.id}).then(res => { 
                     this.tableData = res.data;
                     console.log(res,'站点最新三条');
                    }) 
+                   map.siteAbnormalRatio({site_id:v.id}).then(res => { 
+                    console.log(res,'站点异常电力设备异常趋势率');
+                    this.abnormalInfos = res.data;
+                    this.initCharts3();
+                   })
                    map.siteAbnormal({site_id:v.id}).then(res => { 
                     console.log(res,'站点异常情况处理统计');
                     let tmp = res.data
@@ -168,10 +179,15 @@ import * as map from '@/data/map.js'
                 this.initCharts1();
                 this.initCharts2();
                 this.initCharts4();
+                this.initCharts5();
                })
            },
-           siteStatus(id) { 
+           siteStatus(id,type) { 
                map.siteStatus({ site_id: id, data:{is_refresh: false} }).then(res => { 
+                this.customerInfos = res.data;
+                this.initCharts1(type);
+                this.initCharts2();
+                this.initCharts4();
                })
            },
            initCharts(){
@@ -182,9 +198,9 @@ import * as map from '@/data/map.js'
                 this.initCharts5();
                 
            },
-           initCharts1(){
+           initCharts1(type){
                this.myChart = echarts.init(this.$refs.property);
-               const gaugeData = [
+               let gaugeData = [
                     {
                         value: this.customerInfos.asset_info.site_num,
                         name: '站点',
@@ -229,6 +245,9 @@ import * as map from '@/data/map.js'
                         }
                     }
                 ];
+                if(type=='site'){
+                    gaugeData.shift();
+                }
                let option = {
                     title: {
                         text: '资产统计',
@@ -487,7 +506,7 @@ import * as map from '@/data/map.js'
                         {                       
                             text: '特高频传感器',
                             left:'18%',//居中显示
-                            top:'45%',//底部显示
+                            top:'40%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -496,7 +515,7 @@ import * as map from '@/data/map.js'
                          {                       
                             text: '温度传感器',
                             left:'68%',//居中显示
-                            top:'45%',//底部显示
+                            top:'40%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -505,7 +524,7 @@ import * as map from '@/data/map.js'
                         {                       
                             text: '电压传感器',
                             left:'18%',//居中显示
-                            top:'90%',//底部显示
+                            top:'85%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -514,7 +533,7 @@ import * as map from '@/data/map.js'
                         {                       
                             text: '超声波传感器',
                             left:'68%',//居中显示
-                            top:'90%',//底部显示
+                            top:'85%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -531,18 +550,13 @@ import * as map from '@/data/map.js'
                         },
                         left: 'center',
                         top: 'bottom',
-                        data: [
-                        '总数',
-                        '正常',
-                        '预警',
-                        '告警',
-                        ]
+                        data: ['总数','正常','预警','告警', ]
                     },                
                     series: [
                         {
                             name: '特高频传感器',
                             type: 'pie',
-                            radius: [10, 40],
+                            radius: [10, 50],
                             center: ['25%', '25%'],
                             roseType: 'radius',
                             label: {
@@ -553,7 +567,7 @@ import * as map from '@/data/map.js'
                         {
                             name: '温度传感器',
                             type: 'pie',
-                            radius: [10, 40],
+                            radius: [10, 50],
                             center: ['75%', '25%'],
                             roseType: 'area',  
                             label: {
@@ -564,7 +578,7 @@ import * as map from '@/data/map.js'
                          {
                             name: '电压传感器',
                             type: 'pie',
-                            radius: [10, 40],
+                            radius: [10, 50],
                             center: ['25%', '75%'],
                             roseType: 'area',    
                             label: {
@@ -575,7 +589,7 @@ import * as map from '@/data/map.js'
                          {
                             name: '超声波传感器',
                             type: 'pie',
-                            radius: [10, 40],
+                            radius: [10, 50],
                             center: ['75%', '75%'],
                             roseType: 'area',   
                             label: {
@@ -589,62 +603,169 @@ import * as map from '@/data/map.js'
            },
            initCharts5(){
                 this.myChart = echarts.init(this.$refs.online);
-                var base = +new Date(2021, 9, 3);
-                var oneDay = 24 * 3600 * 1000;
-                var date = [];
+                // var base = +new Date(2021, 9, 3);
+                // var oneDay = 24 * 3600 * 1000;
+                // var date = [];
 
-                var data = [Math.random() * 1];
+                // var data = [Math.random() * 1];
 
-                for (var i = 1; i < 2000; i++) {
-                    var now = new Date(base += oneDay);
-                    date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
-                    data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
-                }
+                // for (var i = 1; i < 2000; i++) {
+                //     var now = new Date(base += oneDay);
+                //     date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+                //     data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
+                // }
 
-                var option = {
-                    tooltip: {
-                        trigger: 'axis',
-                        position: function (pt) {
-                            return [pt[0], '10%'];
+                // var option = {
+                //     tooltip: {
+                //         trigger: 'axis',
+                //         position: function (pt) {
+                //             return [pt[0], '10%'];
+                //         }
+                //     },
+                //     title: {
+                //         left: 'center',
+                //         text: '传感器在线率',
+                //         textStyle:{
+                //             color:'#fff'
+                //         }
+                //     },                   
+                //     xAxis: {
+                //         type: 'category',
+                //         boundaryGap: false,
+                //         data: date
+                //     },
+                //     yAxis: {
+                //         type: 'value',
+                //         boundaryGap: [0, '100%']
+                //     },
+                    
+                //     series: [
+                //         {
+                //             name: '模拟数据',
+                //             type: 'line',
+                //             smooth: true,
+                //             symbol: 'none',
+                //             sampling: 'average',
+                //             itemStyle: {
+                //                 color: 'rgb(255, 70, 131)'
+                //             },
+                //             areaStyle: {
+                //                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                //                     offset: 0,
+                //                     color: 'rgb(255, 158, 68)'
+                //                 }, {
+                //                     offset: 1,
+                //                     color: 'rgb(255, 70, 131)'
+                //                 }])
+                //             },
+                //             data: data
+                //         }
+                //     ]
+                // };
+                let gaugeData = [
+                    {
+                        value: this.customerInfos.sensor_online_ratio[0].AE,
+                        name: '超声波传感器',
+                        title: {
+                            offsetCenter: ['-35%', '-15%']
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-35%', '-35%']
                         }
                     },
+                    {
+                        value: this.customerInfos.sensor_online_ratio[1].TEV,
+                        name: '电压传感器',
+                        title: {
+                            offsetCenter: ['-35%', '35%']
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-35%', '15%']
+                        }
+                    },
+                    {
+                        value: this.customerInfos.sensor_online_ratio[2].TEMP,
+                        name: '温度传感器',
+                        title: {
+                            offsetCenter: ['35%', '-15%']
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['35%', '-35%']
+                        }
+                    },{
+                        value: this.customerInfos.sensor_online_ratio[3].UHF,
+                        name: '特高频',
+                        title: {
+                            offsetCenter: ['35%', '35%']
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['35%', '15%']
+                        }
+                    }
+                ];
+               let option = {
                     title: {
-                        left: 'center',
-                        text: '传感器在线率',
+                        text: '资产统计',
                         textStyle:{
                             color:'#fff'
                         }
-                    },                   
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        data: date
                     },
-                    yAxis: {
-                        type: 'value',
-                        boundaryGap: [0, '100%']
-                    },
-                    
                     series: [
                         {
-                            name: '模拟数据',
-                            type: 'line',
-                            smooth: true,
-                            symbol: 'none',
-                            sampling: 'average',
-                            itemStyle: {
-                                color: 'rgb(255, 70, 131)'
+                            type: 'gauge',
+                            radius:'100%',
+                            startAngle: 90,
+                            endAngle: -270,
+                            pointer: {
+                                show: false
                             },
-                            areaStyle: {
-                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: 'rgb(255, 158, 68)'
-                                }, {
-                                    offset: 1,
-                                    color: 'rgb(255, 70, 131)'
-                                }])
+                            progress: {
+                                show: true,
+                                overlap: false,
+                                roundCap: true,
+                                clip: false,
+                                itemStyle: {
+                                borderWidth: 0,
+                                    borderColor: '#464646'
+                                }
                             },
-                            data: data
+                            axisLine: {
+                                lineStyle: {
+                                width: 15,
+                                color:[[1,'#36344D']]
+                                }
+                            },
+                            splitLine: {
+                                show: false,
+                                distance: 0,
+                                length: 10
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            axisLabel: {
+                                show: false,
+                                distance: 50
+                            },
+                            data: gaugeData,
+                            title: {
+                                fontSize: 12,
+                                color:'#fff'
+                            },
+                            detail: {
+                                width: 40,
+                                height: 8,
+                                fontSize: 12,
+                                color: 'auto',
+                                borderColor: 'auto',
+                                borderRadius: 20,
+                                borderWidth: 0.5,
+                                formatter: '{value}'
+                            }
                         }
                     ]
                 };
@@ -656,6 +777,11 @@ import * as map from '@/data/map.js'
 </script>
 
 <style lang="less" scoped>
+ .refresh{
+        width:24px;height:24px;
+        position: absolute;top:-20px;right:0;
+        i{font-size: 24px;color:#fff;}
+    }
 .grid-content{
     height:100%;display:flex;
      .content-box{
@@ -681,9 +807,9 @@ import * as map from '@/data/map.js'
     }
     .map{height:100%;width: calc(100% - 20px);}
     .notify{height:170px;}
-    .point{height:50%}
-    .online{height:25%}
-    .unusual-deal{height:25%}
+    .point{height:45%}
+    .online{height:35%}
+    .unusual-deal{height:20%}
     
     .notify-title{
         height:36px;line-height:36px;padding-left:20px;color:#fff;font-size: 14px;;
@@ -708,15 +834,15 @@ import * as map from '@/data/map.js'
         }
     }
     .deal-box{
-        display:flex;height:calc(100% - 36px);color:#fff;margin-top: 20px;
+        display:flex;height:calc(100% - 46px);color:#fff;
     }
     .deal-describ{
         width:40%;height:100%;text-align: center;
         span{
-            display: block;height:60px;line-height:60px;;
+            display: block;height:40px;line-height:40px;;
         }
         p{
-            height:36px;line-height: 36px;;
+            height:30px;line-height: 30px;;
         }
     }
     .el-icon-message-solid{
@@ -726,9 +852,10 @@ import * as map from '@/data/map.js'
         width:60%;
         table td{
             width:33%;text-align: center;
-            height:36px;
+            height:32px;
         }
     }
+   
 }
 
 </style>

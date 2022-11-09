@@ -25,7 +25,7 @@ export function siteAlarmList(params = {}, callback) {
 
 /* 设备下告警列表 */
 export function equipmentAlarmList(params = {}, callback) {
-    handlerPaging(params);
+    handlerPaging(params.data);
     return axios.request({
       "url" : baseUrl+'/equipments/'+params.equipments_id+"/alarm_info/",
         "method": "get",

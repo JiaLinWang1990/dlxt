@@ -52,6 +52,13 @@ export function customerAbnormal(params={},callback){
     },callback)
 }
 
+//站点异常电力设备异常趋势率
+export function siteAbnormalRatio(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/sites/'+params.site_id+'/abnormal-ratio/',
+    "method" : "get"
+  },callback)
+}
 
 //站点异常情况处理统计
 export function siteAbnormal(params={},callback){

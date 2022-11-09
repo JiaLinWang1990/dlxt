@@ -23,7 +23,7 @@
                     <el-tab-pane label="传感器报警" name="list"></el-tab-pane>
                 </el-tabs>
             </div>
-            <div v-if="activeTab == 'list'" >
+            <div v-if="activeTab == 'list'" style="height:calc(100% - 50px);">
                 <div class="search-content">
                     <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
                         <el-col :span="14">
@@ -94,9 +94,19 @@
                             </template>
                         </el-table-column>
                     </el-table>
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[5,10, 20, 50]"
+                        prev-text="上一页" next-text="下一页"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                    </el-pagination>
                 </div>
             </div>
-            <div v-if="activeTab == 'chart'" style="font-size:30px">
+            <div v-if="activeTab == 'chart'" style="font-size:30px;height:calc(100% - 50px);">
                 <div class="search-content">
                     <el-form ref="form" :model="form" label-width="80px"  :inline="true" class="site-form">
                         <el-col :span="14">
@@ -164,6 +174,16 @@
                             </template>
                         </el-table-column>
                     </el-table>
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[5,10, 20, 50]"
+                        prev-text="上一页" next-text="下一页"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                    </el-pagination>
                 </div>                        
             </div>
         </div>
@@ -201,7 +221,7 @@ import * as device from '@/data/device.js'
                     date1:'',
                     date2:'', 
                 },
-                activeTab:'list',
+                activeTab:'chart',
                showDetails: false,
                dataRange:[],
                loading: false,
@@ -209,7 +229,7 @@ import * as device from '@/data/device.js'
                detailsInfo: {},
                currentNodeInfo: {},
                searchForm:{
-                    "alarm_type": 1,
+                    "alarm_type": 2,
                     "sensor_type": "",
                     "start_date": "",
                     "end_data": "",
@@ -217,7 +237,10 @@ import * as device from '@/data/device.js'
                     "is_processed": '',
                },
                showChartDetails: false,
-               dataDetails:{}               
+               dataDetails:{},
+               currentPage:1,
+                size:10,
+                total:0,            
            }
        },
        mounted(){
@@ -225,8 +248,17 @@ import * as device from '@/data/device.js'
        },
 
     methods: {
+        handleSizeChange(val){
+             this.size = val;
+             this.queryList();
+        },
+        handleCurrentChange(val){
+            this.currentPage = val;
+            this.queryList();
+        },
         clickTabs(tab){
-            console.log(tab.label, tab.name, 555);
+            this.currentPage = 1;
+            console.log(tab.label, tab.name, 555);            
             if (tab.name == 'chart') {
                 this.searchForm.alarm_type = 2;                
             } else {
@@ -268,6 +300,7 @@ import * as device from '@/data/device.js'
             return v<10?'0'+v:v
         },
         clickNode(v) {
+            this.currentPage = 1;
             let obj;
             if (!v) {
                 obj = this.currentNodeInfo
@@ -294,15 +327,17 @@ import * as device from '@/data/device.js'
             })
         },
         getSiteList(id) {
-            warning.siteAlarmList({site_id:id,data:this.searchForm}).then(res => {
+            warning.siteAlarmList({site_id:id,data:Object.assign(this.searchForm, {page:this.currentPage,limit:this.size})}).then(res => {
                 this.loading = false;
                 this.tableData = res.data.alarm_list;
+                this.total = res.data.total;  
             })
         },
         getEquipmentList(id) { 
-            warning.equipmentAlarmList({equipments_id:id,data:this.searchForm}).then(res => {
+            warning.equipmentAlarmList({equipments_id:id,data:Object.assign(this.searchForm, {page:this.currentPage,limit:this.size})}).then(res => {
                 this.loading = false;
                 this.tableData = res.data.alarm_list;
+                this.total = res.data.total;  
             })
         },
         handle(row) {
@@ -363,6 +398,24 @@ import * as device from '@/data/device.js'
     }
     /deep/.el-date-editor .el-range__close-icon{
         line-height:25px;
+    }
+    /deep/.el-pagination {
+        position: absolute;text-align: center;
+        bottom: 0;left:0;right:0;margin:0 auto;
+        .el-input__inner{
+            background: #2C2E30;
+            border:0;color:#fff;
+        }
+        .btn-prev,.btn-next{
+            background: #2C2E30;
+        }
+        .el-pager li{
+            background: #2C2E30;
+        }
+    }
+    .table-content{
+        position: relative;
+        height: calc(100% - 100px);
     }
 </style>
 
