@@ -91,8 +91,8 @@
                     <el-table-column prop="sensor_type" align="center"  width="90" label="传感器类型"></el-table-column>
                     <el-table-column prop="battery" align="center" label="工作状态" width="200" show-overflow-tooltip>
                        <template slot-scope="props">
-                            <p>{{(props.row.is_online?'在线:':'离线')+'电量'+props.row.battery+'%, RSSI '}}</p>        
-                            <p>{{props.row.rssi+'dBm, SNR:'+props.row.snr+'BM'}}</p>
+                            <p>{{(props.row.is_online?'在线':'离线')+(props.row.battery?(':电量'+props.row.battery+'%'):'')}}</p>        
+                            <p>{{(props.row.rssi?('RSSI:'+props.row.rssi+'dBm'):'')+(props.row.snr?(', SNR:'+props.row.snr+'BM'):'')}}</p>
                         </template>  
                     </el-table-column>
                     <el-table-column prop="alarm_describe" align="center" label="报警状态" width="200" show-overflow-tooltip>
@@ -107,7 +107,7 @@
                             <span v-if="props.row.type=='Temp'">/</span>   
                             <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'/'}}</span>     
                         </template>-->
-                    <el-table-column prop="upload_interval" align="center" label="采集周期">
+                    <el-table-column prop="upload_interval" align="center" label="上传间隔">
                         <template slot-scope="props">
                             <p>{{props.row.upload_interval/60 + 'min'}}</p>      
                         </template>
@@ -144,7 +144,7 @@
             <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
         </div>    
         <div  v-if="showjx" >
-            <jx  :visible.sync="showjx" ></jx>
+            <jx  :visible.sync="showjx" :dataDetails="dataDetails"></jx>
         </div>     
     </div>
 </template>
@@ -337,9 +337,14 @@ export default {
             return resultArr
         },
         details(row){
-            this.dataDetails = [row];
-            this.showChartDetails = true;
             console.log(row,'row')
+            if(row.sensor_type=="MECH"){
+                this.dataDetails = row;
+                this.showjx = true;
+                return;
+            }
+            this.dataDetails = [row];
+            this.showChartDetails = true;            
         },
        bagimg() {
             /* 获取当前页面的缩放比
