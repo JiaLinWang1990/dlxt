@@ -72,7 +72,7 @@
 
 <script>
 import * as echarts from 'echarts';
-import 'echarts/extension/bmap/bmap'
+// import 'echarts/extension/bmap/bmap'
 import  amap  from './map.vue';
  import tree from '@/components/tree.vue'
 import * as device from '@/data/device.js'

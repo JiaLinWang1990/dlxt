@@ -147,3 +147,17 @@
 .dark-style.el-popper .popper__arrow{
   display: none;
 }
+
+
+
+.pane-content{
+    display: flex;
+}
+.pane-content .content-chart{
+    width:calc(100% - 200px);
+    height:600px;
+}
+.pane-content .content-params{
+    width:200px;
+    height:600px;
+}
