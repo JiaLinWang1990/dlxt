@@ -149,15 +149,19 @@
 }
 
 
-
+.el-tabs__item:first-child{
+    border-left: solid 1px #4472C4 !important;
+}
 .pane-content{
     display: flex;
+    margin-top:5px;
 }
 .pane-content .content-chart{
-    width:calc(100% - 200px);
+    width:calc(100% - 300px);
     height:600px;
+    border:solid  1px #409EFF;
 }
 .pane-content .content-params{
-    width:200px;
+    width:300px;
     height:600px;
 }

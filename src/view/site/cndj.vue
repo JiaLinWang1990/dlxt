@@ -4,7 +4,9 @@
             <div class="content-chart">
                 <div id="switch" ref="switch" class="switch"></div>
             </div>
-            <div class="content-params">eeee</div>
+            <div class="content-params">
+                <h3>特征参数</h3>
+            </div>
         </div>
     </div>
 </template>
@@ -16,13 +18,22 @@ export default {
     data() {
         return {
             switchChart: null,
-            option :{
+            option: {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                grid: {
+                    top: '20px',
+                    right: '20px',
+                    left: '80px',
+                    bottom: '20px' 
+                },
                 xAxis: {
                     // show:false,
                     type: 'category',
                     name: '时间(s)',   
                     nameLocation: "center",  
-                    nameGap: 42,           
+                    nameGap: 42,            
                     data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     // axisLabel:{show:false},
                     axisTick: {

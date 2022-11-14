@@ -3,10 +3,7 @@
         <div class="pane-content">
             <div class="content-chart">
                 <div id="switch" ref="switch" class="switch"></div>
-                <div id="dis" ref="dis" class="dis"></div>
-                <div id="current" ref="current" class="current"></div>
             </div>
-            <div class="content-params">eeee</div>
         </div>
     </div>
 </template>
@@ -16,20 +13,42 @@ import * as echarts from 'echarts';
 export default {
     name: "",
     props:{      
-        dataDetails:{
+        dataInfo:{
             type:Object,
             default:()=>{}
         },   
     },
+    watch: {
+        dataInfo(val) {
+            console.log(this.dataInfo, 456);
+            this.zhlData = this.dataInfo;
+            this.init();
+        }
+    },
     data() {
         return {
+            zhlData: {},
             switchChart: null,
             disChart: null,
             currentChart: null,
-            option :{
+            option: {
+                title: {
+                    text: '',
+                    left:'center'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {},
+                grid: {
+                    top: '20px',
+                    right: '20px',
+                    left: '80px',
+                    bottom: '20px' 
+                },
                 xAxis: {
                     type: 'category',
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    data: [],
                     axisLabel:{show:false},
                     axisTick: {
                         show: false
@@ -40,46 +59,39 @@ export default {
                     name: '',
                     nameLocation: "center",
                     nameGap: 42,
+                    axisLine: {
+                        show: true,
+                    }
                 },
                 series: [
                     {
-                    data: [820, 932, 901, 934, 1290, 1330, 1320],
-                    type: 'line',
-                    smooth: true
+                        data: [],
+                        type: 'line',
+                        smooth: true
+                    },{
+                        data: [],
+                        type: 'line',
+                        smooth: true
                     }
                 ]
-            }
+            },
         };
     },
     mounted() {
-        this.init();
+        // this.init();
     },
 
     methods: {
         init() {
             this.initSwitchChart();
-            this.initDisChart();
-            this.initCurrentChart();
         },
         initSwitchChart() { 
             this.switchChart = echarts.init(this.$refs.switch);
-            this.option.yAxis.name = '开关量';
-            this.switchChart.setOption(this.option);
-        },
-        initDisChart() { 
-            this.disChart = echarts.init(this.$refs.dis);
-            this.option.yAxis.name = '行程(mm)'
-            this.disChart.setOption(this.option);
-        },
-        initCurrentChart() {
-            this.currentChart = echarts.init(this.$refs.current);
             let _option = JSON.parse(JSON.stringify(this.option))
-            _option.yAxis.name = '线圈电流(A)'
-            _option.xAxis.axisLabel.show = true;
-            _option.xAxis.name = '时间(ms)';
-            _option.xAxis.nameLocation = 'center';
-            _option.xAxis.nameGap = 42;
-            this.currentChart.setOption(_option);
+            // _option.series[0].data = this.zhlData.Mech_CT_A_V.wave;
+            _option.series[1].data = this.zhlData.Mech_CT_B_V.wave;
+            _option.series[2].data = this.zhlData.Mech_CT_C_V.wave;
+            this.switchChart.setOption(_option);
         },
     },
 };

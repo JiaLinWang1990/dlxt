@@ -8,7 +8,7 @@
                机械特性数据
            </div>
            <div class="">
-               <el-tabs v-model="activeName" type="card" >
+               <el-tabs v-model="activeName" type="card">
                 <!-- <div class="pane-content">
                             <div class="content-chart">dddd</div>
                             <div class="content-params">eeee</div>
@@ -17,7 +17,7 @@
                     <el-tab-pane label="储能电机电流" name="second"></el-tab-pane>
                     <el-tab-pane label="主回路电流" name="third"></el-tab-pane>
                 </el-tabs>  
-                <component :is="isComponent" :dataDetails="dataDetails"></component>  
+                <component :is="isComponent" :dataInfo="dataInfo"></component>  
            </div>
                         
         </el-dialog>
@@ -63,7 +63,8 @@ import cnjd from './cndj.vue'
                     first:resolve => {require(['./dlq.vue'], resolve)},
                     second:resolve => {require(['./cndj.vue'], resolve)},
                     third:resolve => {require(['./zhl.vue'], resolve)},
-               },            
+               },    
+               dataInfo: {}        
            }
        },
        mounted(){
@@ -71,14 +72,14 @@ import cnjd from './cndj.vue'
             this.getSensorDetails(this.dataDetails)
         })         
        },
-       methods: {
+        methods: {
             getSensorDetails(item) { 
                 device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type}).then(res => {
-                    console.log(res);
+                    console.log(res,'机械特性详情');
                     this.dataInfo=res.data;
                 })
             },
-       }
+        }
    }
 </script>
 <style lang='less' scoped>
