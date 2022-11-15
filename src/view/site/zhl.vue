@@ -20,7 +20,7 @@ export default {
     },
     watch: {
         dataInfo(val) {
-            console.log(this.dataInfo, 456);
+            console.log(this.dataInfo, 45678);
             this.zhlData = this.dataInfo;
             this.init();
         }
@@ -44,12 +44,15 @@ export default {
                     top: '20px',
                     right: '20px',
                     left: '80px',
-                    bottom: '20px' 
+                    bottom: '60px' 
                 },
                 xAxis: {
                     type: 'category',
                     data: [],
-                    axisLabel:{show:false},
+                    name:'时间(ms)',
+                    nameGap:40,
+                    nameLocation:'middle',
+                    axisLabel:{show:true},
                     axisTick: {
                         show: false
                     },
@@ -72,12 +75,20 @@ export default {
                         data: [],
                         type: 'line',
                         smooth: true
+                    },{
+                        data: [],
+                        type: 'line',
+                        smooth: true
                     }
                 ]
             },
         };
     },
     mounted() {
+        console.log(this.dataInfo,888);
+        this.$nextTick(()=>{
+            this.initSwitchChart();
+        })
         // this.init();
     },
 
@@ -88,17 +99,26 @@ export default {
         initSwitchChart() { 
             this.switchChart = echarts.init(this.$refs.switch);
             let _option = JSON.parse(JSON.stringify(this.option))
+            _option.yAxis.name = '主回路电流(A)'
             // _option.series[0].data = this.zhlData.Mech_CT_A_V.wave;
-            _option.series[1].data = this.zhlData.Mech_CT_B_V.wave;
-            _option.series[2].data = this.zhlData.Mech_CT_C_V.wave;
+            _option.xAxis.data = this.setxAxisData(this.dataInfo.Mech_CT_B_V.wave.length, this.dataInfo.Mech_CT_B_V.samplingperiod);
+            _option.series[1].data = this.dataInfo.Mech_CT_B_V.wave;
+            _option.series[2].data = this.dataInfo.Mech_CT_C_V.wave;
             this.switchChart.setOption(_option);
         },
+        setxAxisData(len, period) { 
+            let arr = [];
+            for (let i = 0; i < len; i++){
+                arr.push(i*period/1000)
+            }
+            return arr;
+        }
     },
 };
 </script>
 
 <style lang='less' scoped>
-    .switch, .dis ,.current{
-        height:33%;width:100%;
+    .switch{
+        height:50%;width:100%;
     }
 </style>

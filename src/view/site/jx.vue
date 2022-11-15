@@ -1,6 +1,6 @@
 <template>
    <div>
-       <el-dialog :visible.sync="dialogVisible"  width="1000px" :close-on-click-modal="false">
+       <el-dialog :visible.sync="dialogVisible"  width="1000px" :close-on-click-modal="false" top="30px">
            <div style="width:25px;height:25px;cursor:pointer;float:right;padding-right:5px;padding-top:10px;">
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;" @click="dialogVisible=false"></i>
            </div>
@@ -17,7 +17,7 @@
                     <el-tab-pane label="储能电机电流" name="second"></el-tab-pane>
                     <el-tab-pane label="主回路电流" name="third"></el-tab-pane>
                 </el-tabs>  
-                <component :is="isComponent" :dataInfo="dataInfo"></component>  
+                <component :is="isComponent" :dataInfo="dataInfo" :dataDetails="dataDetails"></component>  
            </div>
                         
         </el-dialog>
@@ -62,7 +62,7 @@ import cnjd from './cndj.vue'
                componentsList:{                  
                     first:resolve => {require(['./dlq.vue'], resolve)},
                     second:resolve => {require(['./cndj.vue'], resolve)},
-                    third:resolve => {require(['./zhl.vue'], resolve)},
+                    third:zhl
                },    
                dataInfo: {}        
            }

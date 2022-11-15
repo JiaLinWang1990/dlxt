@@ -199,4 +199,11 @@ export function setBatch(params={},callback){
 }
 
 
+/* 传感器详情机械特性特有 */
+export function getCNDJInfo(params={},callback){
+  return axios.request({
+    "url" : baseUrl+'/mech-motor/'+params.sensor_number+'/details/',
+    "method" : "get",
+  },callback)
+}
 

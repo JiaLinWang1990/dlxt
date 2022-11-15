@@ -92,7 +92,7 @@
         },
         mounted(){
             setInterval(this.timeFormat, 1000);
-            // this.createWebSocket();
+            this.createWebSocket();
             this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'site'
             this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:1
         },
