@@ -134,4 +134,7 @@
 .span-ellipis{
     font-size: 14px;
 }
+/deep/.el-tree-node:focus>.el-tree-node__content{
+    background-color:transparent !important;
+}
 </style>

@@ -61,6 +61,7 @@
                                     <el-option label="TEV" value="TEV"></el-option>
                                     <el-option label="Temp" value="Temp"></el-option>
                                     <el-option label="UHF" value="UHF"></el-option>
+                                    <el-option label="MECH" value="MECH"></el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
@@ -151,7 +152,8 @@
 
 <script>
 import * as device from '@/data/device.js'
- import tree from '@/components/tree.vue'
+import tree from '@/components/tree.vue'
+import Bus from "@/util/Bus.js";
 export default {
     name: "",
     components:{
@@ -191,13 +193,113 @@ export default {
             currentNode:{},//操作分页组件时需要知道之前点击的是哪个node
             loading:false,
             showjx: false,
-            alarmLevel:['正常','预警','报警']
+            alarmLevel: ['正常', '预警', '报警'],
+
+            testObj : {
+                "msg": "",
+                "code": 20001,
+                "data": {
+                    "alarm_broadcast": false,
+                    "latest3_alarm": true,
+                    "customer_id": "635b836dde618adbcf271125",
+                    "site_id": "635b836dde618adbcf271126",
+                    "equipment_id": "635b836dde618adbcf271127",
+                    "point_id": "635b836dde618adbcf271128",
+                    "sensor_data": {
+                        "_id": "6372f61598ca5fd489f7fc14",
+                        "sensor_type": "AE",
+                        "client_number": "8E00130200000100",
+                        "sensor_id": "584e500400200002",
+                        "is_latest": true,
+                        "is_online": true,
+                        "customer_id": "635b836dde618adbcf271125",
+                        "site_id": "635b836dde618adbcf271126",
+                        "equipment_id": "635b836dde618adbcf271127",
+                        "point_id": "635b836dde618adbcf271128",
+                        "battery": 78,
+                        "rssi": -89,
+                        "snr": 10,
+                        "upload_interval": 600,
+                        "srtc": 0,
+                        "acq_t": 0,
+                        "acq_period": 60,
+                        "acq_toffset": 0,
+                        "create_date": "2022-11-15 10:23:35",
+                        "update_date": "2022-11-15 10:23:35",
+                        "alarm_flag": 2,
+                        "alarm_level": 2,
+                        "alarm_describe": "悬浮放电221",
+                        "maxvalue": -10,
+                        "rmsvalue": "-2.60261368751526",
+                        "harmonic1": -10,
+                        "harmonic2": -10,
+                        "gain": 100,
+                        "sensor_data_id": "6372f61598ca5fd489f7fc15",
+                        "character_value": -10
+                    },
+                    "alarm_data": {
+                        "sensor_id": "584e500400200002",
+                        "sensor_type": "AE",
+                        "client_number": "8E00130200000100",
+                        "is_latest": true,
+                        "alarm_flag": 2,
+                        "alarm_type": 2,
+                        "alarm_level": 2,
+                        "alarm_describe": "悬浮放电999",
+                        "sensor_data_id": "6372f61598ca5fd489f7fc14",
+                        "is_online": true,
+                        "is_processed": false,
+                        "create_date": "2022-11-15 10:23:35",
+                        "update_date": "2022-11-15 10:23:35",
+                        "customer_id": "635b836dde618adbcf271125",
+                        "site_id": "635b836dde618adbcf271126",
+                        "equipment_id": "635b836dde618adbcf271127",
+                        "point_id": "635b836dde618adbcf271128",
+                        "id": "6372f61598ca5fd489f7fc15"
+                    },
+                    "unprocessed_num": "23",
+                    "abnormal_count_info": {
+                        "customer_abnormal_info": {
+                            "customer_day_abnormal_info": {
+                                "alarm_num": 2,
+                                "processed_num": 0
+                            },
+                            "customer_week_abnormal_info": {
+                                "alarm_num": 2,
+                                "processed_num": 0
+                            },
+                            "customer_month_abnormal_info": {
+                                "alarm_num": 5,
+                                "processed_num": 2
+                            }
+                        },
+                        "site_abnormal_info": {
+                            "site_day_abnormal_info": {
+                                "alarm_num": 2,
+                                "processed_num": 0
+                            },
+                            "site_week_abnormal_info": {
+                                "alarm_num": 2,
+                                "processed_num": 0
+                            },
+                            "site_month_abnormal_info": {
+                                "alarm_num": 5,
+                                "processed_num": 2
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            
         };
     },
     watch: {
       filterText(val) {
         this.$refs.trees.filterData(val);
-      }
+        },       
     },
     mounted() {
         this.getTreeData();
@@ -205,9 +307,15 @@ export default {
         // // Will get called after embed element was loaded
         // // svgPanZoom(document.getElementById('my-embed'));
         // })
+        Bus.$on('wsData', target => {
+            this.updateListByWs()         
+        })
     },
 
     methods: {
+        updateListByWs() { 
+
+        },
          handleSizeChange(val){
              this.size = val;
              this.clickNode(this.currentNode)
@@ -230,7 +338,8 @@ export default {
              $('.tree-div').css(treeStyle)      
             this.isFold?$('.main-area').css({width:'100%'}):$('.main-area').css({width:'calc(100% - 300px)'})
         },
-        queryData(){
+        queryData() {
+            Bus.$emit('wsData',JSON.stringify(this.testObj));
             let currentArr = JSON.parse(JSON.stringify(this.originTableData))
             if(this.form.type){
                 currentArr = currentArr.filter(item=>item.type==this.form.type)
