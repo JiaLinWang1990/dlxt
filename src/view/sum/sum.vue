@@ -77,6 +77,7 @@ import  amap  from './map.vue';
  import tree from '@/components/tree.vue'
 import * as device from '@/data/device.js'
 import * as map from '@/data/map.js'
+import Bus from "@/util/Bus.js";
    export default {
        name:'',
        components:{amap,tree},
@@ -100,10 +101,26 @@ import * as map from '@/data/map.js'
            
             window.onresize = ()=>{
                 this.initCharts();
-            }
+           }
+           Bus.$on('wsData', target => {
+                target = JSON.parse(target);
+                let abnormal_count_obj = target.data;
+                this.touchWsData(abnormal_count_obj)         
+            })
        },
 
-       methods: {
+    methods: {
+        touchWsData(obj ) {
+            let type = this.currentNode.type;
+            this.setCountAbnormal(obj.abnormal_count_info[type + '_abnormal_info'], type);   //异常情况处理统计
+            if (obj.latest3_alarm) {//最新三条报警
+                //还需要判断下报警的这条是否在当前公司或站点下
+                
+                this.tableData.pop();
+                this.tableData.unshift(obj.alarm_data);
+            }
+                
+        },
             refreshData(){
                 this.clickNode(this.currentNode);
             },
@@ -131,17 +148,8 @@ import * as map from '@/data/map.js'
                     console.log(res,'公司最新三条');
                    }) 
                    map.customerAbnormal({customer_id:v.id}).then(res => { 
-                    let tmp = res.data
-                    this.countAbnormal = {
-                        dayProcessedNum:tmp.customer_day_abnormal_info.processed_num,
-                        dayAlarmNum:tmp.customer_day_abnormal_info.alarm_num,
-                        weekProcessedNum:tmp.customer_week_abnormal_info.processed_num,
-                        weekAlarmNum:tmp.customer_week_abnormal_info.alarm_num,
-                        monthProcessedNum:tmp.customer_month_abnormal_info.processed_num,
-                        monthAlarmNum:tmp.customer_month_abnormal_info.alarm_num,
-                        sumProcessedNum:tmp.customer_month_abnormal_info.processed_num+tmp.customer_week_abnormal_info.processed_num+tmp.customer_day_abnormal_info.processed_num,
-                        sumAlarmNum:tmp.customer_month_abnormal_info.alarm_num+tmp.customer_week_abnormal_info.alarm_num+tmp.customer_day_abnormal_info.alarm_num
-                    };
+                       let tmp = res.data
+                       this.setCountAbnormal(tmp,'customer')                    
                     console.log(res,'公司异常情况处理统计');
                    })
                 }else if (v.type == "site") {
@@ -157,22 +165,24 @@ import * as map from '@/data/map.js'
                    })
                    map.siteAbnormal({site_id:v.id}).then(res => { 
                     console.log(res,'站点异常情况处理统计');
-                    let tmp = res.data
-                    this.countAbnormal = {
-                        dayProcessedNum:tmp.site_day_abnormal_info.processed_num,
-                        dayAlarmNum:tmp.site_day_abnormal_info.alarm_num,
-                        weekProcessedNum:tmp.site_week_abnormal_info.processed_num,
-                        weekAlarmNum:tmp.site_week_abnormal_info.alarm_num,
-                        monthProcessedNum:tmp.site_month_abnormal_info.processed_num,
-                        monthAlarmNum:tmp.site_month_abnormal_info.alarm_num,
-                        sumProcessedNum:tmp.site_month_abnormal_info.processed_num+tmp.site_week_abnormal_info.processed_num+tmp.site_day_abnormal_info.processed_num,
-                        sumAlarmNum:tmp.site_month_abnormal_info.alarm_num+tmp.site_week_abnormal_info.alarm_num+tmp.site_day_abnormal_info.alarm_num
-                    };
-                    // this.initCharts5();
+                       let tmp = res.data;
+                       this.setCountAbnormal(tmp,'site')                                      
                    })
                     
                 }  
-           },
+        },
+            setCountAbnormal(obj, type) { 
+                this.countAbnormal = {
+                    dayProcessedNum:obj[type+'_day_abnormal_info'].processed_num,
+                    dayAlarmNum:obj[type+'_day_abnormal_info'].alarm_num,
+                    weekProcessedNum:obj[type+'_week_abnormal_info'].processed_num,
+                    weekAlarmNum:obj[type+'_week_abnormal_info'].alarm_num,
+                    monthProcessedNum:obj[type+'_month_abnormal_info'].processed_num,
+                    monthAlarmNum:obj[type+'_month_abnormal_info'].alarm_num,
+                    sumProcessedNum:obj[type+'_month_abnormal_info'].processed_num+obj[type+'_week_abnormal_info'].processed_num+obj[type+'_day_abnormal_info'].processed_num,
+                    sumAlarmNum:obj[type+'_month_abnormal_info'].alarm_num+obj[type+'_week_abnormal_info'].alarm_num+obj[type+'_day_abnormal_info'].alarm_num
+                };
+            },
            customerStatus(id) { 
                map.companyStatus({ customer_id: id, data:{is_refresh: false} }).then(res => { 
                 this.customerInfos = res.data;

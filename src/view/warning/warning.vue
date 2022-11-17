@@ -144,7 +144,7 @@
                         <el-form-item  class='btn-group'>
                             <el-button size="small" type="primary"  @click="queryList">查询</el-button>
                             <el-button size="small">重置</el-button>
-                            <el-button size="small">批量确认</el-button>
+                            <!-- <el-button size="small">批量确认</el-button> -->
                         </el-form-item>
                     </el-form>
                 </div>
@@ -201,6 +201,8 @@
 import tree from '@/components/tree.vue'
 import * as warning from '@/data/warning.js'
 import * as device from '@/data/device.js'
+import Bus from "@/util/Bus.js";
+
    export default {
        name:'',
        components:{

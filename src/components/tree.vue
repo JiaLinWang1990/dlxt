@@ -3,8 +3,8 @@
        <el-tree ref="tree" :default-expanded-keys="defaultKeys" :data="data" :props="defaultProps" @node-click="handleNodeClick"
        @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node,data}">
-                <span :title="node.label">{{node.label }}</span>
-                <span v-if="data.type=='site'&&data.unprocessed_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.unprocessed_num?data.unprocessed_num:'')}}</span>
+                <span :title="node.label">{{node.label }}</span>  <!-- v-if="data.type=='site'&&data.unprocessed_num" -->
+                <span v-if="data.unprocessed_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.unprocessed_num?data.unprocessed_num:'')}}</span>
             </span>            
        </el-tree>
        <div id="menu" v-show="showMenu" @mouseleave="showMenu =!showMenu" >
@@ -39,10 +39,21 @@
            }
        },
        mounted(){  
-            
+            if (this.data.length) {
+                   this.data.forEach(item => { 
+                       if (item.children.length) {
+                           let temp=0;
+                           item.children.forEach(i => {
+                                temp+=Number(i.unprocessed_num)
+                           })
+                           item.unprocessed_num = temp;
+                        }
+                   })
+                   console.log(this.data,'树');
+                }
            this.$nextTick(()=>{
                 this.defaultKeys = this.data.length? [this.data[0].id]:[];
-                this.data[0] && this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);
+               this.data[0] && this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);               
            })       
        },
 
