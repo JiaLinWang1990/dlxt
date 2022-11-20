@@ -42,7 +42,7 @@ class PRP3D extends Chart {
             backgroundColor: opts.background,
             title: {
                 textAlign: "center",
-                text: title,
+                text: '   ',//title,
                 left: "50%",
                 textStyle: {
                     color: opts.color,
@@ -53,6 +53,7 @@ class PRP3D extends Chart {
                     align: "right",
                     color: opts.color,
                     fontSize: opts.fontSize,
+                    top:'10%'
                 }
             },
             tooltip: {
@@ -113,11 +114,12 @@ class PRP3D extends Chart {
                     // fontSize: opts.fontSize,
                     margin: opts.fontSize * 0.5,
                     formatter: function (value, index) {
-                        if (index === 2) {
+                       /*  if (index === 2) {
                             return '';
                         } else {
                             return value;
-                        }
+                        } */
+                        return value;
                     },
                 },
                 splitLine: {
@@ -146,12 +148,12 @@ class PRP3D extends Chart {
             },
             xAxis3D: {
                 type: 'value',
-                name: axisInfo.yDesc + ' [' + axisInfo.yUnit + ']',
+                name: axisInfo.yDesc + '/' + axisInfo.yUnit ,
                 interval: (axisInfo.yRangeMax - axisInfo.yRangeMin) / 4,
                 min: axisInfo.yRangeMin,
                 max: axisInfo.yRangeMax,
                 nameLocation: 'center',
-                nameGap: opts.fontSize * 0.5,
+                nameGap: opts.fontSize * 1.5,
                 nameTextStyle: {
                     color: "#FF7070",
                     fontSize: opts.fontSize
@@ -165,12 +167,12 @@ class PRP3D extends Chart {
             },
             yAxis3D: {
                 type: 'value',
-                name: axisInfo.xDesc + ' [' + axisInfo.xUnit + ']',
+                name: axisInfo.xDesc + '/' + axisInfo.xUnit ,
                 interval: (axisInfo.xRangeMax - axisInfo.xRangeMin) / 4,
                 min: axisInfo.xRangeMin,
                 max: axisInfo.xRangeMax,
                 nameLocation: 'center',
-                nameGap: opts.fontSize * 0.5,
+                nameGap: opts.fontSize * 1.5,
                 nameTextStyle: {
                     color: "#5D5DFD",
                     fontSize: opts.fontSize
@@ -183,17 +185,19 @@ class PRP3D extends Chart {
                 },
                 splitArea: {
                     show: true,
-                    areaStyle: '#DDF4F6'
+                    areaStyle: {
+                        color:'#3E3E3E'
+                    }//'#DDF4F6'
                 },
             },
             zAxis3D: {
                 type: 'value',
-                name: axisInfo.zDesc + (axisInfo.zUnit.length === 0 ? '' : '\n[' + axisInfo.zUnit + ']'),
+                name: axisInfo.zDesc + (axisInfo.zUnit.length === 0 ? '' : '/' + axisInfo.zUnit),
                 interval: (axisInfo.zRangeMax - axisInfo.zRangeMin) / 4,
                 min: Number(axisInfo.cycleNum) === 0 ? axisInfo.zRangeMin : axisInfo.zRangeMin / axisInfo.cycleNum,
                 max: Number(axisInfo.cycleNum) === 0 ? axisInfo.zRangeMax : axisInfo.zRangeMax / axisInfo.cycleNum,
                 nameLocation: 'center',
-                nameGap: opts.fontSize * 0.5,
+                nameGap: opts.fontSize * 1.5,
                 nameTextStyle: {
                     color: "#148914",
                     fontSize: opts.fontSize

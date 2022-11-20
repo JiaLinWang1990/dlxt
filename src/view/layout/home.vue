@@ -84,7 +84,19 @@
                },
                 formLabelWidth: "80px",
             }
-        },
+    },
+    watch: {
+        $route: { 
+            handler: function (val) {
+                console.log(val, 'router');
+                if (val.name == 'site') {
+                    this.activeTab = val.name;
+                    this.number = 1;
+                }                
+            },
+             immediate:true
+        },     
+    },
         mounted(){
             setInterval(this.timeFormat, 1000);
             this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'site'
@@ -102,7 +114,8 @@
                         message: '普通用户无权限',
                         type: 'warning'
                     });
-                }else{
+                } else {
+                    sessionStorage.setItem('activeTab',JSON.stringify({id:'site',number:1}))
                     this.$router.push('file')
                 }                
             },
@@ -116,6 +129,7 @@
                     account.logout().then(res=>{
                         if(res.code==0){
                             sessionStorage.removeItem('userInfo')
+                            sessionStorage.removeItem('activeTab')
                             This.$router.push('login')
                         }
                     }) 
@@ -129,7 +143,7 @@
             users(){},
             handleClickTab(tab,idx){
                 sessionStorage.setItem('activeTab',JSON.stringify({id:tab.id,number:idx}))
-                this.activeTab = tab.id;
+                // this.activeTab = tab.id;
                 this.number = idx;
                 this.$router.push(tab.id)
             },

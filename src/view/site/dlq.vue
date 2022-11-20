@@ -87,7 +87,7 @@ export default {
                     data: [],
                     axisLabel:{show:false},
                     axisTick: {
-                        show: false
+                        // show: false
                     },
                 },
                 yAxis: {
@@ -115,6 +115,9 @@ export default {
         };
     },
     mounted() {
+        console.log(999);
+        setTimeout(this.init,0)
+        // this.init();
     },
 
     methods: {
@@ -127,30 +130,31 @@ export default {
             this.switchChart = echarts.init(this.$refs.switch);
             let _option = JSON.parse(JSON.stringify(this.option))
             _option.yAxis.name = '开关量';
-            let obj = this.dlqData.Mech_CT_A_SW;
+            let obj = this.dataInfo.Mech_CT_A_SW;
+            console.log(obj,'obj');
             _option.xAxis.data = this.setxAxisData(obj.wave.length, obj.samplingperiod);
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[2] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dlqData.Mech_CT_A_SW.wave;
-            _option.series[1].data = this.dlqData.Mech_CT_B_SW.wave;
-            _option.series[2].data = this.dlqData.Mech_CT_C_SW.wave;
+            _option.series[0].data = this.dataInfo.Mech_CT_A_SW.wave;
+            _option.series[1].data = this.dataInfo.Mech_CT_B_SW.wave;
+            _option.series[2].data = this.dataInfo.Mech_CT_C_SW.wave;
             this.switchChart.setOption(_option);
         },
         initDisChart() { 
             this.disChart = echarts.init(this.$refs.dis);
             let _option = JSON.parse(JSON.stringify(this.option))
             _option.yAxis.name = '行程(mm)';
-            _option.series[0].data = this.dlqData.Mech_DIS_I.wave[0];
+            _option.series[0].data = this.dataInfo.Mech_DIS_I.wave[0];
             this.disChart.setOption(_option);
         },
         initCurrentChart() {
             this.currentChart = echarts.init(this.$refs.current);
             let _option = JSON.parse(JSON.stringify(this.option))
             _option.yAxis.name = '线圈电流(A)'
-            _option.xAxis.axisLabel.show = true;
+            // _option.xAxis.axisLabel.show = true;
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dlqData.Mech_Off_Coil_I.wave;
-            _option.series[1].data = this.dlqData.Mech_On_Coil_I.wave;
+            _option.series[0].data = this.dataInfo.Mech_Off_Coil_I.wave;
+            _option.series[1].data = this.dataInfo.Mech_On_Coil_I.wave;
             this.currentChart.setOption(_option);
         },
         setxAxisData(len, period) { 

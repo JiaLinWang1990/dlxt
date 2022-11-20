@@ -54,7 +54,17 @@ export default {
                     nameLocation: "center",  
                     nameGap: 42,            
                     data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    // axisLabel:{show:false},
+                    axisLabel: {
+                        formatter: function (value, index) {
+                            console.log(value,index,555);
+                        if (index===2) {
+                            return '';
+                        } else {
+                            return value;
+                        }
+                        // return value;
+                    },
+                    },
                     axisTick: {
                         show: false
                     },

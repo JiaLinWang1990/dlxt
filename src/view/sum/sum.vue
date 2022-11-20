@@ -23,11 +23,20 @@
                         <div class="notify-table">
                             <el-table :data="tableData" style="width: 100%">
                                 <el-table-column prop="create_date" label="报警时间" width="140"></el-table-column>
-                                <el-table-column prop="equipment_name" width="170" label="设备名称"></el-table-column>
-                                <el-table-column prop="site_name" label="站点名称"></el-table-column>
+                                <el-table-column prop="equipment_name"  label="设备名称"></el-table-column>
+                                <el-table-column prop="site_name"   width="150" label="站点名称"></el-table-column>
                                 <!--<el-table-column prop="pointName" label="测点名称"></el-table-column>-->
-                                <el-table-column prop="sensor_type" width="110" label="传感器类型"></el-table-column>
-                                <el-table-column prop="alarm_level" label="报警状态"></el-table-column>
+                                <el-table-column prop="sensor_type" width="90" label="传感器类型"></el-table-column>                                
+                                <el-table-column align="center" label="报警状态" >
+                                    <template slot-scope="props">
+                                        <p>{{alarmLevel[props.row.alarm_level]}}</p>   
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
+                                    </template>
+                                </el-table-column>
                             </el-table>
                         </div>
                     </div>
@@ -67,6 +76,9 @@
                 </div>
             </el-col>
         </el-row>
+        <div v-if="showDetails">
+            <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode"></Details>
+        </div>
    </div>
 </template>
 
@@ -77,10 +89,11 @@ import  amap  from './map.vue';
  import tree from '@/components/tree.vue'
 import * as device from '@/data/device.js'
 import * as map from '@/data/map.js'
+import  Details  from '../warning/details.vue';
 import Bus from "@/util/Bus.js";
    export default {
        name:'',
-       components:{amap,tree},
+       components:{amap,tree,Details},
        data(){
            return {
                myChart:null,
@@ -90,7 +103,9 @@ import Bus from "@/util/Bus.js";
                 abnormalInfos:{},
                countAbnormal: {},
                mapData:[],
-               currentNode:{},
+               currentNode: {},
+               alarmLevel: ['正常', '预警', '报警'],
+               showDetails:false,
            }
        },
        mounted(){
@@ -115,7 +130,7 @@ import Bus from "@/util/Bus.js";
             this.setCountAbnormal(obj.abnormal_count_info[type + '_abnormal_info'], type);   //异常情况处理统计
             if (obj.latest3_alarm) {//最新三条报警
                 //还需要判断下报警的这条是否在当前公司或站点下
-                
+
                 this.tableData.pop();
                 this.tableData.unshift(obj.alarm_data);
             }
@@ -780,7 +795,11 @@ import Bus from "@/util/Bus.js";
                     ]
                 };
                 this.myChart.setOption(option);
-           },
+        },
+        handle(row) {
+            this.detailsInfo = row;
+            this.showDetails = true;
+        },
           
        }
    }
@@ -837,10 +856,13 @@ import Bus from "@/util/Bus.js";
         }
         /deep/.el-table th, /deep/.el-table tr,/deep/.el-table td{
             background:#212325;border-color:#2C2E30;
-            padding:2px;color:#fff;text-align: center;font-size: 12px;;
+            padding:0px;color:#fff;text-align: center;font-size: 12px;;
         }
         /deep/.el-table th{
             background:#2C2E30
+        }
+        /deep/.el-table th.el-table__cell.is-leaf{
+            height:30px;
         }
     }
     .deal-box{

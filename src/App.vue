@@ -7,6 +7,7 @@
 <script>
 import { Message, MessageBox } from 'element-ui';
 import Bus from "@/util/Bus.js";
+import chartDetails from "@/view/site/chartDetails.vue";
 export default {
     name: 'App',
     data() { 
@@ -16,7 +17,7 @@ export default {
             lockReconnect:false,
             wsCfg: {
                 url:'ws://114.116.8.127:7084/ws/cloud-user-id/'
-            },            
+            },                    
         }
     },
     mounted() { 
@@ -25,6 +26,7 @@ export default {
             this.test(target);
         })
     },
+
     methods: {
         createWebSocket() {
             try {
@@ -71,17 +73,18 @@ export default {
             }, 5000);
         },
         test(testObj) {
+            let This = this;
             testObj = JSON.parse(testObj);    
+            if (!testObj.data.alarm_broadcast) return;   //只有测点报警才需要显示报警播报
             const h = this.$createElement;
-            let msgText = '有新的传感器报警，传感器编号为：' + testObj.data.alarm_data.client_number + ' ,类型为' + testObj.data.alarm_data.sensor_type + ',' +
+            let msgText = '有新的测点报警，传感器编号为：' + testObj.data.alarm_data.client_number + ' ,类型为' + testObj.data.alarm_data.sensor_type + ',' +
                 ' , 状态描述为： '+testObj.data.alarm_data.alarm_describe
             let msg = Message({
                 message: h('div', {}, [
                             h('div', {
                                 style: {width: '650px',display:'flex'}
                             }, [
-                                h('span', {
-                                    // style: {width: '520px','line-height':'30px','line-clamp': 2,float:'left',overflow: 'hidden', 'text-overflow':'ellipsis','white-space': 'nowrap'}
+                                h('span', {                                    
                                     style: {width: '520px','line-height':'26px','-webkit-line-clamp': 2,float:'left',overflow: 'hidden','box-orient': 'vertical',display: '-webkit-box'}  
                                 }, msgText),
                                 h('span', {
@@ -100,13 +103,15 @@ export default {
                                         'margin-top' :'15px'
                                     },
                                     on: {
-                                        click() {
+                                        click() {                                           
+                                            sessionStorage.setItem('activeTab', JSON.stringify({ id: 'site', number: 1 }))
+                                            This.$router.replace({ name: 'site', params: {data:testObj.data.sensor_data} });                                        
                                             msg.close()
                                         }
                                     }
                                 }, '立即查看!'),
                                 h('i', {
-                                    class: 'el-icon-circle-close', style: {cursor: 'pointer',float:'right','margin-left':'10px','padding-top': '5px','line-height':'60px'}, on: {
+                                    class: 'el-icon-circle-close', style: {cursor: 'pointer',float:'right','margin-left':'10px','padding-top': '5px','line-height':'42px'}, on: {
                                         click() {
                                             // Store.dispatch('removeWarning', item)
                                              msg.close()

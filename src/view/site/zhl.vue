@@ -37,7 +37,10 @@ export default {
                     left:'center'
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    formatter: function (params) { 
+                    
+                    }
                 },
                 legend: {},
                 grid: {
@@ -85,7 +88,6 @@ export default {
         };
     },
     mounted() {
-        console.log(this.dataInfo,888);
         this.$nextTick(()=>{
             this.initSwitchChart();
         })

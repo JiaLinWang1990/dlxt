@@ -247,7 +247,7 @@ import Bus from "@/util/Bus.js";
                     "msg": "",
                     "code": 20001,
                     "data": {
-                        "alarm_broadcast": false,
+                        "alarm_broadcast": true,
                         "latest3_alarm": true,
                         "customer_id": "635b836dde618adbcf271125",
                         "site_id": "635b836dde618adbcf271126",
@@ -282,7 +282,7 @@ import Bus from "@/util/Bus.js";
                             "harmonic1": -10,
                             "harmonic2": -10,
                             "gain": 100,
-                            "sensor_data_id": "6372f61598ca5fd489f7fc15",
+                            "sensor_data_id": "6372f61598ca5fd489f7fc14",
                             "character_value": -10
                         },
                         "alarm_data": {

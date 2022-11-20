@@ -7,17 +7,17 @@
                     <div style="display:table">
                         <el-col :span="24">
                             <el-col :span="5"> 报警时间：</el-col>
-                            <el-col :span="17">{{detailsInfo.update_time}}</el-col>                        
+                            <el-col :span="17">{{detailsInfo.create_date?detailsInfo.create_date:detailsInfo.update_time}}</el-col>                        
                         </el-col>
                         <el-col :span="24">
                             <el-col :span="5"> 设备名称：</el-col>
                             <el-col :span="17">{{detailsInfo.equipment_name}}</el-col>                        
-                        </el-col><!-- 
-                        <el-col :span="24">
+                        </el-col>
+                        <el-col :span="24" v-if="detailsInfo.site_name">
                             <el-col :span="5"> 站点名称：</el-col>
-                            <el-col :span="17">{{detailsInfo.point_name}}</el-col>                        
-                        </el-col> -->
-                        <el-col :span="24">
+                            <el-col :span="17">{{detailsInfo.site_name}}</el-col>                        
+                        </el-col>
+                        <el-col :span="24" v-if="detailsInfo.point_name">
                             <el-col :span="5"> 测点名称：</el-col>
                             <el-col :span="17">{{detailsInfo.point_name}}</el-col>                        
                         </el-col>

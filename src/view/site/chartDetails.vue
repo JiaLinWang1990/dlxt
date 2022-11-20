@@ -183,7 +183,7 @@
                     else{
                         This.activeTab[idx] =  'prps'
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
-                        data.chartBody.axisInfo.zMaxValue = "Max="+item.ampmax
+                        data.chartBody.axisInfo.zMaxValue = "最大放电幅值："+item.ampmax+'dBm'
                         actualType = 'prps3d';
                         var  _data = item.prps;
                         var  temp = data.chartBody.series[0].dataList
