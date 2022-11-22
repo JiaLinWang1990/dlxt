@@ -119,8 +119,7 @@ import Bus from "@/util/Bus.js";
            }
            Bus.$on('wsData', target => {
                 target = JSON.parse(target);
-                let abnormal_count_obj = target.data;
-                this.touchWsData(abnormal_count_obj)         
+                this.touchWsData(target.message.data)         
             })
        },
 

@@ -23,7 +23,8 @@ export default {
     mounted() { 
         this.createWebSocket();
         Bus.$on('wsData', target => {
-            this.test(target);
+            target = JSON.parse(target);
+            this.test(target.message.data);
         })
     },
 
@@ -59,6 +60,7 @@ export default {
             this.socket.onmessage = msg => {
                 // 业务逻辑处理
                 console.log(msg.data, "ws:data");
+                Bus.$emit('wsData',msg.data);
             };
         },
         reconnect() {
@@ -74,11 +76,10 @@ export default {
         },
         test(testObj) {
             let This = this;
-            testObj = JSON.parse(testObj);    
-            if (!testObj.data.alarm_broadcast) return;   //只有测点报警才需要显示报警播报
+            if (!testObj.alarm_broadcast) return;   //只有测点报警才需要显示报警播报
             const h = this.$createElement;
-            let msgText = '有新的测点报警，传感器编号为：' + testObj.data.alarm_data.client_number + ' ,类型为' + testObj.data.alarm_data.sensor_type + ',' +
-                ' , 状态描述为： '+testObj.data.alarm_data.alarm_describe
+            let msgText = '有新的测点报警，传感器编号为：' + testObj.alarm_data.client_number + ' ,类型为' + testObj.alarm_data.sensor_type + ',' +
+                ' , 状态描述为： '+testObj.alarm_data.alarm_describe
             let msg = Message({
                 message: h('div', {}, [
                             h('div', {
@@ -105,7 +106,7 @@ export default {
                                     on: {
                                         click() {                                           
                                             sessionStorage.setItem('activeTab', JSON.stringify({ id: 'site', number: 1 }))
-                                            This.$router.replace({ name: 'site', params: {data:testObj.data.sensor_data} });                                        
+                                            This.$router.replace({ name: 'site', params: {data:testObj.sensor_data} });                                        
                                             msg.close()
                                         }
                                     }

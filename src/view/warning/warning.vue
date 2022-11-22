@@ -344,7 +344,7 @@ import Bus from "@/util/Bus.js";
            this.getTreeData();
            Bus.$on('wsData', target => {
                target = JSON.parse(target);
-               let alarm_obj = target.data.alarm_data;
+               let alarm_obj = target.message.data.alarm_data;
                 this.updateListByWs(alarm_obj)         
             })
        },

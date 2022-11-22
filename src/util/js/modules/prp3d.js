@@ -149,7 +149,7 @@ class PRP3D extends Chart {
             xAxis3D: {
                 type: 'value',
                 name: axisInfo.yDesc + '/' + axisInfo.yUnit ,
-                interval: (axisInfo.yRangeMax - axisInfo.yRangeMin) / 4,
+                // interval: (axisInfo.yRangeMax - axisInfo.yRangeMin) / 4,
                 min: axisInfo.yRangeMin,
                 max: axisInfo.yRangeMax,
                 nameLocation: 'center',
@@ -162,6 +162,9 @@ class PRP3D extends Chart {
                     textStyle: {
                         color: "#FF7070",
                         fontSize: opts.fontSize
+                    },
+                    formatter: function (params) { 
+                        return params
                     }
                 },
             },
@@ -211,7 +214,7 @@ class PRP3D extends Chart {
             },
             visualMap: {
                 type: 'continuous',
-                show: true,
+                show: false,
                 seriesIndex: 1,
                 min: Number(axisInfo.cycleNum) === 0 ? axisInfo.zRangeMin : axisInfo.zRangeMin / axisInfo.cycleNum,
                 max: Number(axisInfo.cycleNum) === 0 ? axisInfo.zRangeMax : axisInfo.zRangeMax / axisInfo.cycleNum,
@@ -224,7 +227,8 @@ class PRP3D extends Chart {
                     },
                 textStyle: {
                     color: opts.color
-                }
+                },
+                itemWidth:0
             },
             series: this.getSeries(opts, chartBody),
             phaseShift: axisInfo.phaseShift,
