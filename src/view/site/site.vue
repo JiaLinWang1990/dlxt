@@ -113,7 +113,7 @@
                             <p>{{props.row.upload_interval/60 + 'min'}}</p>      
                         </template>
                     </el-table-column>                   
-                    <el-table-column prop="update_time" align="center" width="150" label="更新时间"></el-table-column>
+                    <el-table-column prop="update_date" align="center" width="150" label="更新时间"></el-table-column>
                     <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
                             <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
@@ -209,14 +209,14 @@ export default {
         }
         Bus.$on('wsData', target => {
             target = JSON.parse(target);
-            // this.updateListByWs(target.data)         
+            this.updateListByWs(target.message.data.sensor_data)         
         })
     },
 
     methods: {
         updateListByWs(obj) { 
             this.tableData.pop();
-            this.tableData.unshift(obj.alarm_data);
+            this.tableData.unshift(obj);
         },
          handleSizeChange(val){
              this.size = val;
