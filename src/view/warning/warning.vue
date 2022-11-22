@@ -524,6 +524,10 @@ import Bus from "@/util/Bus.js";
     .table-content{
         position: relative;
         height: calc(100% - 100px);
+        .el-table{
+            height:calc(100% - 40px);
+            overflow: auto;
+        }
     }
 </style>
 

@@ -211,7 +211,7 @@ class Amplitude extends Chart {
                     color: opts.color,
                     fontSize: opts.fontSize,
                     formatter: function (data) { 
-                        console.log(data,dataList, 'data');
+                        // console.log(data,dataList, 'data');
                         return dataList[index].dataList[0].value +axisInfo.unit;                     
                     }
                 }

@@ -4,8 +4,9 @@
            <!-- <div class="refresh" style="width:25px;height:25px;cursor:pointer;margin-left:5px;display:inline-block" @click="dialogVisible=false">
                <i class="el-icon-refresh-left" style="font-size:25px;font-weight:bold;color:#CA5051;"></i>
            </div> -->
-           <div style="width:25px;height:25px;cursor:pointer;padding-left:calc(100% - 30px);display:inline-block" @click="dialogVisible=false">
-               <i class="el-icon-error" style="font-size:25px;color:#CA5051;"></i>
+           <div style="width:100%;height:25px;cursor:pointer;">
+                <i class="el-icon-caret-right" style="font-size:25px;color:#CA5051;float:left" @click="reset"></i>
+               <i class="el-icon-error" style="font-size:25px;color:#CA5051;float:right" @click="dialogVisible=false"></i>
            </div>
             <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: start;">
                 <div class="body-content" v-for="(item,idx) in queryDetails" :key="idx">
@@ -104,20 +105,7 @@
            if(this.clickData){
                this.getTrendDetail();
            }
-           this.dataDetails.forEach((item, i) => {
-                this.tempArr[i]= device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type})
-            // this.queryDetails.push(this.getSensorDetails(item));            
-           })
-           Promise.all([...this.tempArr]).then(res => {
-               this.queryDetails = res   
-               this.$nextTick(() => {               
-                    if(this.dataDetails.length>6){
-                        this.DataDetails =this.DataDetails.slice(0,6);
-                        this.$message('最多同时展示六个');
-                    }
-                    this.initChart(this.queryDetails);
-                })                
-            })
+           this.getAllDetails();
            
             window.onresize = () => {
                 return (() => {
@@ -127,6 +115,25 @@
        },
 
         methods: {
+            getAllDetails(){
+                this.dataDetails.forEach((item, i) => {
+                this.tempArr[i]= device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type})
+                    // this.queryDetails.push(this.getSensorDetails(item));            
+                })
+                Promise.all([...this.tempArr]).then(res => {
+                    this.queryDetails = res   
+                    this.$nextTick(() => {               
+                        if(this.dataDetails.length>6){
+                            this.DataDetails =this.DataDetails.slice(0,6);
+                            this.$message('最多同时展示六个');
+                        }
+                        this.initChart(this.queryDetails);
+                    })                
+                })
+        },
+            reset(){
+                this.getAllDetails();
+            },
             getSensorDetails(item) { 
                 console.log(this.dataDetails);
                 device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type}).then(res => {
@@ -180,7 +187,7 @@
                         data.chartBody.series[2].dataList[0].value = Number(item.harmonic1).toFixed(2);//频率分量1
                         data.chartBody.series[3].dataList[0].value = Number(item.harmonic2).toFixed(2);//频率分量2
                     }
-                    else{
+                    else if(item.sensor_type=='UHF'){
                         This.activeTab[idx] =  'prps'
                         data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
                         data.chartBody.axisInfo.zMaxValue = "最大放电幅值："+item.ampmax+'dBm'
@@ -190,6 +197,8 @@
                         for(var i=0;i<_data.length;i++){
                             temp[i][2] = _data[i];
                         }
+                    }else{
+                        return;
                     }
                     
                     pdcharts.draw(document.getElementById(item.point_id), {

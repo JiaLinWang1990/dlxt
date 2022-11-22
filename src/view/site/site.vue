@@ -83,7 +83,7 @@
                     <el-table-column
                         header-align="center"
                         align="center"
-                        type="selection"
+                        type="selection" :selectable="selectFun"
                         width="55"
                     ></el-table-column>
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
@@ -268,11 +268,14 @@ export default {
                  this.selectedData =  this.tableData
             }
         },
-        handleSelect(val,row){
-            this.selectedData = val;
-            if(val){
-
+        selectFun(row){
+            if(row.sensor_type =='MECH'){
+                return false;
             }
+            return true;
+        },
+        handleSelect(val,row){            
+            this.selectedData = val;
         },
         getTreeData(){
             let This = this;
@@ -280,6 +283,7 @@ export default {
                 if(!res) return;
                 This.treeData = res.data;
                  res.data.length && res.data[0].children && this.getSiteSensor(res.data[0].children[0].id)
+                 this.currentNode = res.data[0].children[0]
             })
         },
         getEquipmentSensor(id){
@@ -303,6 +307,11 @@ export default {
             })
         },
         showDialog(val){
+            //机械特性单独处理
+            let jxtxIndex = this.selectedData.findIndex(v=>v.sensor_type == 'MECH');
+            if(jxtxIndex!=-1){  //
+                this.selectedData.splice(jxtxIndex,1)
+            }
             if(val==1){
                 if(!this.selectedData.length) {
                     this.$message({
