@@ -81,7 +81,7 @@
                                 <p>{{alarmLevel[props.row.alarm_level]}}</p>   
                             </template>
                         </el-table-column>
-                        <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="alarm_describe" align="center" width="200"  label="状态描述"></el-table-column>
                         <el-table-column prop="operator" align="center" label="处理情况">
                             <template slot-scope="props">
                                 <p>{{props.row.is_processed?'已处理':'未处理'}}</p>   
@@ -149,7 +149,11 @@
                     </el-form>
                 </div>
                 <div class="table-content">
-                    <el-table :data="tableData" style="width: 100%">
+                    <el-table :data="tableData" style="width: 100%"
+                    v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)">
                         <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
                         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                         <el-table-column align="center" prop="equipment_name"  width="200" label="设备名称" ></el-table-column>
@@ -161,7 +165,7 @@
                             <p>{{alarmLevel[props.row.alarm_level]}}</p>   
                         </template>
                         </el-table-column>
-                        <el-table-column prop="alarm_describe" align="center" label="状态描述"></el-table-column>
+                        <el-table-column prop="alarm_describe" align="center" width="200"  label="状态描述"></el-table-column>
                         <el-table-column prop="operator" align="center" label="处理情况">
                             <template slot-scope="props">
                                 <p>{{props.row.is_processed?'已处理':'未处理'}}</p>   
