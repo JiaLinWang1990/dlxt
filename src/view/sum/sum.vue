@@ -114,9 +114,9 @@ import Bus from "@/util/Bus.js";
                 this.getTreeData();
             })
            
-            window.onresize = ()=>{
-                this.initCharts();
-           }
+        //     window.onresize = ()=>{
+        //         this.initCharts();
+        //    }
            Bus.$on('wsData', target => {
                 target = JSON.parse(target);
                 this.touchWsData(target.message.data)         

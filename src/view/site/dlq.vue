@@ -115,9 +115,9 @@ export default {
         };
     },
     mounted() {
-        console.log(999);
-        setTimeout(this.init,0)
-        // this.init();
+        this.$nextTick(()=>{
+            this.init();      
+        })  
     },
 
     methods: {
@@ -136,6 +136,9 @@ export default {
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[2] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[0].data = this.dataInfo.Mech_CT_A_SW.wave;
+            _option.series[0].name = '线路一';
+            _option.series[1].name = '线路二';
+            _option.series[2].name = '线路三';
             _option.series[1].data = this.dataInfo.Mech_CT_B_SW.wave;
             _option.series[2].data = this.dataInfo.Mech_CT_C_SW.wave;
             this.switchChart.setOption(_option);

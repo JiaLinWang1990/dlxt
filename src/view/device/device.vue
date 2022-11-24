@@ -90,7 +90,7 @@
                     </el-table>
                 </div>   
                 
-                <div style="margin-top:20px;background:#fff;">
+                <div style="margin-top:10px;background:#fff;">
                     <div class="block-title">传感器详情</div>
                     <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
                         <el-form-item label="传感器名称" prop="name">
@@ -215,7 +215,7 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="addDeviceDialog = false">取 消</el-button>
+                <el-button @click="cancelDialog">取 消</el-button>
                 <el-button type="primary" @click="saveDevice('deviceForm')">保 存</el-button>
             </div>
         </el-dialog>
@@ -237,16 +237,7 @@
                         :value="item.value">
                         </el-option>
                     </el-select>
-                </el-form-item>               
-                <!-- <el-form-item label="时间设置" prop="name">
-                    <el-select v-model="deviceForm.userName" placeholder="请选择">
-                        <el-option label="区域一" value="shanghai"></el-option>
-                        <el-option label="区域二" value="beijing"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input type="textarea" v-model="deviceForm.desc"></el-input>
-                </el-form-item> -->
+                </el-form-item>           
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="saveBatch">同种批量应用</el-button>
@@ -531,10 +522,13 @@ export default {
                 }else{
                     return false
                 }
-            })
-            
-           
+            })                       
         },
+        cancelDialog(){
+            this.clearForm();
+            this.addDeviceDialog = false
+        },
+        
         sensorDetails(obj){
             this.showChartDetails = true;
              this.dataDetails = [
@@ -546,14 +540,9 @@ export default {
             done();
         },
         clearForm(){
-            this.deviceForm = {
-                name:'',
-                customer:'',
-                site_id:'',
-                client_number:'',                
-                time_adjusting:'',
-                remarks:'',
-            }
+            for(let i in this.deviceForm){
+                this.deviceForm[i] = '';
+            }           
         }
     },
 };
@@ -564,7 +553,7 @@ export default {
     position: absolute;right:10px;bottom: 10px;
 }
 /deep/.el-form-item{
-    margin-bottom:18px;
+    margin-bottom:8px;
 }
 /deep/.el-table th.el-table__cell.is-leaf{
     background: #FAFAFA !important;

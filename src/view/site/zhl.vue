@@ -71,14 +71,17 @@ export default {
                 },
                 series: [
                     {
+                        name:'回路A',
                         data: [],
                         type: 'line',
                         smooth: true
                     },{
+                        name:'回路B',
                         data: [],
                         type: 'line',
                         smooth: true
                     },{
+                        name:'回路C',
                         data: [],
                         type: 'line',
                         smooth: true
