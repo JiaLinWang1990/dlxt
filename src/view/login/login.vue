@@ -43,6 +43,7 @@
 
 <script>
 import * as account from '@/data/api.js'
+import Bus from "@/util/Bus.js";
 export default {
   name:'',
   data(){
@@ -78,8 +79,9 @@ export default {
       login(){
           account.login(this.formModel).then(res=>{
               if(res.code == 0){
-                sessionStorage.setItem('userInfo',JSON.stringify(res.data))
-                  this.$router.push({name:'site'})
+                    sessionStorage.setItem('userInfo',JSON.stringify(res.data))
+                  this.$router.push({ name: 'site' })
+                    Bus.$emit('logined')
               }              
           },err=>{
               console.log

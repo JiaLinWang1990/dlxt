@@ -337,6 +337,7 @@ export default {
         },
         clickNode(v){  
             this.currentNode = v;
+            this.currentPage = 1;
             this.selectedData = [];            
             if(v.type=="site"){
                 this.loading = true;

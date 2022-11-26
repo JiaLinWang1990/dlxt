@@ -21,10 +21,14 @@ export default {
         }
     },
     mounted() { 
-        this.createWebSocket();
+        // this.userInfo && this.createWebSocket();
         Bus.$on('wsData', target => {
             target = JSON.parse(target);
             this.test(target.message.data);
+        })
+        Bus.$on('logined', target => {
+            console.log('已经登录');
+            this.createWebSocket();
         })
     },
 

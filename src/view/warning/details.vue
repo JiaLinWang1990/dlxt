@@ -39,8 +39,8 @@
                          <el-form :model="handleForm" label-position="left">
                            <el-form-item label="处理结果："  label-width="98px">
                             <el-radio-group v-model="handleForm.is_processed">
-                                <el-radio label="true">已处理</el-radio>
-                                <el-radio label="false">未处理</el-radio>
+                                <el-radio :label="true">已处理</el-radio>
+                                <el-radio :label="false">未处理</el-radio>
                             </el-radio-group>
                                 
                            </el-form-item>
@@ -96,6 +96,9 @@ export default {
    created(){
    },
     mounted() {
+        if (this.detailsInfo) {
+            this.handleForm.is_processed = this.detailsInfo.is_processed;
+        }
    },
     methods: {
         handleAlarm(row) {            
@@ -103,6 +106,7 @@ export default {
                 console.log(res,);
                 this.$message({ type: 'success', message: '修改成功' }); 
                 this.$emit("clickNode");
+                this.$emit("refreshTree");//更新树的未处理数
                 this.showDetails = false
             })
         }

@@ -102,7 +102,8 @@ router.beforeEach((to,from,next)=>{
     MessageBox.alert('登录已失效，请重新登录','提示', {
           confirmButtonText: '确定',
           callback: function () {
-            sessionStorage.removeItem('userInfo')
+              sessionStorage.removeItem('userInfo')
+              sessionStorage.removeItem('activeTab')
             next({path:'/login'});
           }
       })   

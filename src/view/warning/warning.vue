@@ -70,7 +70,7 @@
                     element-loading-text="拼命加载中"
                     element-loading-spinner="el-icon-loading"
                     element-loading-background="rgba(0, 0, 0, 0.8)">
-                        <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+                        <!-- <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column> -->
                         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                         <el-table-column align="center" prop="equipment_name"  width="200" label="设备名称" ></el-table-column>
                         <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
@@ -154,7 +154,7 @@
                     element-loading-text="拼命加载中"
                     element-loading-spinner="el-icon-loading"
                     element-loading-background="rgba(0, 0, 0, 0.8)">
-                        <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column>
+                        <!-- <el-table-column header-align="center" align="center" type="selection" width="55"></el-table-column> -->
                         <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                         <el-table-column align="center" prop="equipment_name"  width="200" label="设备名称" ></el-table-column>
                         <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
@@ -192,7 +192,7 @@
             </div>
         </div>
         <div v-if="showDetails">
-            <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode"></Details>
+            <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode" @refreshTree="refreshTree"></Details>
         </div>
         <div  v-if="showChartDetails" >
             <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
@@ -428,6 +428,25 @@ import Bus from "@/util/Bus.js";
                 this.loading = true;
                 this.getEquipmentList(obj.id);             
             }    
+        },
+        refreshTree() { 
+            let ids = {}
+            let arr = this.treeData;
+            let _this = this;
+            console.log(this.currentNodeInfo.unprocessed_num,'before');
+            function query(arr) {
+                arr.forEach(item => {
+                    if (item.id = _this.currentNodeInfo.id) {
+                        item.unprocessed_num--;
+                        console.log(_this.currentNodeInfo.unprocessed_num,'after');
+                    }
+                    if (item.children) {
+                        query(item.children)
+                    }
+                })
+            }
+            query(arr)
+            console.log(ids)
         },
         showSearch(){},
         toggle(v){},

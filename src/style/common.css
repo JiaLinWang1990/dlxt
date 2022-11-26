@@ -168,6 +168,6 @@
 .el-pagination{
   color:#ccc;
 }
-.el-pagination .btn-next{
+.el-pagination .btn-next, .el-pagination .btn-prev{
   color:#ccc;
 }

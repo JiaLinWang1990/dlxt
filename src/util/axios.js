@@ -54,6 +54,8 @@ axios.interceptors.response.use((response) => {
             confirmButtonText: '确定',
             callback: function () {
                 delCookie('cloud_token');
+                sessionStorage.removeItem('userInfo')
+                 sessionStorage.removeItem('activeTab')
                 Router.push({path:'/'},()=>{})
             }
         })

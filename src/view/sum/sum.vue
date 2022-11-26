@@ -733,7 +733,7 @@ import Bus from "@/util/Bus.js";
                 ];
                let option = {
                     title: {
-                        text: '资产统计',
+                        text: '传感器在线率',
                         textStyle:{
                             color:'#fff'
                         }
