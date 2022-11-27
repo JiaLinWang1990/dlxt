@@ -88,7 +88,6 @@
     watch: {
         $route: { 
             handler: function (val) {
-                console.log(val, 'router');
                 if (val.name == 'site') {
                     this.activeTab = val.name;
                     this.number = 1;

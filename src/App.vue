@@ -13,7 +13,7 @@ export default {
     data() { 
         return {
             userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
-            socket:null,
+            socket:  null,
             lockReconnect:false,
             wsCfg: {
                 url:'ws://114.116.8.127:7084/ws/cloud-user-id/'
@@ -28,15 +28,20 @@ export default {
         })
         Bus.$on('logined', target => {
             console.log('已经登录');
-            this.createWebSocket();
+            this.createWebSocket(target);
         })
+        if (this.userInfo) { //手动刷新页面时重新连接
+            this.createWebSocket()
+        }
     },
 
     methods: {
-        createWebSocket() {
+        createWebSocket(id) {
             try {
                 // 创建Web Socket 连接
-                this.socket = new WebSocket(this.wsCfg.url+this.userInfo.id+'/');
+                id = id || this.userInfo.id;
+                this.socket = new WebSocket(this.wsCfg.url + id + '/'); 
+                console.log(this.socket,'websocket');
                 // 初始化事件
                 this.initEventHandle(this.socket);
             } catch (e) {
@@ -75,7 +80,7 @@ export default {
             // 没连接上会一直重连，设置延迟避免请求过多
             setTimeout(() => {
                 this.lockReconnect = false;
-                this.createWebSocket(this.wsCfg.url+this.userInfo.id+'/');
+                this.createWebSocket();
             }, 5000);
         },
         test(testObj) {

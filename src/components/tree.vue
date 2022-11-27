@@ -49,7 +49,6 @@
                            item.unprocessed_num = temp;
                         }
                    })
-                   console.log(this.data,'树');
                 }
            this.$nextTick(()=>{
                 this.defaultKeys = this.data.length? [this.data[0].id]:[];

@@ -203,7 +203,6 @@ export default {
     },
     mounted() {
         this.getTreeData();
-        console.log(this.$route.query);
         if (this.$route.params.data) {
             this.details(this.$route.params.data)
         }

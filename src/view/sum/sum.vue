@@ -584,7 +584,7 @@ import Bus from "@/util/Bus.js";
                             center: ['25%', '25%'],
                             roseType: 'radius',
                             label: {
-                                show: false
+                                // show: false
                             },
                             data: obj.UHF
                         },
@@ -595,7 +595,7 @@ import Bus from "@/util/Bus.js";
                             center: ['75%', '25%'],
                             roseType: 'area',  
                             label: {
-                                show: false
+                                // show: false
                             },                      
                             data: obj.TEMP
                         },
@@ -606,18 +606,18 @@ import Bus from "@/util/Bus.js";
                             center: ['25%', '75%'],
                             roseType: 'area',    
                             label: {
-                                show: false
+                                // show: false
                             },                      
                             data: obj.TEV
                         },
                          {
                             name: '超声波传感器',
                             type: 'pie',
-                            radius: [10, 50],
+                            radius: [10, 30],
                             center: ['75%', '75%'],
                             roseType: 'area',   
                             label: {
-                                show: false
+                                // show: false
                             },                        
                             data:obj.AE
                         }

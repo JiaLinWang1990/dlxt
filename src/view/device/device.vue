@@ -256,6 +256,7 @@ import tree from "@/components/tree.vue";
 import * as account from '@/data/api.js'
 import * as device from '@/data/device.js'
 import * as api from '@/data/api.js'
+import request from 'axios'
 export default {
     name: "deviceManager",
     components: {
@@ -368,10 +369,30 @@ export default {
                 type:type
             }
             device.exportData(params).then(res => {
-                console.log(res,'导出');
+                console.log(JSON.parse(res), '导出');
+                
             })
         },
-
+        exportMethod (data) {
+            return request({
+                method: data.method,
+                url: `${data.url}${data.params ? '?' + data.params : ''}`,
+                responseType: 'blob'
+            }).then((res) => {
+                const link = document.createElement('a')
+                let blob = new Blob([res.data], { type: 'application/vnd.ms-excel' })
+                link.style.display = 'none'
+                link.href = URL.createObjectURL(blob)
+            //  link.download = res.headers['content-disposition'] //下载后文件名
+            //  link.setAttribute('download', apis[this.activeName - 0].name + '.xlsx')
+                link.download = data.fileName //下载的文件名
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            }).catch(error => {
+                console.log(error)
+            })
+        },
         add(obj,n){
             this.addDevice();
             if(n==2){
@@ -485,6 +506,8 @@ export default {
         getCustomerList(){
             account.getCustomerList(this.userForm).then(res=>{
                 this.customerList = res.data.customers;
+                this.exportForm.customer_id =  this.customerList[0].id,
+                console.log(this.customerList,'customerList');
             })
         },
         setValue(v){
@@ -532,7 +555,7 @@ export default {
         sensorDetails(obj){
             this.showChartDetails = true;
              this.dataDetails = [
-                 {type:obj.sensor_type,sensor_info:obj.sensor_info,point_id:obj.sensor_id}
+                 {type:obj.sensor_type,sensor_info:obj.sensor_info,point_id:obj.sensor_id,sensor_data_id:obj.sensor_data_id,sensor_type:obj.sensor_type}
              ];
         },
         handleClose(done){

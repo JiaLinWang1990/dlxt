@@ -157,7 +157,7 @@ export function queryTrees(params={},callback){
 export function importFile(params={},callback){
     return axios.request({
       "url" : baseUrl+"/gateway_file_import/",
-      "method" : "post",
+        "method": "post",       
       "data":params.data
     },callback)
   }
@@ -167,6 +167,7 @@ export function exportData(params={},callback){
     return axios.request({
         "url" : baseUrl+'/gateway_file_export/',
         "method": "get",
+        "responseType": "blob",
         "params":params
     },callback)
 }

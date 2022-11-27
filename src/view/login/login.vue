@@ -81,7 +81,7 @@ export default {
               if(res.code == 0){
                     sessionStorage.setItem('userInfo',JSON.stringify(res.data))
                   this.$router.push({ name: 'site' })
-                    Bus.$emit('logined')
+                    Bus.$emit('logined',res.data.id)
               }              
           },err=>{
               console.log

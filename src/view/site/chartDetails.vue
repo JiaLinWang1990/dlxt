@@ -13,18 +13,18 @@
                     <div class="basic-box">
                         <el-row class="basic-info">
                             <el-col :span="12">
-                                <p>测点名称 : {{dataDetails[idx].point_name}}</p>
-                                <p>传感器类型 : {{dataDetails[idx].sensor_type}}</p>
+                                <p>测点名称 : {{queryDetails[idx].data.point_name}}</p>
+                                <p>传感器类型 : {{queryDetails[idx].data.sensor_type}}</p>
                                                         
                             </el-col>
                             <el-col :span="12">
-                                <p>设备名称 : {{dataDetails[idx].device_name}}</p> 
+                                <p>设备名称 : {{queryDetails[idx].data.device_name}}</p> 
                             </el-col>
                         </el-row>
                         <el-row class="basic-info">
                             <el-col :span="24">
                                 <!-- <p>采样时间 : {{JSON.stringify(clickData) != "{}"?item.sensor_info.create_time.substring(0,item.sensor_info.create_time.length-7):(item.sensor_info.update_time?item.sensor_info.update_time.substring(0,item.sensor_info.update_time.length-7):'')}}</p>   -->
-                                <p>采样时间 : {{dataDetails[idx].update_time}}</p>
+                                <p>采样时间 : {{queryDetails[idx].data.update_date}}</p>
                             </el-col>
                             <el-col :span="24">
                                 <p>诊断结果 : 正常</p>  
@@ -115,19 +115,20 @@
        },
 
         methods: {
-            getAllDetails(){
+            getAllDetails() {
+                let This = this;
                 this.dataDetails.forEach((item, i) => {
-                this.tempArr[i]= device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type})
+                    this.tempArr[i]= device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type})
                     // this.queryDetails.push(this.getSensorDetails(item));            
                 })
                 Promise.all([...this.tempArr]).then(res => {
-                    this.queryDetails = res   
+                    This.queryDetails = res 
                     this.$nextTick(() => {               
                         if(this.dataDetails.length>6){
                             this.DataDetails =this.DataDetails.slice(0,6);
                             this.$message('最多同时展示六个');
                         }
-                        this.initChart(this.queryDetails);
+                        this.initChart(This.queryDetails);
                     })                
                 })
         },

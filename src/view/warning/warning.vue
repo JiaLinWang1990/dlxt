@@ -61,7 +61,7 @@
                         <el-form-item  class='btn-group'>
                             <el-button size="small" type="primary" @click="queryList">查询</el-button>
                             <el-button size="small"  @click="reset">重置</el-button>
-                            <el-button size="small">批量确认</el-button>
+                            <!-- <el-button size="small">批量确认</el-button> -->
                         </el-form-item>
                     </el-form>
                 </div>
@@ -420,7 +420,6 @@ import Bus from "@/util/Bus.js";
                 obj = v;
                 this.currentNodeInfo = v;
             }
-            console.log(this.currentNodeInfo,666);
             if(obj.type=="site"){
                 this.loading = true;
                 this.getSiteList(obj.id)

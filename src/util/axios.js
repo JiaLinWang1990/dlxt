@@ -43,7 +43,29 @@ axios.interceptors.request.use(config => {
 
 
 axios.interceptors.response.use((response) => {
-    let {data, config, headers,status} = response
+    let { data, config, headers, status } = response;
+    let ct = headers['content-type']
+    let cd = headers['content-disposition']
+    if (ct === 'application/vnd.ms-excel') {
+        //导出的
+        let fileName = ''        
+        if (!isEmpty(cd)) {
+            fileName = cd.split(";")[1].split("filename=")[1]
+        }
+        var blob = new Blob([data], {type: 'application/vnd.ms-excel;charset=utf-8'})
+        var downloadElement = document.createElement('a');
+        var href = window.URL.createObjectURL(blob); //创建下载的链接
+        downloadElement.href = href;
+        downloadElement.download = fileName; //下载后文件名
+        document.body.appendChild(downloadElement);
+        downloadElement.click(); //点击下载
+        document.body.removeChild(downloadElement); //下载完成移除元素
+        window.URL.revokeObjectURL(href); //释放掉blob对象
+        return response.data
+    }
+    if (typeof data === 'string') {
+        return data;
+    }
     if(data.code!=0){
         return  Promise.reject(data.msg)
     }
@@ -72,5 +94,29 @@ axios.interceptors.response.use((response) => {
     // return Promise.reject(new Error('登录失效'));
     
 })
+/**!
+ * 是否为JSON字符串
+ */
+function isJson(obj) {
+    return typeof (obj) === 'object' && Object.prototype.toString.call(obj).toLowerCase() === '[object object]' && !obj.length
+}
 
+/**!
+ * 是否为空
+ */
+ function isEmpty(obj) {
+    if (typeof obj === 'undefined' || obj === null || obj === '') {
+        return true
+    }
+    if (isJson(obj)) {
+        for (let i in obj) {
+            return false
+        }
+        return true
+    }
+    if (Array.isArray(obj) && obj.length < 1) {
+        return true
+    }
+    return false
+}
 export {axios}
