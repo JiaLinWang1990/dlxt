@@ -5,7 +5,7 @@
                <i class="el-icon-refresh-left" style="font-size:25px;font-weight:bold;color:#CA5051;"></i>
            </div> -->
            <div style="width:100%;height:25px;cursor:pointer;">
-                <i class="el-icon-caret-right" style="font-size:25px;color:#CA5051;float:left" @click="reset"></i>
+                <i class="el-icon-caret-right" style="font-size:25px;color:#CA5051;float:left" @click="reset" v-if="queryDetails.length===1"></i>
                <i class="el-icon-error" style="font-size:25px;color:#CA5051;float:right" @click="dialogVisible=false"></i>
            </div>
             <div style="display:flex;flex-wrap: wrap;flex: 0 0 33%;justify-content: start;">
@@ -56,6 +56,8 @@
 <script>
     import * as pdcharts  from '@/util/js/index.js'
     import * as device from '@/data/device.js'
+    import Bus from "@/util/Bus.js";
+
     export default {
        name:'',
         props:{
@@ -81,7 +83,8 @@
                 showClo:false,
                 DataDetails: [],//区别于直接传过来的值，该值表示趋势详情的数组
                 queryDetails: [],   //查询详情接口返回值的集合
-                tempArr:[],//临时数组
+                tempArr: [],//临时数组
+                currentMode:0, //当前传感器在线工作模式，默认关闭
             }
        },
         computed:{
@@ -111,7 +114,11 @@
                 return (() => {
                     this.setDialogWidth()
                 })()
-            }
+           }
+           Bus.$on('wsData', target => {
+                target = JSON.parse(target);
+                this.updateListByWs(target.message.data.sensor_data)         
+            })
        },
 
         methods: {
@@ -123,6 +130,7 @@
                 })
                 Promise.all([...this.tempArr]).then(res => {
                     This.queryDetails = res 
+                    console.log(This.queryDetails,'This.queryDetails');
                     this.$nextTick(() => {               
                         if(this.dataDetails.length>6){
                             this.DataDetails =this.DataDetails.slice(0,6);
@@ -132,8 +140,22 @@
                     })                
                 })
         },
-            reset(){
-                this.getAllDetails();
+            reset(mode) {
+                let params = {
+                    sensor_id: this.queryDetails[0].data.sensor_id,
+                    data: {
+                        work_mode:mode==='off'?0:1
+                    }                   
+                }
+                this.currentMode = mode === 'off' ? 0 : 1;
+                let msg = mode==='off'?'传感器在线工作模式已关闭':'传感器在线工作模式已开启'
+                device.setWorkMode(params).then(res => { 
+                    this.$message({
+                        message: msg,
+                        type:'success'
+                    });
+                })
+                // this.getAllDetails();
             },
             getSensorDetails(item) { 
                 console.log(this.dataDetails);
@@ -213,7 +235,12 @@
                     });
                 })           
             }
+    },
+    destroyed() {
+        if (this.currentMode) {
+            this.reset('off')
         }
+    }
    }
 </script>
 

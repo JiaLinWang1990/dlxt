@@ -75,7 +75,6 @@ import cnjd from './cndj.vue'
         methods: {
             getSensorDetails(item) { 
                 device.sensorDetails({sensor_data_id:item.sensor_data_id,sensor_type:item.sensor_type}).then(res => {
-                    console.log(res,'机械特性详情');
                     this.dataInfo=res.data;
                 })
             },

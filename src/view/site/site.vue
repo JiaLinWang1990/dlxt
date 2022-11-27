@@ -13,7 +13,7 @@
                 v-model="filterText">
             </el-input>
             <div class="tree-div" style="">
-                <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length!=0"></tree>
+                <tree :type="'site'" :data="treeData" @clickNode="clickNode" :currentKey="currentKey" ref="trees" v-if="treeData.length!=0"></tree>
             </div>            
         </div>
         <div class="main-area">
@@ -194,6 +194,7 @@ export default {
             loading:false,
             showjx: false,
             alarmLevel: ['正常', '预警', '报警'],
+            currentKey:'',//树的当前高亮点
         };
     },
     watch: {
@@ -203,8 +204,11 @@ export default {
     },
     mounted() {
         this.getTreeData();
-        if (this.$route.params.data) {
+       /*  if (this.$route.params.data) {
             this.details(this.$route.params.data)
+        } */
+        if (this.$route.params.obj) {
+            this.clickNode(this.$route.params.obj)
         }
         Bus.$on('wsData', target => {
             target = JSON.parse(target);
@@ -281,6 +285,7 @@ export default {
             device.queryTree().then(res=>{
                 if(!res) return;
                 This.treeData = res.data;
+                if (this.$route.params.obj) { return}
                  res.data.length && res.data[0].children && this.getSiteSensor(res.data[0].children[0].id)
                  this.currentNode = res.data[0].children[0]
             })
@@ -337,7 +342,9 @@ export default {
         clickNode(v){  
             this.currentNode = v;
             this.currentPage = 1;
-            this.selectedData = [];            
+            this.selectedData = [];   
+            this.currentKey = v.id
+            // this.$refs['trees'].setCurrentKey(v.id);        
             if(v.type=="site"){
                 this.loading = true;
                 this.getSiteSensor(v.id)

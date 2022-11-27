@@ -1,6 +1,9 @@
 <template>
   <div id="app">
       <router-view/>
+      <div  v-if="showChartDetails" >
+            <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
+        </div>
   </div>
 </template>
 
@@ -10,11 +13,16 @@ import Bus from "@/util/Bus.js";
 import chartDetails from "@/view/site/chartDetails.vue";
 export default {
     name: 'App',
+    components:{
+        chartDetails
+    },
     data() { 
         return {
             userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
             socket:  null,
-            lockReconnect:false,
+            lockReconnect: false,
+            showChartDetails: false,
+            dataDetails: {},
             wsCfg: {
                 url:'ws://114.116.8.127:7084/ws/cloud-user-id/'
             },                    
@@ -24,7 +32,7 @@ export default {
         // this.userInfo && this.createWebSocket();
         Bus.$on('wsData', target => {
             target = JSON.parse(target);
-            this.test(target.message.data);
+             this.test(target.message.data);
         })
         Bus.$on('logined', target => {
             console.log('已经登录');
@@ -84,6 +92,9 @@ export default {
             }, 5000);
         },
         test(testObj) {
+            this.showChartDetails = true;
+            this.dataDetails = [testObj.alarm_data];
+            return;
             let This = this;
             if (!testObj.alarm_broadcast) return;   //只有测点报警才需要显示报警播报
             const h = this.$createElement;

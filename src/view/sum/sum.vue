@@ -13,7 +13,7 @@
                 <div class="content-box">
                     <div style="height: calc(100% - 170px);">
                         <div class="map-tree">
-                            <tree :type="'site'" :data="treeData" @clickNode="clickNode" ref="trees" v-if="treeData.length"></tree>
+                            <tree :type="'site'" :data="treeData" @clickNode="clickNode" @doubleClick="doubleClick" ref="trees" v-if="treeData.length"></tree>
                         </div>
                         <amap class="map" :mapData="mapData"></amap>
                     </div>                    
@@ -123,7 +123,7 @@ import Bus from "@/util/Bus.js";
             })
        },
 
-    methods: {
+    methods: {        
         touchWsData(obj ) {
             let type = this.currentNode.type;
             this.setCountAbnormal(obj.abnormal_count_info[type + '_abnormal_info'], type);   //异常情况处理统计
@@ -134,6 +134,11 @@ import Bus from "@/util/Bus.js";
                 this.tableData.unshift(obj.alarm_data);
             }
                 
+        },
+        doubleClick(obj) { 
+            console.log(obj, '双击');
+            this.$router.replace({ name: 'site', params: {obj:obj} });                                        
+
         },
             refreshData(){
                 this.clickNode(this.currentNode);
@@ -344,7 +349,7 @@ import Bus from "@/util/Bus.js";
                     normalList.push(item.normal_num)
                     warningList.push(item.warning_num)
                     sumList.push(item.total)
-                    siteNameList.push(item.site_name)
+                    siteNameList.push(item.site_name?item.site_name:item.device_type)
                 })
 
                this.myChart = echarts.init(this.$refs.state);
@@ -580,52 +585,74 @@ import Bus from "@/util/Bus.js";
                         {
                             name: '特高频传感器',
                             type: 'pie',
-                            radius: [10, 50],
+                            radius: [30, 50],
                             center: ['25%', '25%'],
                             roseType: 'radius',
                             label: {
-                                // show: false
+                                show: false,
+                                fontSize: 10,
+                                edgeDistance: 5,
                             },
                             data: obj.UHF
                         },
                         {
                             name: '温度传感器',
                             type: 'pie',
-                            radius: [10, 50],
+                            radius: [30, 40],
                             center: ['75%', '25%'],
                             roseType: 'area',  
                             label: {
-                                // show: false
+                                show: false,
+                                fontSize: 10,
+                                edgeDistance: 5,
                             },                      
                             data: obj.TEMP
                         },
                          {
                             name: '电压传感器',
                             type: 'pie',
-                            radius: [10, 50],
+                            radius: [30, 40],
                             center: ['25%', '75%'],
                             roseType: 'area',    
-                            label: {
-                                // show: false
+                             label: {
+                                show: false,
+                                fontSize: 10,
+                                edgeDistance: 5,
                             },                      
                             data: obj.TEV
                         },
                          {
                             name: '超声波传感器',
                             type: 'pie',
-                            radius: [10, 30],
+                            radius: [30, 40],
                             center: ['75%', '75%'],
                             roseType: 'area',   
-                            label: {
-                                // show: false
+                             label: {
+                                show: false,
+                                fontSize: 10,
+                                edgeDistance: 5,
                             },                        
                             data:obj.AE
                         }
+                        /* , {
+                            name: '机械特性传感器',
+                            type: 'pie',
+                            radius: [30, 40],
+                            center: ['50%', '50%'],
+                            roseType: 'area',   
+                             label: {
+                                show: false,
+                                fontSize: 10,
+                                edgeDistance: 50,
+                            },                        
+                            data:obj.MECH
+                        } */
                     ]
                     };
                 this.myChart.setOption(option);
            },
-           initCharts5(){
+        initCharts5() {
+            console.log(this.customerInfos,'customerInfos');
                 this.myChart = echarts.init(this.$refs.online);
                 // var base = +new Date(2021, 9, 3);
                 // var oneDay = 24 * 3600 * 1000;
@@ -688,49 +715,60 @@ import Bus from "@/util/Bus.js";
                 // };
                 let gaugeData = [
                     {
-                        value: this.customerInfos.sensor_online_ratio[0].AE,
+                        value: this.customerInfos.sensor_online_ratio[0].AE*100||0,
                         name: '超声波传感器',
                         title: {
-                            offsetCenter: ['-35%', '-15%']
+                            offsetCenter: ['-35%', '-30%']
                         },
                         detail: {
                             valueAnimation: true,
-                            offsetCenter: ['-35%', '-35%']
+                            offsetCenter: ['-35%', '-45%']
                         }
                     },
                     {
-                        value: this.customerInfos.sensor_online_ratio[1].TEV,
+                        value: this.customerInfos.sensor_online_ratio[1].TEV*100||0,
                         name: '电压传感器',
                         title: {
-                            offsetCenter: ['-35%', '35%']
+                            offsetCenter: ['-35%', '25%']
                         },
                         detail: {
                             valueAnimation: true,
-                            offsetCenter: ['-35%', '15%']
+                            offsetCenter: ['-35%', '10%']
                         }
                     },
                     {
-                        value: this.customerInfos.sensor_online_ratio[2].TEMP,
+                        value: this.customerInfos.sensor_online_ratio[2].TEMP*100||0,
                         name: '温度传感器',
                         title: {
-                            offsetCenter: ['35%', '-15%']
+                            offsetCenter: ['35%', '-30%']
                         },
                         detail: {
                             valueAnimation: true,
-                            offsetCenter: ['35%', '-35%']
+                            offsetCenter: ['35%', '-45%']
                         }
                     },{
-                        value: this.customerInfos.sensor_online_ratio[3].UHF,
+                        value: (this.customerInfos.sensor_online_ratio[3].UHF*100)||0,
                         name: '特高频',
                         title: {
-                            offsetCenter: ['35%', '35%']
+                            offsetCenter: ['35%', '25%']
                         },
                         detail: {
                             valueAnimation: true,
-                            offsetCenter: ['35%', '15%']
+                            offsetCenter: ['35%', '10%']
+                        }
+                    },{
+                        value: (this.customerInfos.sensor_online_ratio[4].MECH*100)||0,
+                        name: '机械特性',
+                        title: {
+                            offsetCenter: ['0%', '65%']
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['0%', '50%']
                         }
                     }
-                ];
+            ];
+                console.log(gaugeData,'gaugeData');
                let option = {
                     title: {
                         text: '传感器在线率',
@@ -741,7 +779,7 @@ import Bus from "@/util/Bus.js";
                     series: [
                         {
                             type: 'gauge',
-                            radius:'100%',
+                            radius:'90%',
                             startAngle: 90,
                             endAngle: -270,
                             pointer: {
@@ -788,7 +826,7 @@ import Bus from "@/util/Bus.js";
                                 borderColor: 'auto',
                                 borderRadius: 20,
                                 borderWidth: 0.5,
-                                formatter: '{value}'
+                                formatter: '{value} %'
                             }
                         }
                     ]

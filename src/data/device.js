@@ -208,3 +208,15 @@ export function getCNDJInfo(params={},callback){
   },callback)
 }
 
+
+
+/* 
+传感器工作模式修改
+*/
+export function setWorkMode(params={},callback){
+    return axios.request({
+      "url" : baseUrl+'/sensor-work-mode/sensor_id/'+params.sensor_id+'/',
+      "method" : "put",
+      "data":params.data
+    },callback)
+  }

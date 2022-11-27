@@ -248,7 +248,7 @@ import Bus from "@/util/Bus.js";
                 size:10,
                total: 0,  
                 testObj : {
-                    "msg": "",
+                    message: { "msg": "",
                     "code": 20001,
                     "data": {
                         "alarm_broadcast": true,
@@ -340,7 +340,7 @@ import Bus from "@/util/Bus.js";
                                 }
                             }
                         }
-                    }
+                    }}
                 }          
            }
        },
@@ -348,7 +348,8 @@ import Bus from "@/util/Bus.js";
            this.getTreeData();
            Bus.$on('wsData', target => {
                target = JSON.parse(target);
-               let alarm_obj = target.message.data.alarm_data;
+                let alarm_obj = target.message.data.alarm_data;
+            
                 this.updateListByWs(alarm_obj)         
             })
        },
@@ -367,7 +368,8 @@ import Bus from "@/util/Bus.js";
             this.currentPage = val;
             this.queryList();
         },
-        clickTabs(tab){
+        clickTabs(tab) {
+            this.reset();
             this.currentPage = 1;
             console.log(tab.label, tab.name, 555);            
             if (tab.name == 'chart') {
@@ -378,7 +380,7 @@ import Bus from "@/util/Bus.js";
             this.clickNode(this.currentNodeInfo)
         },
         queryList() {
-            Bus.$emit('wsData',JSON.stringify(this.testObj));
+            // Bus.$emit('wsData',JSON.stringify(this.testObj));
             // if(this.activeTab =='list'){
                 if(this.currentNodeInfo.type=='site'){
                     this.getSiteList(this.currentNodeInfo.id)

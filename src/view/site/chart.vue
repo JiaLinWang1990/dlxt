@@ -506,14 +506,14 @@ import * as device from '@/data/device.js'
                         {name: '平均放电幅值',type: 'line', symbol:'true',data:[]}, 
                     ];
                     obj.point_data.forEach((item,idx)=>{
-                        xAxisData.push(item.create_time.substring(0,item.create_time.length-7));
+                        xAxisData.push(item.create_date);
                         if(item.sensor_type=='Temp'){
                             currentChartData = tempData
                             currentChartData[0].data.push(item.T.toFixed(2))
                         }else if(item.sensor_type=='AE'){
                             currentChartData = aeData
                             currentChartData[0].data.push(item.maxvalue.toFixed(2))
-                            currentChartData[1].data.push(item.rmsvalue.toFixed(2))
+                            currentChartData[1].data.push(Number(item.rmsvalue).toFixed(2))
                             currentChartData[2].data.push(item.harmonic1.toFixed(2))
                             currentChartData[3].data.push(item.harmonic2.toFixed(2))
                         }else if(item.sensor_type == 'TEV'){

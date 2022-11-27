@@ -1,6 +1,6 @@
 <template>
-   <div style="overflow: auto;height: 100%" class="tree-box">
-       <el-tree ref="tree" :default-expanded-keys="defaultKeys" :data="data" :props="defaultProps" @node-click="handleNodeClick"
+   <div style="overflow: auto;height: 100%" class="tree-box"> <!--  :default-expanded-keys="defaultKeys"  -->
+       <el-tree ref="tree" default-expand-all :data="data" :props="defaultProps" @node-click="handleNodeClick"
        @node-contextmenu="rightClick" :expand-on-click-node="true" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node,data}">
                 <span :title="node.label">{{node.label }}</span>  <!-- v-if="data.type=='site'&&data.unprocessed_num" -->
@@ -22,7 +22,8 @@
        name:'',
        props:{
            data:Array,   
-           type:String,      
+           type: String,  
+           currentKey:String    
        },
 
        data(){
@@ -34,7 +35,11 @@
                 showMenu:false,
                 currentType:'',
                 operateList:[],
-                defaultKeys:[],
+               defaultKeys: [],
+               nodeCount: 0,
+               preNodeId:null,
+                curNodeId:null,
+                nodeTimer:null
 
            }
        },
@@ -51,8 +56,12 @@
                    })
                 }
            this.$nextTick(()=>{
-                this.defaultKeys = this.data.length? [this.data[0].id]:[];
-               this.data[0] && this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);               
+               this.defaultKeys = this.data.length ? [this.data[0].id] : [];
+               if (this.currentKey) {
+                   this.$refs.tree.setCurrentKey(this.currentKey);
+                   return;
+                }
+                this.data[0] && this.data[0].children && this.$refs.tree.setCurrentKey(this.data[0].children[0].id);               
            })       
        },
 
@@ -60,7 +69,6 @@
            filterData(val){
                this.$refs.tree.filter(val);
            },
-
             filterNode(value,data,node) {
                 if(!value){
                     return true;
@@ -82,7 +90,24 @@
                 }
             },
            handleNodeClick(obj,node,e){
-               this.$emit('clickNode',obj)
+               this.$emit('clickNode', obj)
+               this.nodeCount++
+                if( this.preNodeId && this.nodeCount >= 2){
+                    this.curNodeId = obj.id 
+                    this.nodeCount = 0
+                    if(this.curNodeId == this.preNodeId){//第一次点击的节点和第二次点击的节点id相同
+                        console.log('双击,执行代码写在这里');
+                        this.$emit('doubleClick', obj) 
+                        this.curNodeId = null
+                        this.preNodeId = null      
+                        return
+                    }
+                }
+                this.preNodeId = obj.id
+                this.nodeTimer = setTimeout(() => { //300ms内没有第二次点击就把第一次点击的清空
+                    this.preNodeId  = null
+                    this.nodeCount = 0
+                },300)   
            },
            rightClick(MouseEvent, object, Node, element){
                console.log( object, Node)

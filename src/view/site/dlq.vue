@@ -61,7 +61,6 @@ export default {
     },
     watch: {
         dataInfo(val) {
-            console.log(this.dataInfo, 456);
             this.dlqData = this.dataInfo;
             this.init();
         }
@@ -131,7 +130,6 @@ export default {
             let _option = JSON.parse(JSON.stringify(this.option))
             _option.yAxis.name = '开关量';
             let obj = this.dataInfo.Mech_CT_A_SW;
-            console.log(obj,'obj');
             _option.xAxis.data = this.setxAxisData(obj.wave.length, obj.samplingperiod);
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[2] = JSON.parse(JSON.stringify(this.seriesItem));
