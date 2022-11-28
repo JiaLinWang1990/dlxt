@@ -11,6 +11,8 @@
                     :show-file-list="false" action="string" accept=".xls,.xlsx">
                         <el-button size="small" type="primary">导入</el-button>
                     </el-upload>
+                    <el-button size="small" type="primary"><a href="http://114.116.8.127:7099/customer_resource/网关导入模版.xlsx">模板导出</a></el-button>
+
                 </div>
                 <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
                     <span style="height:40px;line-height: 40px;display:inline-block;">主机档案导出</span>

@@ -171,3 +171,7 @@
 .el-pagination .btn-next, .el-pagination .btn-prev{
   color:#ccc;
 }
+a{
+    text-decoration: none;
+    color:#fff;
+}
