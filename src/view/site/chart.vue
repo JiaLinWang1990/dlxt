@@ -302,7 +302,7 @@ import * as device from '@/data/device.js'
             this.queryPointTrend();      
            this.$nextTick(()=>{
                 // this.$refs.state.style.height = this.checkedCities.length==1?'100%':(this.checkedCities.length==2?'50%':'33.33%')              
-               this.initCharts();              
+               this.queryPointTrend();              
            })
            
        },
@@ -488,7 +488,11 @@ import * as device from '@/data/device.js'
                 let templateObj = {name: '',type: 'line',stack: 'Total', symbol:'true',data:[]};
                                 
                 let currentIndex;
-                let currentChartData = [];
+               let currentChartData = [];
+               if (arr.length == 0) {
+                   this.initCharts(0);
+                   return;
+                }
                 arr.forEach((obj,index)=>{
                     let xAxisData = [];
                     currentIndex = index;

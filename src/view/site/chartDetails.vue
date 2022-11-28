@@ -113,9 +113,9 @@ export default {
         if (this.clickData) {
             this.getTrendDetail();
         }
-        else {
+        // else {
             this.getAllDetails();
-        }
+        // }
         window.onresize = () => {
             return (() => {
                 this.setDialogWidth()
