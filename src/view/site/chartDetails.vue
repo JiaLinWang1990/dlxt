@@ -6,8 +6,10 @@
                <i class="el-icon-refresh-left" style="font-size:25px;font-weight:bold;color:#CA5051;"></i>
            </div> -->
             <div style="width:100%;height:25px;cursor:pointer;">
-                <i class="el-icon-caret-right" style="font-size:25px;color:#CA5051;float:left" @click="reset"
-                    v-if="queryDetails.length === 1"></i>
+                <i class="el-icon-video-play" style="font-size:25px;color:#CA5051;float:left" @click="reset"
+                    v-if="isDefaultIcon&&queryDetails.length === 1"></i>
+                <i class="el-icon-video-pause" style="font-size:25px;color:#CA5051;float:left"
+                    v-if="!isDefaultIcon"></i>
                 <i class="el-icon-error" style="font-size:25px;color:#CA5051;float:right"
                     @click="dialogVisible = false"></i>
             </div>
@@ -90,6 +92,7 @@ export default {
             queryDetails: [],   //查询详情接口返回值的集合
             tempArr: [],//临时数组
             currentMode: 0, //当前传感器在线工作模式，默认关闭
+            isDefaultIcon:true,
         }
     },
     computed: {
@@ -160,6 +163,7 @@ export default {
             this.currentMode = mode === 'off' ? 0 : 1;
             let msg = mode === 'off' ? '传感器在线工作模式已关闭' : '传感器在线工作模式已开启'
             device.setWorkMode(params).then(res => {
+                this.isDefaultIcon = false;
                 this.$message({
                     message: msg,
                     type: 'success'

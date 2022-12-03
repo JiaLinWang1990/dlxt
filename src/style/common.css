@@ -175,3 +175,16 @@ a{
     text-decoration: none;
     color:#fff;
 }
+.el-tree .el-tree-node__expand-icon.expanded {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+.el-tree .el-icon-caret-right:before {
+    content: "\e6d9";
+    font-size: 14px;
+  }
+
+  .el-tree .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+    content: "\e6d8";
+    font-size: 14px;
+  }

@@ -2,7 +2,7 @@
    <div style="height:100%;display:flex;"> 
         <div class="left-tree">
             <div style="background:#4A4C4F;padding:10px 5px;">
-                <span>站点导航</span>
+                <span>设备导航</span>
                 <i class="el-icon-search" @click="showSearch" style="padding-left:15px;" v-if="!isFold"></i>
                 <span style="display:inline-block;float:right" @click="toggle">
                     <i :class="[isFoldClass]"></i>
@@ -60,7 +60,7 @@
                         </el-col>                
                         <el-form-item  class='btn-group'>
                             <el-button size="small" type="primary" @click="queryList">查询</el-button>
-                            <el-button size="small"  @click="reset">重置</el-button>
+                            <el-button size="small"  @click="doReset">重置</el-button>
                             <!-- <el-button size="small">批量确认</el-button> -->
                         </el-form-item>
                     </el-form>
@@ -390,13 +390,17 @@ import Bus from "@/util/Bus.js";
                 
             // }
         },
+        doReset() { 
+            this.reset()
+            this.queryList();
+        },
         reset() { 
             this.dataRange = [];
             this.searchForm.alarm_level = '';
             this.searchForm.is_processed = '';
             this.searchForm.start_date = '';
             this.searchForm.end_date = '';
-            this.queryList();
+            // this.queryList();
         },
         selectDate() {
             if(this.dataRange){

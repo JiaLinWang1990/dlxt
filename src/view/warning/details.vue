@@ -71,6 +71,7 @@ export default {
             processed_remarks:'',
           },
           alarmLevel: ['正常', '预警', '报警'],
+          
       }
    },
     props:{
@@ -96,6 +97,7 @@ export default {
    created(){
    },
     mounted() {
+        
         if (this.detailsInfo) {
             this.handleForm.is_processed = this.detailsInfo.is_processed;
         }

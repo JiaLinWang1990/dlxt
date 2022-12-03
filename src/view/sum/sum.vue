@@ -11,8 +11,14 @@
             </el-col>
             <el-col class="grid-content content-box" :span="12">
                 <div class="content-box">
-                    <div style="height: calc(100% - 170px);">
+                    <div style="height: calc(100% - 170px);">                        
                         <div class="map-tree">
+                            <div class="map-tree-title">
+                                <span>地图导航</span>    
+                                <span style="display:inline-block;float:right" @click="toggleFold">
+                                    <i :class="[isFoldClass]"></i>
+                                </span>                                
+                            </div>
                             <tree :type="'site'" :data="treeData" @clickNode="clickNode" @doubleClick="doubleClick" ref="trees" v-if="treeData.length"></tree>
                         </div>
                         <amap class="map" :mapData="mapData"></amap>
@@ -105,7 +111,9 @@ import Bus from "@/util/Bus.js";
                mapData:[],
                currentNode: {},
                alarmLevel: ['正常', '预警', '报警'],
-               showDetails:false,
+               showDetails: false,
+               isFoldClass: 'el-icon-s-fold',
+               isFold:false
            }
        },
        mounted(){
@@ -132,8 +140,19 @@ import Bus from "@/util/Bus.js";
 
                 this.tableData.pop();
                 this.tableData.unshift(obj.alarm_data);
-            }
-                
+            }                
+        },
+        toggleFold() { 
+            this.isFold = !this.isFold;
+            let style = this.isFold ? { width: '35px' } : { width: '200px' }
+            let heightStyle = this.isFold ? { height: '110px' } : { height:'130px','max-height': 'calc(100% - 200px)' }
+            let titleHeight = this.isFold ? { height: '110px','line-height':'normal' } : { height: '38px','line-height':'38px' }
+            let treeStyle = this.isFold ? { height: 0 } : { height: "100%" }
+            this.isFoldClass = this.isFold?'el-icon-s-unfold':'el-icon-s-fold'
+
+            $('.map-tree').css(heightStyle).animate(style);
+            $('.map-tree-title').css(titleHeight)
+            $('.tree-box').css(treeStyle)  
         },
         doubleClick(obj) { 
             console.log(obj, '双击');
@@ -148,12 +167,18 @@ import Bus from "@/util/Bus.js";
                 device.queryTrees().then(res=>{
                     if(!res) return;
                     This.treeData = res.data;
-                    res.data.length && res.data[0] && This.clickNode(res.data[0])
+                    if (res.data.length && res.data[0]) {
+                        This.clickNode(res.data[0]);
+                        this.currentNode = res.data[0]
+                    }
+                    // res.data.length && res.data[0] && This.clickNode(res.data[0])
                     this.mapData = res.data[0].children;
                 })
             },
-           clickNode(v) { 
-                this.currentNode = v;
+        clickNode(v) { 
+            if (!v||!v.type) {
+                v = this.currentNode
+            }
                if (v.type == "customer") {
                    this.mapData = v.children;
                    this.customerStatus(v.id,v.type)
@@ -391,7 +416,7 @@ import Bus from "@/util/Bus.js";
                     ],
                     yAxis: [
                         {
-                            type: 'value'
+                            type: 'value',                            
                         }
                     ],
                     series: [
@@ -431,10 +456,17 @@ import Bus from "@/util/Bus.js";
                         }
                     },
                     tooltip: {
-                        trigger: 'axis'
+                        trigger: 'axis',
+                        formatter: function (params) {
+                            console.log(params,'params');
+                            console.log(params[0].name,'name');
+                            // return params[0].name
+
+                            return params[0].name.split('T')[0]+'<br/>'+params[0].value
+                        }
                     },
                      grid: {
-                        left: '10%',
+                        left: '16%',
                         right: '30%',
                         bottom: '10%'
                     },
@@ -443,15 +475,22 @@ import Bus from "@/util/Bus.js";
                             return item[0];
                         }),
                         axisLabel:{
-                            color:'#fff'
+                            color: '#fff',
+                            formatter: function (value) { 
+                                let arr = value.split('T')
+                                return arr[0]
+                            }
                         }
                     },
                     yAxis: {
                         splitLine: {
                             show: false
                         },
-                        axisLabel:{
-                            color:'#fff'
+                        axisLabel: {
+                            color:'#fff',
+                            formatter: function (value) { 
+                                return value *100 +'%'
+                            }
                         }
                     }, 
                     visualMap: {
@@ -853,9 +892,14 @@ import Bus from "@/util/Bus.js";
      .content-box{
          height:100%;width:100%;
          display:flex;flex:1;flex-flow: column;position:relative;
-         .map-tree{            
+         .map-tree{  
+            height:170px;                     
             position:absolute;max-height:calc(100% - 200px); 
             width:200px;top:10px;left:10px;background: #ccc;z-index: 1000;
+            .map-tree-title{
+                height:38px;background:#4A4C4F;line-height:38px;
+                color:#fff;padding:0 10px;
+            }
             /deep/.el-tree{
                 background:#2C2F32;color:#fff;
                 overflow:hidden;white-space: nowrap;text-overflow: ellipsis;
@@ -926,5 +970,6 @@ import Bus from "@/util/Bus.js";
     }
    
 }
+
 
 </style>

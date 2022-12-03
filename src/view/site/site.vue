@@ -103,11 +103,11 @@
                         </template>
                     </el-table-column>
                                         
-                    <el-table-column prop="character_value" align="center" label="特征值"></el-table-column>
-                        <!-- <template slot-scope="props">
-                            <span v-if="props.row.type=='Temp'">/</span>   
-                            <span v-else>{{props.row.sensor_info.params?props.row.sensor_info.params.status.rssi:'/'}}</span>     
-                        </template>-->
+                    <el-table-column prop="character_value" align="center" width="120"  label="特征值">
+                        <template slot-scope="props">
+                            <span>{{props.row.character_value.toFixed(2) + property[props.row.sensor_type]}}</span>     
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="upload_interval" align="center" label="上传间隔">
                         <template slot-scope="props">
                             <p>{{props.row.upload_interval/60 + 'min'}}</p>      
@@ -194,7 +194,15 @@ export default {
             loading:false,
             showjx: false,
             alarmLevel: ['正常', '预警', '报警'],
-            currentKey:'',//树的当前高亮点
+            currentKey: '',//树的当前高亮点
+            property: {//特征值
+                'AE': 'dBuV',
+                'UHF': 'dBm',
+                'TEV': 'dBmV',
+                'TEMP': '℃',
+                'MECH':'mA',
+                
+            }
         };
     },
     watch: {

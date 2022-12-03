@@ -1,15 +1,19 @@
 <template>
   <div id="app">
-      <router-view/>
-      <div  v-if="showChartDetails" >
+        <router-view/>
+        <div  v-if="showChartDetails" >
             <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
         </div>
+        <!-- <div v-if="showChartDetails">
+            <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode" @refreshTree="refreshTree"></Details>
+        </div> -->
   </div>
 </template>
 
 <script>
 import { Message, MessageBox } from 'element-ui';
 import Bus from "@/util/Bus.js";
+// import chartDetails from "@/view/warning/details.vue";
 import chartDetails from "@/view/site/chartDetails.vue";
 export default {
     name: 'App',
@@ -93,7 +97,7 @@ export default {
         },
         test(testObj) {
             this.showChartDetails = true;
-            this.dataDetails = [testObj.alarm_data];
+            this.detailsInfo = testObj.alarm_data;
             return;
             let This = this;
             if (!testObj.alarm_broadcast) return;   //只有测点报警才需要显示报警播报
