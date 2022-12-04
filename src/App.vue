@@ -1,8 +1,8 @@
 <template>
   <div id="app">
         <router-view/>
-        <div  v-if="showChartDetails" >
-            <chartDetails  :visible.sync="showChartDetails" :dataDetails="dataDetails"></chartDetails>
+        <div  v-if="showDetails" >
+            <Details  :visible.sync="showDetails" :detailsInfo="detailsInfo"></Details>
         </div>
         <!-- <div v-if="showChartDetails">
             <Details :visible.sync="showDetails" :detailsInfo="detailsInfo" @clickNode="clickNode" @refreshTree="refreshTree"></Details>
@@ -13,19 +13,19 @@
 <script>
 import { Message, MessageBox } from 'element-ui';
 import Bus from "@/util/Bus.js";
-// import chartDetails from "@/view/warning/details.vue";
-import chartDetails from "@/view/site/chartDetails.vue";
+import Details from "@/view/warning/details.vue";
+// import chartDetails from "@/view/site/chartDetails.vue";
 export default {
     name: 'App',
     components:{
-        chartDetails
+        Details: resolve => { require(['@/view/warning/details.vue'], resolve) },
     },
     data() { 
         return {
             userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
             socket:  null,
             lockReconnect: false,
-            showChartDetails: false,
+            showDetails: false,
             dataDetails: {},
             wsCfg: {
                 url:'ws://114.116.8.127:7084/ws/cloud-user-id/'
@@ -96,7 +96,7 @@ export default {
             }, 5000);
         },
         test(testObj) {
-            this.showChartDetails = true;
+            this.showDetails = true;
             this.detailsInfo = testObj.alarm_data;
             return;
             let This = this;

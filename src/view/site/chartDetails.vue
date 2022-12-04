@@ -23,7 +23,7 @@
 
                             </el-col>
                             <el-col :span="12">
-                                <p>设备名称 : {{ queryDetails[idx].data.device_name }}</p>
+                                <p>设备名称 : {{ queryDetails[idx].data.equipment_name }}</p>
                             </el-col>
                         </el-row>
                         <el-row class="basic-info">

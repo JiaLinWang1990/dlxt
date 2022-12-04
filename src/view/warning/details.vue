@@ -81,7 +81,7 @@ export default {
         },
         detailsInfo: {
             type: Object,
-            default: {}
+            default: ()=>{}
         }
     },
    computed:{
@@ -97,10 +97,12 @@ export default {
    created(){
    },
     mounted() {
-        
-        if (this.detailsInfo) {
-            this.handleForm.is_processed = this.detailsInfo.is_processed;
-        }
+        this.$nextTick(() => { 
+            if (this.detailsInfo) {
+                this.handleForm.is_processed = this.detailsInfo.is_processed;
+            }
+        })
+       
    },
     methods: {
         handleAlarm(row) {            

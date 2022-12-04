@@ -894,12 +894,16 @@ import Bus from "@/util/Bus.js";
          display:flex;flex:1;flex-flow: column;position:relative;
          .map-tree{  
             height:170px;                     
-            position:absolute;max-height:calc(100% - 200px); 
+            position:absolute;max-height:calc(100% - 200px); background: #2C2F32;
             width:200px;top:10px;left:10px;background: #ccc;z-index: 1000;
             .map-tree-title{
                 height:38px;background:#4A4C4F;line-height:38px;
                 color:#fff;padding:0 10px;
+               
             }
+            .tree-box{
+                    background: #2C2F32;
+                }
             /deep/.el-tree{
                 background:#2C2F32;color:#fff;
                 overflow:hidden;white-space: nowrap;text-overflow: ellipsis;

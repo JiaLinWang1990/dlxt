@@ -464,6 +464,9 @@ export default {
 .table-btn{
     color:#f00;
     text-decoration: underline;
+    a{
+        color:#f00;
+    }
 }
 .main-area{
     width:calc(100% - 300px);
