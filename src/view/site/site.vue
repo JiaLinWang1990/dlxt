@@ -90,22 +90,22 @@
                     <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
                     <el-table-column prop="sensor_type" align="center"  width="90" label="传感器类型"></el-table-column>
-                    <el-table-column prop="battery" align="center" label="工作状态" width="200" show-overflow-tooltip>
+                    <el-table-column prop="battery" align="center" label="工作状态" width="190" show-overflow-tooltip>
                        <template slot-scope="props">
                             <p>{{(props.row.is_online?'在线':'离线')+(props.row.battery?(':电量'+props.row.battery+'%'):'')}}</p>        
                             <p>{{(props.row.rssi?('RSSI:'+props.row.rssi+'dBm'):'')+(props.row.snr?(', SNR:'+props.row.snr+'BM'):'')}}</p>
                         </template>  
                     </el-table-column>
-                    <el-table-column prop="alarm_describe" align="center" label="报警状态" width="200" show-overflow-tooltip>
+                    <el-table-column prop="alarm_describe" align="center" label="报警状态" width="160" show-overflow-tooltip>
                         <template slot-scope="props">
                             <p>{{alarmLevel[props.row.alarm_level]}}</p>  
                             <p>{{'状态描述：'+props.row.alarm_describe}}</p>      
                         </template>
                     </el-table-column>
                                         
-                    <el-table-column prop="character_value" align="center" width="120"  label="特征值">
+                    <el-table-column prop="character_value" align="center" width="200"  label="特征值">
                         <template slot-scope="props">
-                            <span>{{props.row.character_value.toFixed(2) + property[props.row.sensor_type]}}</span>     
+                            <span>{{property[props.row.sensor_type].name+props.row.character_value.toFixed(2) + property[props.row.sensor_type].dw}}</span>     
                         </template>
                     </el-table-column>
                     <el-table-column prop="upload_interval" align="center" label="上传间隔">
@@ -114,7 +114,7 @@
                         </template>
                     </el-table-column>                   
                     <el-table-column prop="create_date" align="center" width="150" label="更新时间"></el-table-column>
-                    <el-table-column label="操作" width="100">
+                    <el-table-column label="操作" width="80">
                         <template slot-scope="scope">
                             <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
                         </template>
@@ -196,11 +196,11 @@ export default {
             alarmLevel: ['正常', '预警', '报警'],
             currentKey: '',//树的当前高亮点
             property: {//特征值
-                'AE': 'dBuV',
-                'UHF': 'dBm',
-                'TEV': 'dBmV',
-                'TEMP': '℃',
-                'MECH':'mA',
+                'AE': {dw:'dBuV',name:'最大放电幅值：'},
+                'UHF': {dw:'dBm',name:'最大放电幅值：'},
+                'TEV': {dw:'dBmV',name:'最大放电幅值：'},
+                'TEMP': {dw:'℃',name:'温度：'},
+                'MECH':{dw:'mA',name:'电机电流：'},
                 
             }
         };

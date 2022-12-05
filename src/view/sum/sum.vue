@@ -24,8 +24,8 @@
                         <amap class="map" :mapData="mapData"></amap>
                     </div>                    
                     <!-- <div  ref="map" class="map"></div> -->
-                    <div class="notify">
-                        <div class="notify-title">最新异常通知</div>
+                    <div class="notify  cape-header">
+                        <div class="notify-title"><img src="../../assets/u233.png" />最新异常通知</div>
                         <div class="notify-table">
                             <el-table :data="tableData" style="width: 100%">
                                 <el-table-column prop="create_date" label="报警时间" width="140"></el-table-column>
@@ -45,15 +45,16 @@
                                 </el-table-column>
                             </el-table>
                         </div>
+                        <div class="cape-footer"></div>
                     </div>
                 </div>
             </el-col>
             <el-col class="grid-content content-box" :span="6">
                 <div class="content-box">
-                    <div ref="point" class="point"></div>
-                    <div ref="online" class="online"></div>
-                    <div ref="unusual-deal" class="unusual-deal">
-                        <div class="notify-title">异常情况处理统计</div>
+                    <div ref="point" class="point cape-header"></div>
+                    <div ref="online" class="online  cape-header"></div>
+                    <div ref="unusual-deal" class="unusual-deal  cape-header">
+                        <div class="notify-title"><img src="../../assets/u236.png" />异常情况处理统计</div>
                         <div class="deal-box">
                             <div class="deal-describ">
                                 <span><i class="el-icon-message-solid"></i></span>
@@ -78,6 +79,7 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="cape-footer"></div>
                     </div>
                 </div>
             </el-col>
@@ -128,7 +130,8 @@ import Bus from "@/util/Bus.js";
            Bus.$on('wsData', target => {
                 target = JSON.parse(target);
                 this.touchWsData(target.message.data)         
-            })
+           })
+            setInterval(this.clickNode,3600000)
        },
 
     methods: {        
@@ -303,10 +306,21 @@ import Bus from "@/util/Bus.js";
                     gaugeData.shift();
                 }
                let option = {
-                    title: {
-                        text: '资产统计',
-                        textStyle:{
-                            color:'#fff'
+                   title: {
+                       text: "{A|     资产统计}",
+                        top:4,
+                        textStyle: {
+                            color: '#fff',
+                            rich: {
+                                A: {
+                                    width:20,
+                                    height: 20,
+                                    fontSize: 16,
+                                    backgroundColor: {
+                                        image: require("../../assets/u212.png")
+                                    }
+                                }
+                            }
                         }
                     },
                     series: [
@@ -379,10 +393,21 @@ import Bus from "@/util/Bus.js";
 
                this.myChart = echarts.init(this.$refs.state);
                 var option = {
-                     title: {
-                        text: '各站点状态统计',
-                        textStyle:{
-                            color:'#fff'
+                    title: {
+                        text: "{A|     各站点状态统计}",
+                        textStyle: {
+                            color: '#fff',
+                            rich: {
+                                A: {
+                                    //添加背景图片并且设置宽高，会自适应显示
+                                    width:20,
+                                    height: 20,
+                                    fontSize: 16,
+                                    backgroundColor: {
+                                        image: require("../../assets/u231.png")
+                                    }
+                                }
+                            }
                         }
                     },
                       grid: {
@@ -450,9 +475,20 @@ import Bus from "@/util/Bus.js";
                this.myChart = echarts.init(this.$refs.unusual);
                 var option = {
                     title: {
-                        text: '电力设备异常率趋势',
-                         textStyle:{
-                            color:'#fff'
+                       text: "{A|     电力设备异常率趋势}",
+                        top:4,
+                        textStyle: {
+                            color: '#fff',
+                            rich: {
+                                A: {
+                                    width:20,
+                                    height: 20,
+                                    fontSize: 16,
+                                    backgroundColor: {
+                                        image: require("../../assets/u232.png")
+                                    }
+                                }
+                            }
                         }
                     },
                     tooltip: {
@@ -565,11 +601,21 @@ import Bus from "@/util/Bus.js";
                 var option = {
                     title:[
                          {
-                            text: '各监测类型测点状态分布',
-                            left: 'center',
-                            textStyle:{
-                                color:'#fff'
-                            }
+                            text: "{A|     各监测类型测点状态分布}",
+                            top:4,
+                            textStyle: {
+                                color: '#fff',
+                                rich: {
+                                    A: {
+                                        width:20,
+                                        height: 20,
+                                        fontSize: 16,
+                                        backgroundColor: {
+                                            image: require("../../assets/u234.png")
+                                        }
+                                    }
+                                }
+                            }                                                   
                         },
                         {                       
                             text: '特高频传感器',
@@ -809,10 +855,21 @@ import Bus from "@/util/Bus.js";
             ];
                 console.log(gaugeData,'gaugeData');
                let option = {
-                    title: {
-                        text: '传感器在线率',
-                        textStyle:{
-                            color:'#fff'
+                   title: {
+                       text: "{A|     传感器在线率}",
+                        top:4,
+                        textStyle: {
+                            color: '#fff',
+                            rich: {
+                                A: {
+                                    width:20,
+                                    height: 20,
+                                    fontSize: 16,
+                                    backgroundColor: {
+                                        image: require("../../assets/u235.png")
+                                    }
+                                }
+                            }
                         }
                     },
                     series: [
@@ -892,6 +949,9 @@ import Bus from "@/util/Bus.js";
      .content-box{
          height:100%;width:100%;
          display:flex;flex:1;flex-flow: column;position:relative;
+         /deep/.ec-extension-bmap{
+            height:calc(100% - 10px) !important
+         }
          .map-tree{  
             height:170px;                     
             position:absolute;max-height:calc(100% - 200px); background: #2C2F32;
@@ -914,19 +974,49 @@ import Bus from "@/util/Bus.js";
          }
      }
     .property,.state,.unusual,.map,.notify,.point,.online,.unusual-deal{
-       background:#17191A;margin:10px;
+       background:#17191A;margin:10px;position: relative;
     }
     .property,.state,.unusual{
         height:33%;background:#17191A;margin:10px;
     }
     .map{height:100%;width: calc(100% - 20px);}
     .notify{height:170px;}
-    .point{height:45%}
+    .point{height:45%;position: relative;}
+    .cape-header::before{
+        position: absolute;width:30px;height:15px;content: '';
+        left:-1px;top:-2px;
+        border-top:solid 2px #73D1EB;
+        border-left:solid 1px #73D1EB;
+    }
+    .cape-header::after{
+        position: absolute;height:30px;width:15px;content: '';
+        right:-1px;top:-2px;
+        border-top:solid 1px #73D1EB;
+        border-right:solid 2px #73D1EB;
+    }
+    .cape-footer{
+        position: relative;
+    }
+    .cape-footer::before{
+        position: absolute;height:30px;width:15px;content: '';
+        left:-1px;bottom:-2px;
+        border-bottom:solid 2px #73D1EB;
+        border-left:solid 1px #73D1EB;
+    }
+    .cape-footer::after{
+        position: absolute;width:30px;height:15px;content: '';
+        right:-1px;bottom:-2px;
+        border-bottom:solid 1px #73D1EB;
+        border-right:solid 2px #73D1EB;
+    }
     .online{height:35%}
     .unusual-deal{height:20%}
     
     .notify-title{
-        height:36px;line-height:36px;padding-left:20px;color:#fff;font-size: 14px;;
+        height:36px;line-height:36px;padding-left:5px;color:#fff;font-size: 16px;
+        img{
+            width:20px;height:20px;margin-top: 6px;float:left;margin-right:5px;
+        }
     }
     .notify-table{
         /deep/.el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell{
