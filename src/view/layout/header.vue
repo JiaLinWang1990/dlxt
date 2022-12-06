@@ -105,6 +105,7 @@ import {MessageBox} from 'element-ui';
                 account.editUserInfo({data:this.form,userId:this.userInfo.id}).then(res=>{
                     console.log(res,'res')
                     this.editUserDialog = false;
+                    this.$router.push('login')
                 })                
            } 
        }

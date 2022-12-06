@@ -508,7 +508,8 @@ export default {
         getCustomerList(){
             account.getCustomerList(this.userForm).then(res=>{
                 this.customerList = res.data.customers;
-                this.exportForm.customer_id =  this.customerList[0].id,
+                this.exportForm.customer_id = this.customerList[0].id,
+                this. getSiteList(this.exportForm.customer_id)
                 console.log(this.customerList,'customerList');
             })
         },

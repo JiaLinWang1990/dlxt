@@ -4,14 +4,23 @@
         <el-row style="height:100%;">
             <el-col class="grid-content" :span="6">
                 <div class="bg-purple content-box">
-                    <div ref="property" id="property" class="property"></div>
-                    <div ref="state" id="state" class="state"></div>
-                    <div ref="unusual" id="unusual" class="unusual"></div>
+                    <div class="property-box cape-header ">
+                        <div ref="property" id="property" class="property"></div>
+                        <div class="cape-footer"></div>
+                    </div>
+                    <div class="state-box cape-header ">
+                        <div ref="state" id="state" class="state"></div>
+                        <div class="cape-footer"></div>
+                    </div>
+                    <div class="unusual-box cape-header ">
+                        <div ref="unusual" id="unusual" class="unusual"></div>
+                        <div class="cape-footer"></div>
+                    </div>
                 </div>
             </el-col>
             <el-col class="grid-content content-box" :span="12">
                 <div class="content-box">
-                    <div style="height: calc(100% - 170px);">                        
+                    <div style="height: calc(100% - 170px);" class="map-box cape-header">                        
                         <div class="map-tree">
                             <div class="map-tree-title">
                                 <span>地图导航</span>    
@@ -22,6 +31,7 @@
                             <tree :type="'site'" :data="treeData" @clickNode="clickNode" @doubleClick="doubleClick" ref="trees" v-if="treeData.length"></tree>
                         </div>
                         <amap class="map" :mapData="mapData"></amap>
+                        <div class="cape-footer"></div>
                     </div>                    
                     <!-- <div  ref="map" class="map"></div> -->
                     <div class="notify  cape-header">
@@ -51,8 +61,14 @@
             </el-col>
             <el-col class="grid-content content-box" :span="6">
                 <div class="content-box">
-                    <div ref="point" class="point cape-header"></div>
-                    <div ref="online" class="online  cape-header"></div>
+                    <div class="point-box cape-header ">
+                        <div ref="point" class="point"></div>
+                        <div class="cape-footer"></div>
+                    </div>
+                    <div class="online-box cape-header ">
+                        <div ref="online" class="online"></div>
+                        <div class="cape-footer"></div>
+                    </div>
                     <div ref="unusual-deal" class="unusual-deal  cape-header">
                         <div class="notify-title"><img src="../../assets/u236.png" />异常情况处理统计</div>
                         <div class="deal-box">
@@ -148,7 +164,7 @@ import Bus from "@/util/Bus.js";
         toggleFold() { 
             this.isFold = !this.isFold;
             let style = this.isFold ? { width: '35px' } : { width: '200px' }
-            let heightStyle = this.isFold ? { height: '110px' } : { height:'130px','max-height': 'calc(100% - 200px)' }
+            let heightStyle = this.isFold ? { height: '110px' } : { height:'300px','max-height': 'calc(100% - 200px)' }
             let titleHeight = this.isFold ? { height: '110px','line-height':'normal' } : { height: '38px','line-height':'38px' }
             let treeStyle = this.isFold ? { height: 0 } : { height: "100%" }
             this.isFoldClass = this.isFold?'el-icon-s-unfold':'el-icon-s-fold'
@@ -950,12 +966,12 @@ import Bus from "@/util/Bus.js";
          height:100%;width:100%;
          display:flex;flex:1;flex-flow: column;position:relative;
          /deep/.ec-extension-bmap{
-            height:calc(100% - 10px) !important
+            // height:calc(100% - 10px) !important
          }
          .map-tree{  
-            height:170px;                     
+            height:300px;                     
             position:absolute;max-height:calc(100% - 200px); background: #2C2F32;
-            width:200px;top:10px;left:10px;background: #ccc;z-index: 1000;
+            width:200px;background: #ccc;z-index: 1000;
             .map-tree-title{
                 height:38px;background:#4A4C4F;line-height:38px;
                 color:#fff;padding:0 10px;
@@ -973,15 +989,20 @@ import Bus from "@/util/Bus.js";
             }
          }
      }
-    .property,.state,.unusual,.map,.notify,.point,.online,.unusual-deal{
+    .property-box,.state-box,.unusual-box,.map-box,.notify,.point-box,.online-box,.unusual-deal{
        background:#17191A;margin:10px;position: relative;
     }
-    .property,.state,.unusual{
+    .property-box,.state-box,.unusual-box{
         height:33%;background:#17191A;margin:10px;
+
     }
-    .map{height:100%;width: calc(100% - 20px);}
+    .property,.state,.unusual{
+        height:100%;
+    }
+    .map{height:100%;}
     .notify{height:170px;}
-    .point{height:45%;position: relative;}
+    .point{height:100%;position: relative;}
+    .point-box{height:45%;position: relative;}
     .cape-header::before{
         position: absolute;width:30px;height:15px;content: '';
         left:-1px;top:-2px;
@@ -1009,7 +1030,56 @@ import Bus from "@/util/Bus.js";
         border-bottom:solid 1px #73D1EB;
         border-right:solid 2px #73D1EB;
     }
-    .online{height:35%}
+    .notify .cape-footer::before{
+        position: absolute;height:30px;width:15px;content: '';
+        left:-1px;bottom:-12px;
+        border-bottom:solid 2px #73D1EB;
+        border-left:solid 1px #73D1EB;
+    }
+    .notify .cape-footer::after{
+        position: absolute;width:30px;height:15px;content: '';
+        right:-1px;bottom:-12px;
+        border-bottom:solid 1px #73D1EB;
+        border-right:solid 2px #73D1EB;
+    }
+    .unusual-deal .cape-footer::before{
+        position: absolute;height:30px;width:15px;content: '';
+        left:-1px;bottom:-12px;
+        border-bottom:solid 2px #73D1EB;
+        border-left:solid 1px #73D1EB;
+    }
+    .unusual-deal .cape-footer::after{
+        position: absolute;width:30px;height:15px;content: '';
+        right:-1px;bottom:-12px;
+        border-bottom:solid 1px #73D1EB;
+        border-right:solid 2px #73D1EB;
+    }
+    .map-box.cape-header::before{
+        position: absolute;width:70px;height:70px;content: '';
+        left:-6px;top:-6px;
+        border-top:solid 6px #fff;
+        border-left:solid 6px #fff;
+    }
+    .map-box.cape-header::after{
+        position: absolute;height:30px;width:30px;content: '';
+        right:-6px;top:-6px;
+        border-top:solid 6px #fff;
+        border-right:solid 6px #fff;
+    }
+    .map-box .cape-footer::before{
+        position: absolute;height:30px;width:30px;content: '';
+        left:-6px;bottom:-6px;
+        border-bottom:solid 6px #fff;
+        border-left:solid 6px #fff;
+    }
+    .map-box .cape-footer::after{
+        position: absolute;width:70px;height:70px;content: '';
+        right:-6px;bottom:-6px;
+        border-bottom:solid 6px #fff;
+        border-right:solid 6px #fff;
+    }
+    .online-box{height:35%}
+    .online{height:100%}
     .unusual-deal{height:20%}
     
     .notify-title{
