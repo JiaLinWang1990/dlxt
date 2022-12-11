@@ -5,7 +5,44 @@
             <el-col class="grid-content" :span="6">
                 <div class="bg-purple content-box">
                     <div class="property-box cape-header ">
-                        <div ref="property" id="property" class="property"></div>
+                        <div ref="property" id="property" class="property">
+                            <div class="notify-title"><img src="../../assets/u212.png" />资产统计</div>
+                            <div class="property-content">
+                                <div class="content-title">东区变电站</div>
+                                <div class="b-content-box">
+                                    <div class="content-item" v-if="currentNode.type=='customer'">
+                                        <div><img src="../../assets/bdz.png" /></div>
+                                        <div>
+                                            <p>站点</p>
+                                            <p>{{customerInfos.asset_info.site_num}}个</p>
+                                        </div>
+                                    </div>
+                                    <div class="content-item">
+                                        <div><img src="../../assets/dlsb.png" /></div>
+                                        <div>
+                                            <p>一次设备</p>
+                                            <p>{{customerInfos.asset_info.equipment_num}}个</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="b-content-box">
+                                    <div class="content-item">
+                                        <div><img src="../../assets/cd.png" /></div>
+                                        <div>
+                                            <p>测点</p>
+                                            <p>{{customerInfos.asset_info.point_num}}个</p>
+                                        </div>
+                                    </div>
+                                    <div class="content-item">
+                                        <div><img src="../../assets/cgq.png" /></div>
+                                        <div>
+                                            <p>传感器</p>
+                                            <p>{{customerInfos.asset_info.sensor_num}}个</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="cape-footer"></div>
                     </div>
                     <div class="state-box cape-header ">
@@ -50,7 +87,7 @@
                                 </el-table-column>
                                 <el-table-column align="center" label="操作">
                                     <template slot-scope="scope">
-                                        <el-button type="text" size="mini" @click="handle(scope.row)">确认</el-button>                       
+                                        <el-button type="text" size="mini" @click="handle(scope.row)">查看</el-button>                       
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -123,7 +160,9 @@ import Bus from "@/util/Bus.js";
                myChart:null,
                tableData: [],
                 treeData:[],
-                customerInfos:{},
+               customerInfos: {
+                   asset_info: {}
+                },
                 abnormalInfos:{},
                countAbnormal: {},
                mapData:[],
@@ -198,6 +237,8 @@ import Bus from "@/util/Bus.js";
             if (!v||!v.type) {
                 v = this.currentNode
             }
+            this.currentNode = v;
+            console.log(this.currentNode,'currentNode');
                if (v.type == "customer") {
                    this.mapData = v.children;
                    this.customerStatus(v.id,v.type)
@@ -249,7 +290,7 @@ import Bus from "@/util/Bus.js";
            customerStatus(id) { 
                map.companyStatus({ customer_id: id, data:{is_refresh: false} }).then(res => { 
                 this.customerInfos = res.data;
-                this.initCharts1();
+                // this.initCharts1();
                 this.initCharts2();
                 this.initCharts4();
                 this.initCharts5();
@@ -258,13 +299,13 @@ import Bus from "@/util/Bus.js";
            siteStatus(id,type) { 
                map.siteStatus({ site_id: id, data:{is_refresh: false} }).then(res => { 
                 this.customerInfos = res.data;
-                this.initCharts1(type);
+                // this.initCharts1(type);
                 this.initCharts2();
                 this.initCharts4();
                })
            },
            initCharts(){
-                this.initCharts1();
+                // this.initCharts1();
                 this.initCharts2();
                 this.initCharts3();
                 this.initCharts4();
@@ -272,129 +313,6 @@ import Bus from "@/util/Bus.js";
                 
            },
            initCharts1(type){
-               this.myChart = echarts.init(this.$refs.property);
-               let gaugeData = [
-                    {
-                        value: this.customerInfos.asset_info.site_num,
-                        name: '站点',
-                        title: {
-                            offsetCenter: ['-35%', '-15%']
-                        },
-                        detail: {
-                            valueAnimation: true,
-                            offsetCenter: ['-35%', '-35%']
-                        }
-                    },
-                    {
-                        value: this.customerInfos.asset_info.point_num,
-                        name: '测点',
-                        title: {
-                            offsetCenter: ['-35%', '35%']
-                        },
-                        detail: {
-                            valueAnimation: true,
-                            offsetCenter: ['-35%', '15%']
-                        }
-                    },
-                    {
-                        value: this.customerInfos.asset_info.equipment_num,
-                        name: '一次设备',
-                        title: {
-                            offsetCenter: ['35%', '-15%']
-                        },
-                        detail: {
-                            valueAnimation: true,
-                            offsetCenter: ['35%', '-35%']
-                        }
-                    },{
-                        value: this.customerInfos.asset_info.sensor_num,
-                        name: '传感器',
-                        title: {
-                            offsetCenter: ['35%', '35%']
-                        },
-                        detail: {
-                            valueAnimation: true,
-                            offsetCenter: ['35%', '15%']
-                        }
-                    }
-                ];
-                if(type=='site'){
-                    gaugeData.shift();
-                }
-               let option = {
-                   title: {
-                       text: "{A|     资产统计}",
-                        top:4,
-                        textStyle: {
-                            color: '#fff',
-                            rich: {
-                                A: {
-                                    width:20,
-                                    height: 20,
-                                    fontSize: 16,
-                                    backgroundColor: {
-                                        image: require("../../assets/u212.png")
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    series: [
-                        {
-                            type: 'gauge',
-                            radius:'100%',
-                            startAngle: 90,
-                            endAngle: -270,
-                            pointer: {
-                                show: false
-                            },
-                            progress: {
-                                show: true,
-                                overlap: false,
-                                roundCap: true,
-                                clip: false,
-                                itemStyle: {
-                                borderWidth: 0,
-                                    borderColor: '#464646'
-                                }
-                            },
-                            axisLine: {
-                                lineStyle: {
-                                width: 15,
-                                color:[[1,'#36344D']]
-                                }
-                            },
-                            splitLine: {
-                                show: false,
-                                distance: 0,
-                                length: 10
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            axisLabel: {
-                                show: false,
-                                distance: 50
-                            },
-                            data: gaugeData,
-                            title: {
-                                fontSize: 12,
-                                color:'#fff'
-                            },
-                            detail: {
-                                width: 40,
-                                height: 8,
-                                fontSize: 12,
-                                color: 'auto',
-                                borderColor: 'auto',
-                                borderRadius: 20,
-                                borderWidth: 0.5,
-                                formatter: '{value}'
-                            }
-                        }
-                    ]
-                };
-                this.myChart.setOption(option);
            },
            initCharts2(){
                 let statusList = this.customerInfos.equipment_status_info;
@@ -541,6 +459,7 @@ import Bus from "@/util/Bus.js";
                         axisLabel: {
                             color:'#fff',
                             formatter: function (value) { 
+                                console.log(value,'value');
                                 return value *100 +'%'
                             }
                         }
@@ -551,30 +470,39 @@ import Bus from "@/util/Bus.js";
                         textStyle:{
                             color:'#fff'
                         },
-                        pieces: [{
+                        pieces: [
+                        {
+                            gt: 1,
+                            color: 'red'
+                        }, {
+                            lt: 0,
+                            color: '#096'
+                            }
+                        ],
+                        /* pieces: [{
                             gt: 0,
-                            lte: 50,
+                            lte: 20,
                             color: '#096'
                         }, {
-                            gt: 50,
-                            lte: 100,
+                            gt: 20,
+                            lte: 40,
                             color: '#ffde33'
                         }, {
-                            gt: 100,
-                            lte: 150,
+                            gt: 40,
+                            lte: 60,
                             color: '#ff9933'
                         }, {
-                            gt: 150,
-                            lte: 200,
+                            gt: 60,
+                            lte: 80,
                             color: '#cc0033'
                         }, {
-                            gt: 200,
-                            lte: 300,
+                            gt: 80,
+                            lte: 100,
                             color: '#660099'
                         }, {
-                            gt: 300,
+                            gt: 100,
                             color: '#7e0023'
-                        }],
+                        }], */
                         outOfRange: {
                             color: '#999'
                         }
@@ -585,17 +513,21 @@ import Bus from "@/util/Bus.js";
                             return item[1];
                         }),
                         markLine: {
-                            silent: true,
+                            // silent: true,
+                            symbol: 'none',
+                            label: {
+                                show:false,
+                            },
                             data: [{
-                                yAxis: 50
+                                yAxis: 0.2
                             }, {
-                                yAxis: 100
+                                yAxis: 0.4
                             }, {
-                                yAxis: 150
+                                yAxis: 0.6
                             }, {
-                                yAxis: 200
+                                yAxis: 0.8
                             }, {
-                                yAxis: 300
+                                yAxis: 1
                             }]
                         }
                     }
@@ -635,8 +567,8 @@ import Bus from "@/util/Bus.js";
                         },
                         {                       
                             text: '特高频传感器',
-                            left:'18%',//居中显示
-                            top:'40%',//底部显示
+                            left:'10%',//居中显示
+                            top:'28%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -644,8 +576,8 @@ import Bus from "@/util/Bus.js";
                         },
                          {                       
                             text: '温度传感器',
-                            left:'68%',//居中显示
-                            top:'40%',//底部显示
+                            left:'62%',//居中显示
+                            top:'28%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -653,8 +585,8 @@ import Bus from "@/util/Bus.js";
                         },
                         {                       
                             text: '电压传感器',
-                            left:'18%',//居中显示
-                            top:'85%',//底部显示
+                            left:'10%',//居中显示
+                            top:'56%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -662,8 +594,17 @@ import Bus from "@/util/Bus.js";
                         },
                         {                       
                             text: '超声波传感器',
-                            left:'68%',//居中显示
-                            top:'85%',//底部显示
+                            left:'62%',//居中显示
+                            top:'56%',//底部显示
+                            textStyle: {
+                                color: '#fff',
+                                fontSize: 12
+                            }
+                        },
+                        {                       
+                            text: '机械特性传感器',
+                            left:'10%',//居中显示
+                            top:'86%',//底部显示
                             textStyle: {
                                 color: '#fff',
                                 fontSize: 12
@@ -686,13 +627,14 @@ import Bus from "@/util/Bus.js";
                         {
                             name: '特高频传感器',
                             type: 'pie',
-                            radius: [30, 50],
-                            center: ['25%', '25%'],
-                            roseType: 'radius',
+                            radius: [30, 40],
+                            center: ['20%', '20%'],
+                            roseType: 'area',
                             label: {
                                 show: false,
-                                fontSize: 10,
-                                edgeDistance: 5,
+                            }, 
+                            itemStyle: {
+                                borderRadius: 5
                             },
                             data: obj.UHF
                         },
@@ -700,46 +642,55 @@ import Bus from "@/util/Bus.js";
                             name: '温度传感器',
                             type: 'pie',
                             radius: [30, 40],
-                            center: ['75%', '25%'],
+                            center: ['70%', '20%'],
                             roseType: 'area',  
                             label: {
                                 show: false,
                                 fontSize: 10,
                                 edgeDistance: 5,
-                            },                      
+                            },   
+                            itemStyle: {
+                                borderRadius: 5
+                            },                   
                             data: obj.TEMP
                         },
-                         {
+                        {
                             name: '电压传感器',
                             type: 'pie',
                             radius: [30, 40],
-                            center: ['25%', '75%'],
+                            center: ['20%', '50%'],
                             roseType: 'area',    
                              label: {
                                 show: false,
                                 fontSize: 10,
                                 edgeDistance: 5,
-                            },                      
+                             },     
+                             itemStyle: {
+                                borderRadius: 5
+                            },                 
                             data: obj.TEV
                         },
                          {
                             name: '超声波传感器',
                             type: 'pie',
                             radius: [30, 40],
-                            center: ['75%', '75%'],
+                            center: ['70%', '50%'],
                             roseType: 'area',   
                              label: {
                                 show: false,
                                 fontSize: 10,
                                 edgeDistance: 5,
-                            },                        
+                             },   
+                             itemStyle: {
+                                borderRadius: 5
+                            },                     
                             data:obj.AE
                         }
-                        /* , {
+                        , {
                             name: '机械特性传感器',
                             type: 'pie',
                             radius: [30, 40],
-                            center: ['50%', '50%'],
+                            center: ['20%', '76%'],
                             roseType: 'area',   
                              label: {
                                 show: false,
@@ -747,7 +698,7 @@ import Bus from "@/util/Bus.js";
                                 edgeDistance: 50,
                             },                        
                             data:obj.MECH
-                        } */
+                        } 
                     ]
                     };
                 this.myChart.setOption(option);
@@ -1001,17 +952,17 @@ import Bus from "@/util/Bus.js";
     }
     .map{height:100%;}
     .notify{height:170px;}
-    .point{height:100%;position: relative;}
-    .point-box{height:45%;position: relative;}
+    .point{height:150%;position: relative;}
+    .point-box{height:45%;position: relative;overflow-y: auto;overflow-x: hidden;}
     .cape-header::before{
         position: absolute;width:30px;height:15px;content: '';
-        left:-1px;top:-2px;
+        left:0px;top:0px;
         border-top:solid 2px #73D1EB;
-        border-left:solid 1px #73D1EB;
+        border-left:solid 1px #73D1EB;z-index: 1000;
     }
     .cape-header::after{
         position: absolute;height:30px;width:15px;content: '';
-        right:-1px;top:-2px;
+        right:0px;top:0px;
         border-top:solid 1px #73D1EB;
         border-right:solid 2px #73D1EB;
     }
@@ -1020,13 +971,13 @@ import Bus from "@/util/Bus.js";
     }
     .cape-footer::before{
         position: absolute;height:30px;width:15px;content: '';
-        left:-1px;bottom:-2px;
+        left:0px;bottom: 0px;
         border-bottom:solid 2px #73D1EB;
         border-left:solid 1px #73D1EB;
     }
     .cape-footer::after{
         position: absolute;width:30px;height:15px;content: '';
-        right:-1px;bottom:-2px;
+        right:0px;bottom:0px;
         border-bottom:solid 1px #73D1EB;
         border-right:solid 2px #73D1EB;
     }
@@ -1133,6 +1084,28 @@ import Bus from "@/util/Bus.js";
         }
     }
    
+}
+.property-content{
+    width:calc(100% - 60px);
+    height:calc(100% - 60px);margin:auto;
+    border:solid 2px #EBF3FA;padding:10px;
+    .content-title{
+        width:100%;text-align: center;color:#fff;
+    }
+    .b-content-box{
+        display:flex;
+        justify-content: center;
+        margin-top: 15px;;
+        .content-item{
+            width:120px;
+            color:#fff;
+            display:flex;
+            p{text-align:center;padding-left:5px;}
+            img{
+                width:50px;height:50px;
+            }
+        }
+    }
 }
 
 

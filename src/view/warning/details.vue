@@ -54,8 +54,8 @@
                 </div>
             </div>   
              <span slot="footer" class="dialog-footer">
-                <el-button @click="showDetails = false">取 消</el-button>
                 <el-button type="primary" @click="handleAlarm">确 定</el-button>
+                <el-button @click="showDetails = false">取 消</el-button>                
             </span>         
         </el-dialog>
     </div>
@@ -100,6 +100,7 @@ export default {
         this.$nextTick(() => { 
             if (this.detailsInfo) {
                 this.handleForm.is_processed = this.detailsInfo.is_processed;
+                this.handleForm.processed_remarks = this.detailsInfo.processed_remarks;
             }
         })
        

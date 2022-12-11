@@ -105,7 +105,8 @@
                                         
                     <el-table-column prop="character_value" align="center" width="200"  label="特征值">
                         <template slot-scope="props">
-                            <span>{{property[props.row.sensor_type].name+props.row.character_value.toFixed(2) + property[props.row.sensor_type].dw}}</span>     
+                            <span v-if="props.row.sensor_type!='MECH'">{{property[props.row.sensor_type].name+props.row.character_value.toFixed(2) + property[props.row.sensor_type].dw}}</span>     
+                            <span v-else>{{property[props.row.sensor_type].name+mechState[props.row.character_value]}}</span>     
                         </template>
                     </el-table-column>
                     <el-table-column prop="upload_interval" align="center" label="上传间隔">
@@ -200,9 +201,9 @@ export default {
                 'UHF': {dw:'dBm',name:'最大放电幅值：'},
                 'TEV': {dw:'dBmV',name:'最大放电幅值：'},
                 'TEMP': {dw:'℃',name:'温度：'},
-                'MECH':{dw:'mA',name:'电机电流：'},
-                
-            }
+                'MECH':{dw:'mA',name:'开关分合位置：'},                
+            },
+            mechState:['无','分闸','合闸']
         };
     },
     watch: {
