@@ -52,9 +52,15 @@ export default {
                     type: 'category',
                     name: '时间(s)',   
                     nameLocation: "center",  
+                    nameTextStyle: {
+                        color:'#fff'
+                    },
                     nameGap: 42,            
                     data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     axisLabel: {
+                        textStyle: {
+                            color: '#fff'
+                        },
                         formatter: function (value, index) {
                             console.log(value,index,555);
                         if (index===2) {
@@ -74,7 +80,15 @@ export default {
                     type: 'value',
                     name: '电机电流(A)',
                     nameLocation: "center",
+                    nameTextStyle: {
+                        color:'#fff'
+                    },
                     nameGap: 42,
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    }
                 },
                 series: [
                     {
@@ -143,7 +157,7 @@ export default {
                 }
                 .item-value{
                     width:50px;height:30px;
-                    border:solid 1px #000;
+                    border:solid 1px #ccc
                 }            
             }
 

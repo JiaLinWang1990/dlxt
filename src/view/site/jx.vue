@@ -96,30 +96,33 @@ import cnjd from './cndj.vue'
     }
       /deep/.el-dialog__body{
         padding:0;
-        background: #fff;
+        color: #fff;
+        background: #2C2E30
     }
     .dialog_header{
         height:46px;line-height: 46px;
-        width:100%;text-align: center;color:#fff;font-size: 20px;background:#4472C4;
+        width:100%;text-align: center;color:#fff;font-size: 20px;border-bottom: solid 2px #ccc;;
     }
     /deep/.el-tabs{
         padding-top: 15px;;
         .el-tabs__item{
-            color:#409eff;
-            border:solid 1px #4472C4;
+            border:solid 1px #ccc;
             height:30px;line-height: 30px;;
             margin-right:1px;
             border-radius:3px;
             font-size: 16px;
         }
         .el-tabs__item:last-child{
-            border-right:solid 1px #4472C4;
+            border-right:solid 1px #ccc;
         }
         .el-tabs__nav-wrap{
             margin-bottom:0;
         }
         .el-tabs__item.is-active{
-            background:#409eff;
+            background:#D7D7D7;
+            color:#000;
+        }
+        .el-tabs__item:hover{
             color:#fff;
         }
         .el-tabs__header{
@@ -132,6 +135,9 @@ import cnjd from './cndj.vue'
         }
         .el-tab-pane{
             width:100%;
+        }
+        .el-tabs__item.is-active:hover{
+            color:#000;
         }
     }
 </style>

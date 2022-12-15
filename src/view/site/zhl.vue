@@ -42,7 +42,11 @@ export default {
                     
                     }
                 },
-                legend: {},
+                legend: {
+                    textStyle: {
+                        color: '#ffffff'//字体颜色
+                    }
+                },
                 grid: {
                     top: '20px',
                     right: '20px',
@@ -54,8 +58,16 @@ export default {
                     data: [],
                     name:'时间(ms)',
                     nameGap:40,
-                    nameLocation:'middle',
-                    axisLabel:{show:true},
+                    nameLocation: 'middle',
+                    nameTextStyle: {
+                        color:'#fff'
+                    },
+                    axisLabel: {
+                        show: true,
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
                     axisTick: {
                         show: false
                     },
@@ -64,9 +76,17 @@ export default {
                     type: 'value',
                     name: '',
                     nameLocation: "center",
+                    nameTextStyle: {
+                        color:'#fff'
+                    },
                     nameGap: 42,
                     axisLine: {
                         show: true,
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff'
+                        }
                     }
                 },
                 series: [

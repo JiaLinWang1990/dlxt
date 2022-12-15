@@ -81,6 +81,11 @@ export default {
                     left: '80px',
                     bottom: '20px' 
                 },
+                legend: {
+                    textStyle: {
+                        color: '#ffffff'//字体颜色
+                    }
+                },
                 xAxis: {
                     type: 'category',
                     data: [],
@@ -93,9 +98,17 @@ export default {
                     type: 'value',
                     name: '',
                     nameLocation: "center",
+                    nameTextStyle: {
+                        color:'#fff'
+                    },
                     nameGap: 42,
                     axisLine: {
                         show: true,
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff'
+                        }
                     }
                 },
                 series: [
