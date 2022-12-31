@@ -8,13 +8,13 @@
                 <div class="title"><h3>特征参数</h3></div>
                 <div class="details">
                     <div class="details-item">
-                        <div class="item-label">电机启动电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_FI}}</div> A
+                        <div class="item-label">电机启动电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_FI}}A</div> 
                     </div>
                     <div class="details-item">
-                        <div class="item-label">电机最大电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_MAXI}}</div> A
+                        <div class="item-label">电机最大电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_MAXI}}A</div> 
                     </div>
                     <div class="details-item">
-                        <div class="item-label">电机运行时间</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_dt}}</div>  s
+                        <div class="item-label">电机运行时间</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_dt}}s</div>  
                     </div>
                 </div>
             </div>
@@ -39,7 +39,8 @@ export default {
             switchChart: null,
             option: {
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    formatter: '{b}(s) <br/>{a} : {c} (A)'
                 },
                 grid: {
                     top: '20px',
@@ -61,15 +62,7 @@ export default {
                         textStyle: {
                             color: '#fff'
                         },
-                        formatter: function (value, index) {
-                            console.log(value,index,555);
-                        if (index===2) {
-                            return '';
-                        } else {
-                            return value;
-                        }
-                        // return value;
-                    },
+                        interval: 99,
                     },
                     axisTick: {
                         show: false
@@ -84,6 +77,9 @@ export default {
                         color:'#fff'
                     },
                     nameGap: 42,
+                    axisLine: {
+                        show: true,
+                    },
                     axisLabel: {
                         textStyle: {
                             color: '#fff'
@@ -140,24 +136,26 @@ export default {
         height:50%;width:100%;
     }
     .content-params{
+        padding:0 20px;box-sizing: border-box;
         .title{
-            width:100%;text-align: center;
+            width:100%;text-align: center;            
         }
         .details{
             width:100%;text-align:center;
             .details-item{
                 display: flex; line-height: 30px;
                 // justify-content: space-evenly;
+                border:solid 1px #666;
                 margin-top:15px;
                 .item-label{
-                    width:100px;
+                    width:50%;
+                    border-right:solid 1px #666;
                 } 
                 .item-label-m{
-                    width:7 px;
+                    width:50%;
                 }
                 .item-value{
-                    width:50px;height:30px;
-                    border:solid 1px #ccc
+                    width:50%;height:30px;
                 }            
             }
 
