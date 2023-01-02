@@ -92,7 +92,8 @@ export default {
             queryDetails: [],   //查询详情接口返回值的集合
             tempArr: [],//临时数组
             currentMode: 0, //当前传感器在线工作模式，默认关闭
-            isDefaultIcon:true,
+            isDefaultIcon: true,
+            timer:null,
         }
     },
     computed: {
@@ -235,10 +236,29 @@ export default {
                     data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
                     actualType = 'prps3d';
                     var _data = item.prps;
-                    var temp = data.chartBody.series[0].dataList
-                    for (var i = 0; i < _data.length; i++) {
-                        temp[i][2] = _data[i];
-                    }
+                    var temp = data.chartBody.series[0].dataList;
+                    let n=0
+                    this.timer = setInterval(function () { 
+                        if (n >= 60) {
+                            clearInterval(this.timer);
+                            return;
+                        }
+                        for (var i = 0; i < 50; i++) {
+                            temp[i+50*n][2] = _data[i+50*n];
+                        }
+                        n++
+                       
+                        pdcharts.draw(document.getElementById(item.point_id), {
+                            width: '352px',
+                            height: '352px',
+                            type: pdcharts.chartType[actualType],
+                            // type:14,
+                            data: data.chartBody,
+                            background: "#141414",
+                            //  autoCycle:true
+                        });                                               
+                    },20)
+                    return;
                 } else {
                     return;
                 }
@@ -256,6 +276,7 @@ export default {
         }
     },
     destroyed() {
+        clearInterval(this.timer)
         if (this.currentMode) {
             this.reset('off')
         }

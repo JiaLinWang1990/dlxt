@@ -15,22 +15,22 @@
                     <div class="details-item">
                         <div class="item-label">操作时间</div> <div class="item-value"></div>
                     </div>
-                    <div class="details-item">
+                    <div class="details-item" v-if="on!=0">
                         <el-row>
-                            <el-col v-if="on" :span="24" style="display: flex;"><div class="item-label-m">合闸时间</div> <div class="item-value">{{Mech_Results.CoilA.ON_T1}} ms</div></el-col>
-                            <el-col v-else :span="24" style="display: flex;"><div class="item-label-m">分闸时间</div> <div class="item-value">{{Mech_Results.CoilA.OFF_T2}} ms</div></el-col>
+                            <el-col v-if="on==2" :span="24" style="display: flex;"><div class="item-label-m">合闸时间</div> <div class="item-value">{{Mech_Results.CoilA.ON_T1}} ms</div></el-col>
+                            <el-col v-if="on==1" :span="24" style="display: flex;"><div class="item-label-m">分闸时间</div> <div class="item-value">{{Mech_Results.CoilA.OFF_T2}} ms</div></el-col>
                         </el-row>                                             
                     </div>
-                    <div class="details-item">
+                    <div class="details-item" v-if="on!=0">
                         <el-row>
-                            <el-col v-if="on" :span="24" style="display: flex;"><div class="item-label-m">合闸同期性</div> <div class="item-value">{{Mech_Results.CoilA.ON_dt}} ms</div></el-col>
-                            <el-col v-else :span="24" style="display: flex;"><div class="item-label-m">分闸同期性</div> <div class="item-value">{{Mech_Results.CoilA.OFF_dt}} ms</div></el-col>
+                            <el-col v-if="on==2" :span="24" style="display: flex;"><div class="item-label-m">合闸同期性</div> <div class="item-value">{{Mech_Results.CoilA.ON_dt}} ms</div></el-col>
+                            <el-col v-if="on==1" :span="24" style="display: flex;"><div class="item-label-m">分闸同期性</div> <div class="item-value">{{Mech_Results.CoilA.OFF_dt}} ms</div></el-col>
                         </el-row>                                             
                     </div>
-                    <div class="details-item">
+                    <div class="details-item" v-if="on!=0">
                         <el-row>
-                            <el-col v-if="on" :span="24" style="display: flex;"><div class="item-label-m">合闸速度</div> <div class="item-value">{{Mech_Results.CoilA.ON_V}} m/s</div></el-col>
-                            <el-col v-else :span="24" style="display: flex;"><div class="item-label-m">分闸速度</div> <div class="item-value">{{Mech_Results.CoilA.OFF_V}} m/s</div></el-col>
+                            <el-col v-if="on==2" :span="24" style="display: flex;"><div class="item-label-m">合闸速度</div> <div class="item-value">{{Mech_Results.CoilA.ON_V}} m/s</div></el-col>
+                            <el-col v-if="on==1" :span="24" style="display: flex;"><div class="item-label-m">分闸速度</div> <div class="item-value">{{Mech_Results.CoilA.OFF_V}} m/s</div></el-col>
                         </el-row>                                             
                     </div>
                     <div class="details-item">
@@ -71,7 +71,7 @@ export default {
             switchChart: null,
             disChart: null,
             currentChart: null,
-            on:true,
+            on:0,
             option: {
                 tooltip: {
                     trigger: 'axis',
@@ -141,7 +141,9 @@ export default {
         };
     },
     computed: {
-        Mech_Results() { 
+        Mech_Results() {
+            this.on = this.dataInfo.Mech_Results?this.dataInfo.Mech_Results.CoilA.ON_OFF_STATE:0;
+            console.log(this.dataInfo.Mech_Results);
             return this.dataInfo.Mech_Results
         }  
     },
