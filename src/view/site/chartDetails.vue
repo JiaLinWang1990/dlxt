@@ -7,7 +7,7 @@
            </div> -->
             <div style="width:100%;height:25px;cursor:pointer;">
                 <i class="el-icon-video-play" style="font-size:25px;color:#CA5051;float:left" @click="reset"
-                    v-if="isDefaultIcon&&queryDetails.length === 1"></i>
+                    v-if="isDefaultIcon && queryDetails.length === 1"></i>
                 <i class="el-icon-video-pause" style="font-size:25px;color:#CA5051;float:left"
                     v-if="!isDefaultIcon"></i>
                 <i class="el-icon-error" style="font-size:25px;color:#CA5051;float:right"
@@ -64,6 +64,7 @@
 import * as pdcharts from '@/util/js/index.js'
 import * as device from '@/data/device.js'
 import Bus from "@/util/Bus.js";
+import * as echarts from 'echarts';
 
 export default {
     name: '',
@@ -93,7 +94,7 @@ export default {
             tempArr: [],//临时数组
             currentMode: 0, //当前传感器在线工作模式，默认关闭
             isDefaultIcon: true,
-            timer:null,
+            timer: null,
         }
     },
     computed: {
@@ -118,7 +119,7 @@ export default {
             this.getTrendDetail();
         }
         // else {
-            this.getAllDetails();
+        this.getAllDetails();
         // }
         window.onresize = () => {
             return (() => {
@@ -236,10 +237,16 @@ export default {
                     data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
                     actualType = 'prps3d';
                     var _data = item.prps;
-                    var temp = data.chartBody.series[0].dataList;
-                    let n=0
-                    this.timer = setInterval(function () { 
-                        if (n >= 60) {
+                    /* this.dealData(item);
+                    return */
+                    var temp = JSON.parse(JSON.stringify(data.chartBody.series[0].dataList));
+                    for (var i = 0; i < _data.length; i++) {
+                        temp[i][2] = _data[i];
+                    }
+                    let n = 60
+                    data.chartBody.series[0].dataList = [];
+                    this.timer = setInterval(function () {
+                        /*if (n >= 60) {
                             clearInterval(this.timer);
                             return;
                         }
@@ -247,7 +254,15 @@ export default {
                             temp[i+50*n][2] = _data[i+50*n];
                         }
                         n++
-                       
+                        */
+                        if (n == 0) {
+                            clearInterval(this.timer);
+                            return;
+                        }
+                        let temp1 = temp.slice(n * 50 - 50, n * 50)
+                        // data.chartBody.series[0].dataList = data.chartBody.series[0].dataList.concat(temp1);
+                        data.chartBody.series[0].dataList = temp1.concat(data.chartBody.series[0].dataList);
+                        n--
                         pdcharts.draw(document.getElementById(item.point_id), {
                             width: '352px',
                             height: '352px',
@@ -256,8 +271,8 @@ export default {
                             data: data.chartBody,
                             background: "#141414",
                             //  autoCycle:true
-                        });                                               
-                    },20)
+                        });
+                    }, 20)
                     return;
                 } else {
                     return;
@@ -273,6 +288,424 @@ export default {
                     //  autoCycle:true
                 });
             })
+        },
+        processData(data) {
+            const prps = data.prps || []
+            const np = data.np
+            const gpp = data.gpp || 1
+            const rangemax = data.rangemax
+            const rangemin = data.rangemin
+            const ampmax = data.ampmax
+            const span = 360 / gpp
+            const cdata = []
+            const id = data.point_id
+            if (rangemax >= 0) {
+                for (let i = 0; i < prps.length; i++) {
+                    prps[i] = prps[i] - rangemax - 1
+                }
+            }
+            let index = 0
+            // np-周期;gpp-相位数;[y,x,z]
+            for (let i = 0; i < gpp; i++) {
+                for (let j = 0; j < np; j++) {
+                    index = j * gpp + i
+                    cdata.push([(i + 1) * span, j, prps[index]])
+                }
+            }
+            let n = 0;
+            let This = this;
+            /* let timer = setInterval(function () { 
+                if (n >= 60) {
+                    clearInterval(timer);
+                    return;
+                }
+                let temp = cdata.slice(n * 50, n * 50 + 50)
+                This.draw(temp, rangemax, rangemin, ampmax, np,id)
+                n++
+            },20) */
+            this.draw(cdata, rangemax, rangemin, ampmax, np, id)
+        },
+        draw(data, max, min, ampmax, np, id) {
+            const option = {
+                title: {
+                    text: 'PRPS图谱',
+                    subtext: 'Max=' + ampmax + 'dBm',
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    subtextStyle: {
+                        color: '#FFF'
+                    },
+                    left: 'center'
+                },
+                tooltip: {
+                    formatter: (item) => {
+                        return max >= 0 ? (item['value'][2] ? (item['value'][2] + max + 1) : '--') : (item['value'][2] || '--')
+                    }
+                },
+                visualMap: {
+                    max: max > 0 ? -1 : max,
+                    min: max > 0 ? min - max - 1 : min,
+                    formatter: function (value) {
+                        return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+                    },
+                    inRange: {
+                        color: [
+                            '#313695',
+                            '#4575b4',
+                            '#74add1',
+                            '#abd9e9',
+                            '#e0f3f8',
+                            '#ffffbf',
+                            '#fee090',
+                            '#fdae61',
+                            '#f46d43',
+                            '#d73027',
+                            '#a50026'
+                        ]
+                    },
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    right: 0
+                },
+                xAxis3D: {
+                    type: 'value',
+                    name: '周期[T]',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    min: 0,
+                    max: np,
+                    axisLabel: {
+                        formatter: (value) => {
+                            return value
+                        }
+                    }
+                },
+                yAxis3D: {
+                    type: 'value',
+                    name: '相位[°]',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    min: 0,
+                    max: 360,
+                    axisLabel: {
+                        formatter: (value) => {
+                            return value
+                        }
+                    }
+                },
+                zAxis3D: {
+                    type: 'value',
+                    name: '幅值\n[dBm]',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    max: () => {
+                        return max >= 0 ? -1 : max
+                    },
+                    min: () => {
+                        return max >= 0 ? min - max - 1 : min
+                    }
+                },
+                grid3D: {
+                    axisPointer: {
+                        show: false
+                    },
+                    light: {
+                        main: {
+                            intensity: 1.2
+                        },
+                        ambient: {
+                            intensity: 0.3
+                        }
+                    },
+                    axisLabel: {
+                        formatter: (value) => {
+                            return max >= 0 ? value + max + 1 : value
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'bar3D',
+                        data: data.map(function (item) {
+                            return {
+                                value: [item[1], item[0], item[2]]
+                            }
+                        }),
+                        shading: 'color',
+                        label: {
+                            show: false,
+                            fontSize: 16,
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            label: {
+                                show: false
+                            }
+                        }
+                    }
+                ]
+            }
+            const myChart = echarts.init(document.getElementById(id))
+            myChart.setOption(option)
+        },
+        dealData(data) {
+            const prps = data.prps
+            const prpd = data.prpd
+            /* const np = data.uhf_powerFrequencyCycles
+            const gpp = data.uhf_phaseWindows || 1
+            const qal = data.uhf_quantizedAmplitude || 1
+            const rangemax = data.uhf_maxLimit
+            const rangemin = data.uhf_minLimit
+            const ampmax = data.uhf_peak */
+            const qal = 50 || 1
+            const np = data.np
+            const gpp = data.gpp || 1
+            const rangemax = data.rangemax
+            const rangemin = data.rangemin
+            const ampmax = data.ampmax
+            const unit = 'dBm' //unitArr[data.uhf_unit - 1] || 
+            const span = 360 / gpp
+            const cdata = []
+            const id = data.point_id
+            if (rangemax >= 0) {
+                for (let i = 0; i < prps.length; i++) {
+                    prps[i] = prps[i] - rangemax - 1
+                }
+            }
+            let index = 0
+            const _span = Math.abs(rangemax - rangemin) / qal
+            // np-周期;gpp-相位数;[y,x,z]
+            for (let i = 0; i < gpp; i++) {
+                for (let j = 0; j < np; j++) {
+                    index = j * gpp + i
+                    if (j == 0) cdata.push([(i + 1) * span, j, prps[index] < rangemin ? prps[index] : rangemin])
+                    else cdata.push([(i + 1) * span, j, prps[index]])
+                }
+            }
+            const dData = []
+            let index1 = 0
+            const offset = rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin) - 1
+            const offset2 = rangemax > 0 ? 1 : -rangemax
+            // qal-量化幅值;gpp-相位数;[y,x,z]
+            if (prpd && prpd.length) {
+                for (let i = 0; i < qal; i++) {
+                    for (let j = 0; j < gpp; j++) {
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        dData.push([j * span + span, 0, i * _span - offset, prpd[index1] - (rangemax > 0 ? Math.abs(rangemax - rangemin) : Math.abs(rangemin))])
+                        index1 += 1
+                    }
+                }
+            }
+            
+            const lData = []
+            // qal-量化幅值;gpp-相位数;[y,x,z]
+            for (let j = 0; j < 360; j++) {
+                lData.push([j, 0, Math.abs(rangemax - rangemin) * (Math.sin(j / 360 * 2 * Math.PI) - 1) / 2 - offset2, 1])
+            }
+            this.draw1(cdata, rangemax, rangemin, ampmax, np, unit, dData, lData, id)
+        },
+        draw1(data, max, min, ampmax, np, unit, data2, data3, id) {
+            const option = {
+                title: {
+                    text: 'PRPS&PRPD图谱',
+                    // subtext: 'Max=' + ampmax + unit,
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    subtextStyle: {
+                        color: '#FFF'
+                    },
+                    left: 'center'
+                },
+                tooltip: {
+                    formatter: (item) => {
+                        return max >= 0 ? (item['value'][2] ? (item['value'][2] + max + 1) : '--') : (item['value'][2] || '--')
+                    }
+                },
+                visualMap: [{
+                    max: max > 0 ? -1 : max,
+                    min: max > 0 ? min - max - 1 : min,
+                    formatter: function (value) {
+                        return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+                    },
+                    inRange: {
+                        color: ['transparent', '#FFF']
+                    },
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    right: 0,
+                    seriesIndex: 2
+                }, {
+                    max: max > 0 ? -1 : max,
+                    min: max > 0 ? min - max - 1 : min,
+                    formatter: function (value) {
+                        return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+                    },
+                    inRange: {
+                        color: ['#8c8c8c', '#9e1068', '#135200', '#006d75', '#237804', '#ad8b00']
+                    },
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    right: 0,
+                    seriesIndex: 1
+                }, {
+                    max: max > 0 ? -1 : max,
+                    min: max > 0 ? min - max - 1 : min,
+                    formatter: function (value) {
+                        return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+                    },
+                    inRange: {
+                        color: [ '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                        // color: ['#136911', '#8f0e0e']
+                    },
+                    textStyle: {
+                        color: '#FFF'
+                    },
+                    right: 0,
+                    seriesIndex: 0
+                }],
+                xAxis3D: {
+                    type: 'value',
+                    name: '周期[T]',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    min: 0,
+                    max: np,
+                    axisLabel: {
+                        formatter: (value) => {
+                            return value
+                        }
+                    }
+                },
+                yAxis3D: {
+                    type: 'value',
+                    name: '相位[°]',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    min: 0,
+                    max: 360,
+                    axisLabel: {
+                        formatter: (value) => {
+                            return value
+                        }
+                    }
+                },
+                zAxis3D: {
+                    type: 'value',
+                    name: '幅值\n[' + unit + ']',
+                    nameTextStyle: {
+                        color: '#FFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#FFF'
+                        }
+                    },
+                    max: () => {
+                        return max >= 0 ? -1 : max
+                    },
+                    min: () => {
+                        return max >= 0 ? min - max - 1 : min
+                    }
+                },
+                grid3D: {
+                    axisPointer: {
+                        show: false
+                    },
+                    light: {
+                        main: {
+                            intensity: 1.2
+                        },
+                        ambient: {
+                            intensity: 0.3
+                        }
+                    },
+                    axisLabel: {
+                        formatter: (value) => {
+                            return max >= 0 ? value + max + 1 : value
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'bar3D',
+                        data: data.map(function (item) {
+                            return {
+                                value: [item[1], item[0], item[2]]
+                            }
+                        }),
+                        shading: 'color',
+                        label: {
+                            show: false,
+                            fontSize: 16,
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            label: {
+                                show: false
+                            }
+                        }
+                    },
+                    {
+                        type: 'scatter3D',
+                        symbolSize: 5,
+                        data: data2.map(function (item) {
+                            return [item[1], item[0], item[2], item[3]]
+                        })
+                    },
+                    {
+                        type: 'scatter3D',
+                        symbolSize: 2,
+                        data: data3.map(function (item) {
+                            return [item[1], item[0], item[2], item[3]]
+                        })
+                    }
+                ]
+            }
+            const myChart = echarts.init(document.getElementById(id))
+            myChart.setOption(option)
         }
     },
     destroyed() {
