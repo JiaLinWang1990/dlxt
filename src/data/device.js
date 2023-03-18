@@ -111,7 +111,7 @@ export function publishSensors(params={},callback){
 
 /*主机下传感器列表*/ 
 export function getSensorList(params={},callback){
-  let _params = params.searchForm || {};
+  let _params = params || {};
   handlerPaging(_params);
   return axios.request({
     "url" : baseUrl+'/gateways/'+params.gateway_id+"/sensor_info/",

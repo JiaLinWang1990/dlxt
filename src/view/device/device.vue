@@ -40,8 +40,17 @@
                         <el-select v-model="exportForm.type" placeholder="传感器类型">
                             <el-option label="AE" value="AE"></el-option>
                             <el-option label="TEV" value="TEV"></el-option>
-                            <el-option label="TEMP" value="TEMP"></el-option>
+                            <!-- <el-option label="TEMP" value="TEMP"></el-option> -->
                             <el-option label="UHF" value="UHF"></el-option>
+
+                            <el-option label="MECH" value="MECH"></el-option>
+                            <el-option label="HFCT" value="HFCT"></el-option>
+                            <el-option label="OZONE" value="OZONE"></el-option>
+                            <el-option label="VIBRATION" value="VIBRATION"></el-option>
+                            <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
+                            <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
+                            <el-option label="ENVTH" value="ENVTH"></el-option>
+
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -85,7 +94,7 @@
                                 <el-button type="text" @click.stop="add(scope.row,2)">配置</el-button>
                                 <el-button type="text" @click="details(scope.row,$event)">详情</el-button>
                                 <el-button type="text" @click="publishSensors(scope.row,$event)">传感器</el-button>
-                                <el-button type="text" @click="publishSensors(scope.row,$event)">刷新</el-button>
+                                <el-button type="text" @click="publishSensors(scope.row,$event,true)">刷新</el-button>
                             </template>
                             
                         </el-table-column>
@@ -123,9 +132,9 @@
                         </el-form-item>
                     </el-form>
                     <el-table :data="sensorData" style="width: 100%"  v-loading="loading"
-                    element-loading-text="拼命加载中"
-                    element-loading-spinner="el-icon-loading"
-                    element-loading-background="rgba(0, 0, 0, 0.8)" >
+                        element-loading-text="拼命加载中"
+                        element-loading-spinner="el-icon-loading"
+                        element-loading-background="rgba(0, 0, 0, 0.8)" >
                         <el-table-column prop="name" label="传感器名称"></el-table-column>
                         <el-table-column prop="sensor_type" label="传感器类型"></el-table-column>
                         <el-table-column prop="sensor_id" label="传感器编号"></el-table-column>
@@ -148,6 +157,16 @@
                            
                         </el-table-column>
                     </el-table>
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[5,10, 20, 50]"
+                        prev-text="上一页" next-text="下一页"
+                        :page-size="size"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                    </el-pagination>
                 </div>            
             </div>
         </div>
@@ -201,7 +220,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="主机编号" prop="client_number">
-                    <el-input v-model="deviceForm.client_number"></el-input>                   
+                    <el-input v-model="deviceForm.client_number" disabled></el-input>                   
                 </el-form-item>
                 <el-form-item label="时间校准" prop="time_adjusting">
                     <!-- <el-input v-model="deviceForm.time_adjusting"></el-input>     -->
@@ -320,7 +339,10 @@ export default {
                 { value: 1, label: 'Min' },
                 { value: 2, label: 'H' },                
             ],
-            acqPeriod:0,
+            acqPeriod: 0,
+            currentPage:1,
+            size:10,
+            total:0,
         };
     },
     mounted() {
@@ -329,6 +351,15 @@ export default {
     },
 
     methods: {
+        handleSizeChange(val){
+            this.size = val;
+            this.selectDevice(this.selectSensorInfo);
+            // this.getUserList();
+        },
+        handleCurrentChange(val){
+            this.currentPage = val;
+            this.selectDevice(this.selectSensorInfo);
+        },
         changePeriod() { },
         saveSetSensorDialog(){
             let timeStep = [1,60,3600]
@@ -427,13 +458,13 @@ export default {
                 this.getTreeData();
             })
         },
-        publishSensors(v,e){
+        publishSensors(v,e,frash){
             e.stopPropagation();
             let This = this
             device.publishSensors({gateway_id:v.gateway_id}).then(res=>{
                 console.log(res,'res');
                 this.$message({ type: 'success', message: '获取传感器列表成功！' }); 
-                setTimeout(This.querySensorList(v.gateway_id),1000)
+                frash && setTimeout(This.querySensorList(v.gateway_id),1000)
                 // this.querySensorList(v.gateway_id)
                 // this.selectDevice(v);
             })
@@ -488,14 +519,16 @@ export default {
                 this.clientForm.acq_period = res.data.acq_period
             })
         },
-        selectDevice(row){
+        selectDevice(row) {
+            this.selectSensorInfo = row
             this.currentGatewayId = row.gateway_id
             this.querySensorList(row.gateway_id)
         },
         querySensorList(id,form){
-            let params = form?{gateway_id:id,searchForm:form}:{gateway_id:id}
+            let params = form ? { gateway_id: id, searchForm: form,page:this.currentPage,limit:this.size } : Object.assign({}, { gateway_id: id,page:this.currentPage,limit:this.size})
             device.getSensorList(params).then(res=>{
                 this.sensorData = res.data.sensor_info;
+                this.total = res.data.total;
             })
         },
         search(){
@@ -607,5 +640,8 @@ export default {
             width:90px;
         }
     }
+}
+.el-pagination{
+    text-align: right;
 }
 </style>

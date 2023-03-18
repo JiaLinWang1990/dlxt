@@ -43,7 +43,10 @@
         </div>
         <div style="margin-top: 20px;display: flex;height: calc(100% - 130px);">
             <div class="z-block file-menu">
-                <div class="block-title">档案导航</div>
+                <div class="block-title">
+                    <span>档案导航</span>
+                    <el-button size="small" class="create-btn" v-if="treeData.length" @click="add({type:'customer'})">新建公司</el-button>
+                </div>
                 <div style="height:calc(100% - 50px)">
                     <tree ref="tree" v-if="showTree"  :data="treeData" @add="add" @addChild="addChild" @del="del" @edit="edit"  @clickNode="clickNode"></tree>
                 </div>
@@ -154,7 +157,7 @@
             </div>
         </div>
         <el-dialog :title="operateType+'公司'" :visible.sync="addCompanyDialog" :close-on-click-modal="false" class="dialog-box" width="500px">
-            <el-form :model="companyForm" :rules="companyRules" label-width="90px" ref="companyForm">
+            <el-form :model="companyForm" :rules="companyRules" label-width="100px" ref="companyForm">
                 <el-form-item label="公司名称" prop="name">
                     <el-input v-model="companyForm.name"></el-input>
                 </el-form-item>
@@ -174,7 +177,7 @@
             </div>
         </el-dialog>
         <el-dialog :title="operateType+'站点'" :visible.sync="addSitetDialog" :close-on-click-modal="false" class="dialog-box" width="500px">
-            <el-form :model="siteForm" :rules="siteRules" label-width="90px" ref="siteForm">
+            <el-form :model="siteForm" :rules="siteRules" label-width="100px" ref="siteForm">
                 <el-form-item label="站点名称" prop="name">
                     <el-input v-model="siteForm.name"></el-input>
                 </el-form-item>
@@ -209,7 +212,7 @@
             </div>
         </el-dialog>
         <el-dialog :title="operateType+'电力设备'" :visible.sync="addDeviceDialog" :close-on-click-modal="false" class="dialog-box" width="500px">
-            <el-form :model="deviceForm" :rules="deviceRules" label-width="90px"  ref="deviceForm">
+            <el-form :model="deviceForm" :rules="deviceRules" label-width="100px"  ref="deviceForm">
                 <el-form-item label="设备名称" prop="device_name">
                     <el-input v-model="deviceForm.device_name"></el-input>
                 </el-form-item>
@@ -255,21 +258,28 @@
             </div>
         </el-dialog>
         <el-dialog :title="operateType+'测点'" :visible.sync="addPointDialog" :close-on-click-modal="false" class="dialog-box" width="500px">
-            <el-form :model="pointForm" :rules="pointRules" label-width="90px" ref="pointForm">
+            <el-form :model="pointForm" :rules="pointRules" label-width="100px" ref="pointForm">
                 <el-form-item label="测点名称" prop="measure_name">
                     <el-input v-model="pointForm.measure_name"></el-input>
                 </el-form-item>
+                <el-form-item label="测点类型" prop="measure_type">
+                    <el-select v-model="pointForm.measure_type" placeholder="请选择" @change="changeType">
+                        <el-option label="AE" value="AE"></el-option>
+                            <el-option label="TEV" value="TEV"></el-option>
+                            <el-option label="UHF" value="UHF"></el-option>
+                            <el-option label="MECH" value="MECH"></el-option>
+                            <el-option label="HFCT" value="HFCT"></el-option>
+                            <el-option label="OZONE" value="OZONE"></el-option>
+                            <el-option label="VIBRATION" value="VIBRATION"></el-option>
+                            <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
+                            <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
+                            <el-option label="ENVTH" value="ENVTH"></el-option>
+                    </el-select>
+                </el-form-item>  
                 <el-form-item label="传感器编号" prop="sensor_number">
                     <el-input v-model="pointForm.sensor_number"></el-input>
                 </el-form-item>
-                <el-form-item label="测点类型" prop="measure_type">
-                    <el-select v-model="pointForm.measure_type" placeholder="请选择">
-                        <el-option label="AE" value="AE"></el-option>
-                        <el-option label="TEV" value="TEV"></el-option>
-                        <el-option label="Temp" value="Temp"></el-option>
-                        <el-option label="UHF" value="UHF"></el-option>
-                    </el-select>
-                </el-form-item>              
+                           
                 
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="pointForm.remarks"></el-input>
@@ -490,6 +500,12 @@ export default {
                     break;
             } 
         },
+        changeType(val) { 
+            let params = {data:{sensor_type:val},site_id:this.clickNodeObj.parent_id}
+            file.queryUnbindSensor(params).then(res => {
+                console.log(res,'未绑定');
+            })
+        },
         edit(obj){
             this.operateType = '修改';
             this.clickNodeObj  = obj;
@@ -684,5 +700,8 @@ export default {
 }
 /deep/.el-form-item__content{
 //    margin-left:100px !important;
+}
+.create-btn{
+    margin-left:50px;
 }
 </style>

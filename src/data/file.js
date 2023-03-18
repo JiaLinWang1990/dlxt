@@ -149,3 +149,11 @@ export function importFile(params={},callback){
   },callback)
 }
 
+/* 站点下未绑定的传感器 */
+export function queryUnbindSensor(params={},callback){
+    return axios.request({
+      "url" : baseUrl+'/sites/'+params.site_id+'/sensor_configs/',
+      "method" : "get",
+      "params":params.data
+    },callback)
+}

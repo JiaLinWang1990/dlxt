@@ -237,10 +237,13 @@ export default {
                     data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
                     actualType = 'prps3d';
                     var _data = item.prps;
-                    /* this.dealData(item);
+                    /* this.processData(item);
                     return */
                     var temp = JSON.parse(JSON.stringify(data.chartBody.series[0].dataList));
-                    for (var i = 0; i < _data.length; i++) {
+                    for (var i = 0; i < _data.length-1; i++) {
+                        if (!temp[i]) {
+                            temp[i] = [0,0,0]
+                        }
                         temp[i][2] = _data[i];
                     }
                     let n = 60
