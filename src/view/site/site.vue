@@ -59,9 +59,14 @@
                                 <el-select v-model="form.sensor_type" placeholder="请选择" clearable popper-class="dark-style">
                                     <el-option label="AE" value="AE"></el-option>
                                     <el-option label="TEV" value="TEV"></el-option>
-                                    <el-option label="TEMP" value="Temp"></el-option>
+                                    <!-- <el-option label="TEMP" value="Temp"></el-option> -->
                                     <el-option label="UHF" value="UHF"></el-option>
                                     <el-option label="MECH" value="MECH"></el-option>
+                                    <el-option label="OZONE" value="OZONE"></el-option>
+                                    <el-option label="VIBRATION" value="VIBRATION"></el-option>
+                                    <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
+                                    <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
+                                    <el-option label="ENVTH" value="ENVTH"></el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
@@ -86,6 +91,11 @@
                         type="selection" :selectable="selectFun"
                         width="55"
                     ></el-table-column>
+                    <el-table-column label="操作" width="80">
+                        <template slot-scope="scope">
+                            <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
+                        </template>                    
+                    </el-table-column>
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                     <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
@@ -115,12 +125,7 @@
                         </template>
                     </el-table-column>                   
                     <el-table-column prop="create_date" align="center" width="150" label="更新时间"></el-table-column>
-                    <el-table-column label="操作" width="80">
-                        <template slot-scope="scope">
-                            <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
-                        </template>
                     
-                    </el-table-column>
                 </el-table>
                 <el-pagination
                     @size-change="handleSizeChange"

@@ -263,21 +263,25 @@
                     <el-input v-model="pointForm.measure_name"></el-input>
                 </el-form-item>
                 <el-form-item label="测点类型" prop="measure_type">
-                    <el-select v-model="pointForm.measure_type" placeholder="请选择" @change="changeType">
+                    <el-select v-model="pointForm.measure_type" placeholder="请选择" :disabled="operateType=='修改'">
                         <el-option label="AE" value="AE"></el-option>
-                            <el-option label="TEV" value="TEV"></el-option>
-                            <el-option label="UHF" value="UHF"></el-option>
-                            <el-option label="MECH" value="MECH"></el-option>
-                            <el-option label="HFCT" value="HFCT"></el-option>
-                            <el-option label="OZONE" value="OZONE"></el-option>
-                            <el-option label="VIBRATION" value="VIBRATION"></el-option>
-                            <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
-                            <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
-                            <el-option label="ENVTH" value="ENVTH"></el-option>
+                        <el-option label="TEV" value="TEV"></el-option>
+                        <el-option label="UHF" value="UHF"></el-option>
+                        <el-option label="MECH" value="MECH"></el-option>
+                        <el-option label="HFCT" value="HFCT"></el-option>
+                        <el-option label="OZONE" value="OZONE"></el-option>
+                        <el-option label="VIBRATION" value="VIBRATION"></el-option>
+                        <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
+                        <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
+                        <el-option label="ENVTH" value="ENVTH"></el-option>
                     </el-select>
                 </el-form-item>  
                 <el-form-item label="传感器编号" prop="sensor_number">
-                    <el-input v-model="pointForm.sensor_number"></el-input>
+                    <el-select v-model="pointForm.sensor_number" placeholder="请选择" filterable  allow-create default-first-option
+                    @blur="onTypeBlur($event)">
+                        <el-option v-for="i in sensorNumberArr" :key="i" :value="i">{{ i }}</el-option>
+                    </el-select>
+                    <!-- <el-input v-model="pointForm.sensor_number"></el-input> -->
                 </el-form-item>
                            
                 
@@ -400,7 +404,8 @@ export default {
                 region:""
             },
             contentDetails:{},
-            divisionArr:[]
+            divisionArr: [],
+            sensorNumberArr:[],//未绑定的传感器编号数组
         };
     },
     methods: {
@@ -474,7 +479,7 @@ export default {
                     break;
                 default:
                     break;
-            } 
+            }            
         },
         add(obj) {
             this.operateType = '新建';
@@ -500,11 +505,33 @@ export default {
                     break;
             } 
         },
-        changeType(val) { 
-            let params = {data:{sensor_type:val},site_id:this.clickNodeObj.parent_id}
+        queryUnbindSensor(obj) { 
+            //根据测点的parent_id去树里面匹配对应的站点id
+            console.log(this.treeData, 'treeData');
+            const node = this.findNode(this.treeData, (node) => {
+                return node.id == this.clickNodeObj.parent_id;
+            })
+            console.log(node,'node');
+            let params = {data:{sensor_type:obj.measure_type},site_id:node.parent_id}
             file.queryUnbindSensor(params).then(res => {
+                this.sensorNumberArr = res.data;
                 console.log(res,'未绑定');
             })
+        },
+        findNode(tree, func) {
+            for (const node of tree) {
+                if (func(node)) return node
+                if (node.children) {
+                    const res = this.findNode(node.children, func)
+                    if (res) return res
+                }
+            }
+            return null
+        },
+        onTypeBlur(e) {
+            if (e.target.value) {
+                this.pointForm.sensor_number = e.target.value
+            }
         },
         edit(obj){
             this.operateType = '修改';
@@ -530,7 +557,8 @@ export default {
                 })
             }else if(obj.type=='point'){
                 file.pointDetails({point_id:obj.id,equipment_id:obj.parent_id}).then(res=>{
-                    this.valueAssign(this.pointForm,res.data)
+                    this.valueAssign(this.pointForm, res.data);
+                    this.queryUnbindSensor(res.data)
                 }) 
             }
 

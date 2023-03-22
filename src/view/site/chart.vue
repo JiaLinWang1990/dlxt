@@ -516,16 +516,16 @@ import * as device from '@/data/device.js'
                             currentChartData[0].data.push(item.T.toFixed(2))
                         }else if(item.sensor_type=='AE'){
                             currentChartData = aeData
-                            currentChartData[0].data.push(item.maxvalue.toFixed(2))
-                            currentChartData[1].data.push(Number(item.rmsvalue).toFixed(2))
-                            currentChartData[2].data.push(item.harmonic1.toFixed(2))
-                            currentChartData[3].data.push(item.harmonic2.toFixed(2))
+                            currentChartData[0].data.push(Number(item.peak).toFixed(2))
+                            currentChartData[1].data.push(Number(item.average).toFixed(2))
+                            currentChartData[2].data.push(Number(item.F50).toFixed(2))
+                            currentChartData[3].data.push(Number(item.F100).toFixed(2))
                         }else if(item.sensor_type == 'TEV'){
                             currentChartData = tevData
-                            currentChartData[0].data.push(item.amp.toFixed(2))
+                            currentChartData[0].data.push(Number(item.average).toFixed(2))
                         }else if(item.sensor_type == 'UHF'){
                             currentChartData = uhfData
-                            currentChartData[0].data.push(item.ampmax.toFixed(2))
+                            currentChartData[0].data.push(Number(item.ampmax).toFixed(2))
                             currentChartData[1].data.push(Number(item.ampmean).toFixed(2))
                         }
                     })

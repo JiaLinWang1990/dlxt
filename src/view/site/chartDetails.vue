@@ -36,22 +36,42 @@
                             </el-col>
                         </el-row>
                     </div>
-                    <el-tabs type="border-card" v-model="activeTab1" @tab-click="handleClick" class="chart-tabs"
-                        v-if="item.data.sensor_type == 'UHF'">
-                        <el-tab-pane label="特征图谱" name="common" disabled>
+                    <!-- <el-tabs type="border-card" v-model="activeTab[idx]" @tab-click="handleClick" class="chart-tabs">
+                        <el-tab-pane label="测点名称" name="point">
+                            
                         </el-tab-pane>
-                        <el-tab-pane label="PRPS" name="prps">
+                        <el-tab-pane label="PRPS&PRPD" name="prps" v-if="['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(item.data.sensor_type)==-1">
                         </el-tab-pane>
-                        <el-tab-pane label="PRPD" name="prpd" disabled>
+                        <el-tab-pane label="特征图谱" name="prpd">
                         </el-tab-pane>
-                    </el-tabs>
-                    <el-tabs type="border-card" v-model="activeTab2" @tab-click="handleClick" class="chart-tabs"
-                        v-if="item.data.sensor_type !== 'UHF'">
-                        <el-tab-pane label="特征图谱" name="common">
-                        </el-tab-pane>
-                    </el-tabs>
-                    <div :id="item.data.point_id" class="chart-3d"></div>
+                    </el-tabs> -->
+                    <ul class="tabs-ul">
+                        <li
+                            v-for="(ite) in tabs"
+                            :key="ite.value" 
+                            :class="{active: activeTab[idx] == ite.value}"
+                            @click="changetabs(ite.value,idx)">
+                            {{ ite.label }}
+                        </li> <!-- :class="{active: activeTab[idx] == ite.value}" -->
+                    </ul>                    
+                    <div v-show="queryDetails[idx].data.tabSelect === 'point'" class="basic-point-info">
+                        <p>电池电量:{{queryDetails[idx].data.battery}}</p>
+                        <p>报警等级:{{queryDetails[idx].data.alarm_level}}</p>
+                        <p>放电类型:{{queryDetails[idx].data.alarm_level}}</p>
+                        <p>放电频次:{{queryDetails[idx].data.DenoisingN}}</p>
+                        <p>放电类型概率:{{queryDetails[idx].data.PD_type_probability}}</p>
+                        <p>最大放电幅值:{{queryDetails[idx].data.max_limit}}</p>
+                        <p>50Hz相关性:{{queryDetails[idx].data.F50}}</p>
+                        <p>100Hz相关性:{{queryDetails[idx].data.F100}}</p>
 
+                    </div>
+                    
+                    <!-- <div v-show="queryDetails[idx].data.tabSelect ==='prps' && queryDetails[idx].data.sensor_type =='UHF'">
+                        <div :id="item.data.point_id" class="chart-3d" ></div>
+                    </div> -->
+                    <div v-show="queryDetails[idx].data.tabSelect ==='chart'">
+                        <div :id="item.data.point_id" class="chart-3d" ></div>
+                    </div>
                 </div>
 
             </div>
@@ -65,6 +85,7 @@ import * as pdcharts from '@/util/js/index.js'
 import * as device from '@/data/device.js'
 import Bus from "@/util/Bus.js";
 import * as echarts from 'echarts';
+import { dealData } from './handle.js';
 
 export default {
     name: '',
@@ -85,9 +106,7 @@ export default {
     data() {
         return {
             dialogWidth: 0,
-            activeTab: ['common'],
-            activeTab1: 'prps',
-            activeTab2: 'common',
+            activeTab: ['point','point','point','point','point','point'],
             showClo: false,
             DataDetails: [],//区别于直接传过来的值，该值表示趋势详情的数组
             queryDetails: [],   //查询详情接口返回值的集合
@@ -95,6 +114,12 @@ export default {
             currentMode: 0, //当前传感器在线工作模式，默认关闭
             isDefaultIcon: true,
             timer: null,
+            tabs: [
+                { label: '测点名称', value: 'point' },
+                { label: 'PRPS&PRPD', value: 'prps' },
+                { label: '特征图谱', value: 'chart'},
+            ],
+            tabSelect:'',
         }
     },
     computed: {
@@ -144,6 +169,14 @@ export default {
                 // this.queryDetails.push(this.getSensorDetails(item));            
             })
             Promise.all([...this.tempArr]).then(res => {
+                res.forEach(item => {
+                    if (item.data.sensor_type == 'UHF') {
+                        item.data.tabSelect = 'prps'
+                    } else {
+                        item.data.tabSelect = 'point'
+                    }
+                    
+                })
                 This.queryDetails = res
                 console.log(This.queryDetails, 'This.queryDetails');
                 this.$nextTick(() => {
@@ -197,10 +230,16 @@ export default {
             let len = this.dataDetails.length;
             this.dialogWidth = (len == 1 ? 1 : (len > 4 ? 3 : 2)) * 353 + 'px';
         },
-        handleClick(tab) {
-            // if(tab.name=='common'){
+        changetabs(val,i) { 
+            this.activeTab[i] = val;
+            this.queryDetails[i].data.tabSelect = val
+            console.log(this.activeTab[i]=='point');
+        },
+        handleClick(tab, i) {
+            console.log(tab,i);
+             if(tab.name=='common'){
 
-            // }
+             }
         },
         initChart(res) {
             let This = this;
@@ -214,31 +253,30 @@ export default {
                     throw Error();
                 }
                 let data;
-                This.activeTab[idx] = 'common'
+                This.activeTab[idx] = 'point'
                 let actualType = item.sensor_type.toLowerCase()
-                if (item.sensor_type == 'TEMP') {
+                if (['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(item.sensor_type)>-1) {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/temperature.js').data));
                     actualType = 'temperature'
-                    data.chartBody.series[0].dataList = Number(item.T);
+                    data.chartBody.series[0].dataList = Number(item.amplitude);
                 } else if (item.sensor_type == 'TEV') {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/tev.js').data));
-                    data.chartBody.axisInfo.value = item.amp;
+                    data.chartBody.axisInfo.value = item.average||0;
                 } else if (item.sensor_type == 'AE') {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/ae.js').data));
-                    let maxvalue = item.maxvalue;
-                    data.chartBody.series[0].dataList[0].value = Number(maxvalue).toFixed(2);//最大放电幅值
-                    data.chartBody.series[1].dataList[0].value = Number(item.rmsvalue).toFixed(2);//有效放电幅值
-                    data.chartBody.series[2].dataList[0].value = Number(item.harmonic1).toFixed(2);//频率分量1
-                    data.chartBody.series[3].dataList[0].value = Number(item.harmonic2).toFixed(2);//频率分量2
+                    data.chartBody.series[0].dataList[0].value = Number(item.peak).toFixed(2);//最大放电幅值
+                    data.chartBody.series[1].dataList[0].value = Number(item.average).toFixed(2);//有效放电幅值
+                    data.chartBody.series[2].dataList[0].value = Number(item.F50).toFixed(2);//频率分量1
+                    data.chartBody.series[3].dataList[0].value = Number(item.F100).toFixed(2);//频率分量2
                 }
                 else if (item.sensor_type == 'UHF') {
-                    This.activeTab[idx] = 'prps'
+                    // This.activeTab[idx] = 'prps'
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
                     data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
                     actualType = 'prps3d';
                     var _data = item.prps;
-                    /* this.processData(item);
-                    return */
+                    dealData(item);
+                    return
                     var temp = JSON.parse(JSON.stringify(data.chartBody.series[0].dataList));
                     for (var i = 0; i < _data.length-1; i++) {
                         if (!temp[i]) {
@@ -282,8 +320,8 @@ export default {
                 }
 
                 pdcharts.draw(document.getElementById(item.point_id), {
-                    width: '352px',
-                    height: '352px',
+                    width: '350px',
+                    height: '343px',
                     type: pdcharts.chartType[actualType],
                     // type:14,
                     data: data.chartBody,
@@ -346,7 +384,54 @@ export default {
                         return max >= 0 ? (item['value'][2] ? (item['value'][2] + max + 1) : '--') : (item['value'][2] || '--')
                     }
                 },
-                visualMap: {
+                visualMap: [{
+            max: max > 0 ? -1 : max,
+            min: max > 0 ? min - max - 1 : min,
+            formatter: function (value) {
+                return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+            },
+            inRange: {
+                color: ['transparent', '#FFF']
+            },
+            textStyle: {
+                color: '#FFF'
+            },
+            right: 0,
+            itemWidth:0,
+            seriesIndex: 2
+        }, {
+            max: max > 0 ? -1 : max,
+            min: max > 0 ? min - max - 1 : min,
+            formatter: function (value) {
+                return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+            },
+            inRange: {
+               color: ['transparent', '#9e1068', '#135200', '#006d75', '#237804', '#ad8b00']
+            },
+            textStyle: {
+                color: '#FFF'
+            },
+            itemWidth:0,
+            right: 10,
+            seriesIndex: 1
+            }, {            
+            max: max > 0 ? -1 : max,
+            min: max > 0 ? min - max - 1 : min,
+            formatter: function (value) {
+                return max >= 0 ? (value ? (value + max + 1) : '--') : (value || '--') // 范围标签显示内容。
+            },
+            inRange: {
+                // color: [ '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                 color: ['#136911','#A8D225','#F2DD05', '#EF0000','#8f0e0e']
+            },
+            textStyle: {
+                color: '#FFF'
+            },
+            itemWidth:20,
+            right: 0,
+            seriesIndex: 0
+        }],
+                /* visualMap: {
                     max: max > 0 ? -1 : max,
                     min: max > 0 ? min - max - 1 : min,
                     formatter: function (value) {
@@ -371,7 +456,7 @@ export default {
                         color: '#FFF'
                     },
                     right: 0
-                },
+                }, */
                 xAxis3D: {
                     type: 'value',
                     name: '周期[T]',
@@ -726,12 +811,11 @@ export default {
 }
 
 .chart-3d {
-    height: 346px;
+    height: 345px !important;
+    width:  350px !important;
     position: relative !important;
     border: solid 1px #DCDFE6;
     bottom: 0 !important;
-    border-top: 0;
-    ;
 }
 
 /deep/.chart-3d>div {
@@ -827,6 +911,28 @@ export default {
 
     to {
         transform: rotate(359deg)
+    }
+}
+ul,li{list-style: none;}
+.tabs-ul{
+    display: flex;
+    justify-content: start;
+    margin-top: 10px;
+    li{
+        padding:0 15px;
+        border:solid 1px #ccc;
+    }
+    .active{
+        background-color: #F4D759;
+        color:#000;
+    }
+}
+.basic-point-info{
+    width: 350px;height: 345px;display: block;border: solid 1px #DCDFE6;
+    padding:20px;
+    p{
+        padding:5px;
+        color:lightblue;
     }
 }
 </style>
