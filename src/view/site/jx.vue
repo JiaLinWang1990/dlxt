@@ -15,7 +15,7 @@
                         </div> -->
                     <el-tab-pane label="断路器机械特性" name="first"></el-tab-pane>
                     <el-tab-pane label="储能电机电流" name="second"></el-tab-pane>
-                    <el-tab-pane label="主回路电流" name="third"></el-tab-pane>
+                    <!-- <el-tab-pane label="主回路电流" name="third"></el-tab-pane> -->
                 </el-tabs>  
                 <component :is="isComponent" :dataInfo="dataInfo" :dataDetails="dataDetails"></component>  
            </div>

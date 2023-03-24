@@ -90,12 +90,7 @@
                         align="center"
                         type="selection" :selectable="selectFun"
                         width="55"
-                    ></el-table-column>
-                    <el-table-column label="操作" width="80">
-                        <template slot-scope="scope">
-                            <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
-                        </template>                    
-                    </el-table-column>
+                    ></el-table-column>                   
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                     <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
@@ -121,11 +116,16 @@
                     </el-table-column>
                     <el-table-column prop="upload_interval" align="center" label="上传间隔">
                         <template slot-scope="props">
-                            <p>{{props.row.upload_interval/60 + 'min'}}</p>      
+                            <p  v-if="props.row.sensor_type!='MECH'">{{props.row.upload_interval/60 + 'min'}}</p>
+                            <P v-else>--</P>      
                         </template>
                     </el-table-column>                   
                     <el-table-column prop="create_date" align="center" width="150" label="更新时间"></el-table-column>
-                    
+                    <el-table-column label="操作" width="80">
+                        <template slot-scope="scope">
+                            <el-button type="text" class="table-btn" @click="details(scope.row)"><a>查看</a></el-button>                           
+                        </template>                    
+                    </el-table-column>
                 </el-table>
                 <el-pagination
                     @size-change="handleSizeChange"

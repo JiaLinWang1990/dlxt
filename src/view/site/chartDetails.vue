@@ -47,9 +47,9 @@
                     </el-tabs> -->
                     <ul class="tabs-ul">
                         <li
-                            v-for="(ite) in tabs"
+                            v-for="(ite) in currentTabs(item)"
                             :key="ite.value" 
-                            :class="{active: activeTab[idx] == ite.value}"
+                            :class="{active: queryDetails[idx].data.tabSelect == ite.value}"
                             @click="changetabs(ite.value,idx)">
                             {{ ite.label }}
                         </li> <!-- :class="{active: activeTab[idx] == ite.value}" -->
@@ -66,12 +66,12 @@
 
                     </div>
                     
-                    <!-- <div v-show="queryDetails[idx].data.tabSelect ==='prps' && queryDetails[idx].data.sensor_type =='UHF'">
-                        <div :id="item.data.point_id" class="chart-3d" ></div>
-                    </div> -->
-                    <div v-show="queryDetails[idx].data.tabSelect ==='chart'">
+                    <div v-show="queryDetails[idx].data.tabSelect ==='prps'||queryDetails[idx].data.tabSelect ==='chart'">
                         <div :id="item.data.point_id" class="chart-3d" ></div>
                     </div>
+                    <!-- <div v-show="queryDetails[idx].data.tabSelect ==='chart'">
+                        <div :id="item.data.point_id" class="chart-3d" ></div>
+                    </div> -->
                 </div>
 
             </div>
@@ -158,6 +158,16 @@ export default {
     },
 
     methods: {
+        currentTabs(item) { 
+            if (['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(item.data.sensor_type) == -1) {
+                return this.tabs
+            } else {
+                return [
+                    { label: '测点名称', value: 'point' },
+                    { label: '特征图谱', value: 'chart'},
+                ]
+            }        
+        },
         updateDataByWs(obj) {
             this.dataDetails = [obj];
             this.getAllDetails();
@@ -270,7 +280,8 @@ export default {
                     data.chartBody.series[3].dataList[0].value = Number(item.F100).toFixed(2);//频率分量2
                 }
                 else if (item.sensor_type == 'UHF') {
-                    // This.activeTab[idx] = 'prps'
+                    This.activeTab[idx] = 'prps'
+                    // This.changetabs('prps',0)
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
                     data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
                     actualType = 'prps3d';

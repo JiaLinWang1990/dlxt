@@ -195,7 +195,7 @@
             </div>
         </el-dialog>
          <el-dialog :title="dialogTitle+'主机'" :visible.sync="addDeviceDialog" class="dialog-box" :before-close="handleClose" width="500px" :close-on-click-modal="false">
-            <el-form :model="deviceForm" :rules="deviceRules" label-width="90px" ref="deviceForm"> 
+            <el-form :model="deviceForm" :rules="deviceRules" label-width="90px" ref="deviceForm" class="deviceForm"> 
                 <el-form-item label="主机名称" prop="name">
                     <el-input v-model="deviceForm.name"></el-input>
                 </el-form-item>                             
@@ -220,7 +220,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="主机编号" prop="client_number">
-                    <el-input v-model="deviceForm.client_number" disabled></el-input>                   
+                    <el-input v-model="deviceForm.client_number" :disabled="actionType=='edit'"></el-input>                   
                 </el-form-item>
                 <el-form-item label="时间校准" prop="time_adjusting">
                     <!-- <el-input v-model="deviceForm.time_adjusting"></el-input>     -->
@@ -303,8 +303,8 @@ export default {
             rules:{},
             deviceRules:{
                 name: [{ required: true, message: '请输入主机名称', trigger: 'blur' }],
-                customer:[{ required: true, message: '请选择公司', trigger: 'change' }],
-                site_id:[{ required: true, message: '请选择站点', trigger: 'change' }],
+                customer:[{ required: true, message: '请选择公司', trigger: 'blur' }],
+                site_id:[{ required: true, message: '请选择站点', trigger: 'blur' }],
                 client_number: [{ required: true, message: '请输入主机编号', trigger: 'blur' }],
                 time_adjusting: [{ required: true, message: '请选择时间', trigger: 'blur' }],
             },
@@ -643,5 +643,10 @@ export default {
 }
 .el-pagination{
     text-align: right;
+}
+.deviceForm {
+    /deep/.el-form-item{
+        margin-bottom:20px;
+    }
 }
 </style>

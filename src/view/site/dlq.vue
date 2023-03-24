@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="pane-content">
-            <div class="content-chart">
+            <div class="content-chart">                                
+                <div id="current" ref="current" class="current"></div>                
                 <div id="switch" ref="switch" class="switch"></div>
                 <div id="dis" ref="dis" class="dis"></div>
-                <div id="current" ref="current" class="current"></div>
             </div>
             <div class="content-params" v-if="Mech_Results">
                 <div class="title"><h3>特征参数</h3></div>
@@ -165,17 +165,17 @@ export default {
         initSwitchChart() { 
             this.switchChart = echarts.init(this.$refs.switch);
             let _option = JSON.parse(JSON.stringify(this.option))
-            _option.yAxis.name = '开关量';
-            let obj = this.dataInfo.Mech_CT_A_SW;
-            _option.xAxis.data = this.setxAxisData(obj.wave.length, obj.samplingperiod);
+            _option.yAxis.name = '主回路电流(A)';
+            let obj = this.dataInfo.Mech_CT_A_V;
+            _option.xAxis.data = this.setxAxisData(obj.wave[0].length, obj.samplingperiod);
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[2] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dataInfo.Mech_CT_A_SW.wave;
-            _option.series[0].name = '线路一';
-            _option.series[1].name = '线路二';
-            _option.series[2].name = '线路三';
-            _option.series[1].data = this.dataInfo.Mech_CT_B_SW.wave;
-            _option.series[2].data = this.dataInfo.Mech_CT_C_SW.wave;
+            _option.series[0].data = this.dataInfo.Mech_CT_A_V.wave[0];
+            _option.series[0].name = '主回路电流A';
+            _option.series[1].name = '主回路电流B';
+            _option.series[2].name = '主回路电流C';
+            _option.series[1].data = this.dataInfo.Mech_CT_B_V.wave[0];
+            _option.series[2].data = this.dataInfo.Mech_CT_C_V.wave[0];
             this.switchChart.setOption(_option);
         },
         initDisChart() { 
