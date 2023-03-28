@@ -1,16 +1,11 @@
 <template>
     <div>
         <div class="pane-content">
-            <div class="content-chart">                                
-                <div id="current" ref="current" class="current"></div>                
-                <div id="switch" ref="switch" class="switch"></div>
-                <div id="dis" ref="dis" class="dis"></div>
-            </div>
             <div class="content-params" v-if="Mech_Results">
-                <div class="title"><h3>特征参数</h3></div>
+                <!-- <div class="title"><h3>特征参数</h3></div> -->
                 <div class="details">
                     <div class="details-item">
-                        <div class="item-label">开关分合位置</div> <div class="item-value">{{Mech_Results.CoilA.ON_OFF_STATE}}</div>
+                        <div class="item-label">开关分合位置</div> <div class="item-value">{{mechState[Mech_Results.CoilA.ON_OFF_STATE]}}</div>
                     </div>
                     <div class="details-item">
                         <div class="item-label">操作时间</div> <div class="item-value"></div>
@@ -45,6 +40,12 @@
                     </div>
                 </div>
             </div>
+            <div class="content-chart">                                
+                <div id="current" ref="current" class="current"></div>                
+                <div id="switch" ref="switch" class="switch"></div>
+                <div id="dis" ref="dis" class="dis"></div>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -73,17 +74,26 @@ export default {
             currentChart: null,
             on:0,
             option: {
+                title: {
+                    left:'center',
+                    text: '',
+                    textStyle: {
+                        color: '#fff',
+                        fontSize:14
+                    }
+                },
                 tooltip: {
                     trigger: 'axis',
                     // formatter: '{b}(s) <br/>{a} : {c} (A)'
                 },
                 grid: {
-                    top: '10%',
+                    top: '16%',
                     right: '8%',
                     left: '80px',
-                    bottom: '20%' 
+                    bottom: '30%' 
                 },
                 legend: {
+                    padding:[26,0,0,0],
                     textStyle: {
                         color: '#ffffff'//字体颜色
                     }
@@ -138,6 +148,7 @@ export default {
                 type: 'line',
                 smooth: true
             },
+            mechState: ['无', '分闸', '合闸'],
         };
     },
     computed: {
@@ -165,36 +176,40 @@ export default {
         initSwitchChart() { 
             this.switchChart = echarts.init(this.$refs.switch);
             let _option = JSON.parse(JSON.stringify(this.option))
-            _option.yAxis.name = '主回路电流(A)';
+            _option.title.text = '主回路电流';
+            _option.yAxis.name = '电流/(A)'
+            _option.grid.top = '20%'
             let obj = this.dataInfo.Mech_CT_A_V;
-            _option.xAxis.data = this.setxAxisData(obj.wave[0].length, obj.samplingperiod);
+            _option.xAxis.data = this.setxAxisData(obj.wave.length, obj.samplingperiod);
             _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
             _option.series[2] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dataInfo.Mech_CT_A_V.wave[0];
+            _option.series[0].data = this.dataInfo.Mech_CT_A_V.wave;
             _option.series[0].name = '主回路电流A';
             _option.series[1].name = '主回路电流B';
             _option.series[2].name = '主回路电流C';
-            _option.series[1].data = this.dataInfo.Mech_CT_B_V.wave[0];
-            _option.series[2].data = this.dataInfo.Mech_CT_C_V.wave[0];
+            _option.series[1].data = this.dataInfo.Mech_CT_B_V.wave;
+            _option.series[2].data = this.dataInfo.Mech_CT_C_V.wave;
             this.switchChart.setOption(_option);
         },
         initDisChart() { 
             this.disChart = echarts.init(this.$refs.dis);
             let _option = JSON.parse(JSON.stringify(this.option))
-            _option.xAxis.data = this.setxAxisData(this.dataInfo.Mech_DIS_I.wave[0].length, this.dataInfo.Mech_DIS_I.samplingperiod);
-            _option.yAxis.name = '行程(mm)';
-            _option.series[0].data = this.dataInfo.Mech_DIS_I.wave[0];
+            _option.xAxis.data = this.setxAxisData(this.dataInfo.Mech_DIS_I.wave.length, this.dataInfo.Mech_DIS_I.samplingperiod);
+            _option.yAxis.name = '行程/(mm)';
+            _option.title.text= '行程';
+            _option.series[0].data = this.dataInfo.Mech_DIS_I.wave;
             this.disChart.setOption(_option);
         },
         initCurrentChart() {
             this.currentChart = echarts.init(this.$refs.current);
             let _option = JSON.parse(JSON.stringify(this.option))
             _option.xAxis.data = this.setxAxisData(this.dataInfo.Mech_Off_Coil_I.wave.length, this.dataInfo.Mech_Off_Coil_I.samplingperiod);
-            _option.yAxis.name = '线圈电流(A)'
+            _option.title.text = '线圈电流'
+            _option.yAxis.name = '电流/(A)'
             _option.xAxis.axisLabel.show = true;
-            _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dataInfo.Mech_Off_Coil_I.wave;
-            _option.series[1].data = this.dataInfo.Mech_On_Coil_I.wave;
+            // _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
+            _option.series[0].data = this.dataInfo.Mech_Results.CoilA.ON_OFF_STATE == 2?this.dataInfo.Mech_Off_Coil_I.wave:this.dataInfo.Mech_On_Coil_I.wave
+            // _option.series[1].data = this.dataInfo.Mech_On_Coil_I.wave;
             this.currentChart.setOption(_option);
         },
         setxAxisData(len, period) { 
@@ -209,17 +224,21 @@ export default {
 </script>
 
 <style lang='less' scoped>
+    
     .switch, .dis ,.current{
         height:33%;width:100%;
     }
-    .content-params{
+    .content-params{        
         padding:0 20px;box-sizing: border-box;
         .title{
             width:100%;text-align: center;
         }
         .details{
             width:100%;text-align:center;
+            display: flex;
+            flex-wrap: wrap;
             .details-item{
+                width:33%;
                 display: flex; line-height: 30px;
                 // justify-content: space-evenly;
                 border:solid 1px #666;
@@ -237,9 +256,11 @@ export default {
                 }
                 .item-value{
                     width:50%;height:30px;
+                    background:#666
                 }            
             }
 
         }
+        
     }
 </style>

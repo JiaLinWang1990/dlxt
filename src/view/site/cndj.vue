@@ -1,11 +1,8 @@
 <template>
     <div>
         <div class="pane-content">
-            <div class="content-chart">
-                <div id="switch" ref="switch" class="switch"></div>
-            </div>
             <div class="content-params" v-if="cndjInfo.Mech_Results&&cndjInfo.Mech_Results.Motor">
-                <div class="title"><h3>特征参数</h3></div>
+                <!-- <div class="title"><h3>特征参数</h3></div> -->
                 <div class="details">
                     <div class="details-item">
                         <div class="item-label">电机启动电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_FI}}A</div> 
@@ -18,7 +15,9 @@
                     </div>
                 </div>
             </div>
-
+            <div class="content-chart">
+                <div id="switch" ref="switch" class="switch"></div>
+            </div>           
         </div>
     </div>
 </template>
@@ -142,7 +141,10 @@ export default {
         }
         .details{
             width:100%;text-align:center;
+            display: flex;
+            flex-wrap: wrap;
             .details-item{
+                width:33%;
                 display: flex; line-height: 30px;
                 // justify-content: space-evenly;
                 border:solid 1px #666;
@@ -156,6 +158,7 @@ export default {
                 }
                 .item-value{
                     width:50%;height:30px;
+                    background:#666
                 }            
             }
 

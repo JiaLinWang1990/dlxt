@@ -57,16 +57,17 @@
                         <el-col :span="12">
                             <el-form-item label="数据类型">
                                 <el-select v-model="form.sensor_type" placeholder="请选择" clearable popper-class="dark-style">
-                                    <el-option label="AE" value="AE"></el-option>
-                                    <el-option label="TEV" value="TEV"></el-option>
+                                    <el-option label="超声波局放" value="AE"></el-option>
+                                    <el-option label="暂态地电压局放" value="TEV"></el-option>
                                     <!-- <el-option label="TEMP" value="Temp"></el-option> -->
-                                    <el-option label="UHF" value="UHF"></el-option>
-                                    <el-option label="MECH" value="MECH"></el-option>
-                                    <el-option label="OZONE" value="OZONE"></el-option>
+                                    <el-option label="特高频局放" value="UHF"></el-option>
+                                    <el-option label="断路器机械特性" value="MECH"></el-option>
+                                    <el-option label="振动" value="VIBRATION"></el-option>
+                                    <el-option label="臭氧" value="OZONE"></el-option>
                                     <el-option label="VIBRATION" value="VIBRATION"></el-option>
-                                    <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
-                                    <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
-                                    <el-option label="ENVTH" value="ENVTH"></el-option>
+                                    <el-option label="设备温度" value="DEVTEMP"></el-option>
+                                    <el-option label="环境温度" value="ENVTEMP"></el-option>
+                                    <el-option label="环境湿度" value="ENVTH"></el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
@@ -94,7 +95,11 @@
                     <el-table-column label="序号" align="center" type="index" width="50"></el-table-column>
                     <el-table-column prop="equipment_name" align="center"  label="设备名称"></el-table-column>
                     <el-table-column prop="point_name" align="center" label="测点名称"></el-table-column>
-                    <el-table-column prop="sensor_type" align="center"  width="90" label="传感器类型"></el-table-column>
+                    <el-table-column prop="sensor_type" align="center"  width="90" label="传感器类型">
+                        <template slot-scope="props">
+                            <p>{{getLabel(props.row.sensor_type)}}</p>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="battery" align="center" label="工作状态" width="190" show-overflow-tooltip>
                        <template slot-scope="props">
                             <p>{{(props.row.is_online?'在线':'离线')+(props.row.battery?(':电量'+props.row.battery+'%'):'')}}</p>        
@@ -110,8 +115,9 @@
                                         
                     <el-table-column prop="character_value" align="center" width="200"  label="特征值">
                         <template slot-scope="props">
-                            <span v-if="props.row.sensor_type!='MECH'">{{property[props.row.sensor_type].name+(props.row.character_value||0).toFixed(2) + property[props.row.sensor_type].dw}}</span>     
-                            <span v-else>{{property[props.row.sensor_type].name+mechState[props.row.character_value]}}</span>     
+                            <span v-if="props.row.sensor_type!='MECH'">{{property[props.row.sensor_type].name+(props.row.character_value||0).toFixed(2) }}</span>     
+                            <span v-else>{{property[props.row.sensor_type].name+mechState[props.row.character_value]}}</span>  
+                            <span>{{ sensorType[props.row.unit] }}</span>   
                         </template>
                     </el-table-column>
                     <el-table-column prop="upload_interval" align="center" label="上传间隔">
@@ -160,6 +166,7 @@
 import * as device from '@/data/device.js'
 import tree from '@/components/tree.vue'
 import Bus from "@/util/Bus.js";
+import {sensorType} from "@/util/sensorType.js"
 export default {
     name: "",
     components:{
@@ -202,11 +209,11 @@ export default {
             alarmLevel: ['正常', '预警', '报警'],
             currentKey: '',//树的当前高亮点
             property: {//特征值
-                'AE': {dw:'dBuV',name:'最大放电幅值：'},
-                'UHF': {dw:'dBm',name:'最大放电幅值：'},
-                'TEV': {dw:'dBmV',name:'最大放电幅值：'},
+                'AE': {dw:'',name:'最大放电幅值：'},
+                'UHF': {dw:'',name:'最大放电幅值：'},
+                'TEV': {dw:'',name:'最大放电幅值：'},
                 // 'TEMP': {dw:'℃',name:'温度：'},
-                'MECH': { dw: '', name: '断路器机械特性：' },      
+                'MECH': { dw: '', name: '开合闸状态：' },      
                 'HFCT': { dw: '', name: '高频电流局放：' },
                 'OZONE': {dw:'',name:'臭氧：'},
                 'VIBRATION': {dw:'',name:'振动：'},
@@ -215,7 +222,21 @@ export default {
                 'ENVTH': { dw: '', name: '环境湿度：' },    
 
             },
-            mechState:['无','分闸','合闸']
+            mechState: ['无', '分闸', '合闸'],
+            sensorType: sensorType,
+            sensorTypeList: [
+                { type: 'UHF', label: '特高频局放' },
+                { type: 'HFCT', label: '高频电流局放' },
+                { type: 'TEV', label: '暂态地电压局放' },
+                { type: 'AE', label: '超声波局放' },
+                { type: 'MECH', label: '断路器机械特性' },
+                { type: 'VIBRATION', label: '振动' },
+                { type: 'OZONE', label: '臭氧' },
+                { type: 'DEVTEMP', label: '设备温度' },
+                { type: 'ENVTEMP', label: '环境温度' },
+                { type: 'ENVTH', label: '环境湿度' },
+            ]
+            
         };
     },
     watch: {
@@ -224,6 +245,7 @@ export default {
         },       
     },
     mounted() {
+        console.log(sensorType,999);
         this.getTreeData();
        /*  if (this.$route.params.data) {
             this.details(this.$route.params.data)
@@ -238,6 +260,9 @@ export default {
     },
 
     methods: {
+        getLabel(type) { 
+           return  this.sensorTypeList.filter(item=>item.type==type)[0].label
+        },
         updateListByWs(obj) { 
             this.tableData.pop();
             this.tableData.unshift(obj);

@@ -57,8 +57,8 @@ class Temperature extends Chart {
             series: [
                 {
                   type: 'gauge',
-                  min: -40,
-                  max: 200,
+                  min: chartBody.series[0].min,
+                  max: chartBody.series[0].max,
                   axisLine: {
                     lineStyle: {
                       width: 10,

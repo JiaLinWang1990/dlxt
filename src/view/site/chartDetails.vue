@@ -56,13 +56,16 @@
                     </ul>                    
                     <div v-show="queryDetails[idx].data.tabSelect === 'point'" class="basic-point-info">
                         <p>电池电量:{{queryDetails[idx].data.battery}}</p>
-                        <p>报警等级:{{queryDetails[idx].data.alarm_level}}</p>
-                        <p>放电类型:{{queryDetails[idx].data.alarm_level}}</p>
-                        <p>放电频次:{{queryDetails[idx].data.DenoisingN}}</p>
-                        <p>放电类型概率:{{queryDetails[idx].data.PD_type_probability}}</p>
-                        <p>最大放电幅值:{{queryDetails[idx].data.max_limit}}</p>
-                        <p>50Hz相关性:{{queryDetails[idx].data.F50}}</p>
-                        <p>100Hz相关性:{{queryDetails[idx].data.F100}}</p>
+                        <div v-if="['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(queryDetails[idx].data.sensor_type)==-1">
+                            <p>报警等级:{{queryDetails[idx].data.alarm_level}}</p>
+                            <p>放电类型:{{queryDetails[idx].data.alarm_level}}</p>
+                            <p>放电频次:{{queryDetails[idx].data.DenoisingN}}</p>
+                            <p>放电类型概率:{{queryDetails[idx].data.PD_type_probability}}</p>
+                            <p>最大放电幅值:{{queryDetails[idx].data.max_limit}}</p>
+                            <p>50Hz相关性:{{queryDetails[idx].data.F50}}</p>
+                            <p>100Hz相关性:{{queryDetails[idx].data.F100}}</p>
+                        </div>
+                        
 
                     </div>
                     
@@ -115,7 +118,7 @@ export default {
             isDefaultIcon: true,
             timer: null,
             tabs: [
-                { label: '测点名称', value: 'point' },
+                { label: '特征数据', value: 'point' },
                 { label: 'PRPS&PRPD', value: 'prps' },
                 { label: '特征图谱', value: 'chart'},
             ],
@@ -163,7 +166,7 @@ export default {
                 return this.tabs
             } else {
                 return [
-                    { label: '测点名称', value: 'point' },
+                    { label: '特征数据', value: 'point' },
                     { label: '特征图谱', value: 'chart'},
                 ]
             }        
@@ -183,7 +186,7 @@ export default {
                     if (item.data.sensor_type == 'UHF') {
                         item.data.tabSelect = 'prps'
                     } else {
-                        item.data.tabSelect = 'point'
+                        item.data.tabSelect = 'chart'
                     }
                     
                 })
@@ -269,6 +272,8 @@ export default {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/temperature.js').data));
                     actualType = 'temperature'
                     data.chartBody.series[0].dataList = Number(item.amplitude);
+                    data.chartBody.series[0].min = Number(item.min_limit)
+                    data.chartBody.series[0].max = Number(item.max_limit)
                 } else if (item.sensor_type == 'TEV') {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/tev.js').data));
                     data.chartBody.axisInfo.value = item.average||0;
