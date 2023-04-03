@@ -39,7 +39,6 @@ export default {
              this.test(target.message.data);
         })
         Bus.$on('logined', target => {
-            console.log('已经登录');
             this.createWebSocket(target);
         })
         if (this.userInfo) { //手动刷新页面时重新连接

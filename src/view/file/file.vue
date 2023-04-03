@@ -47,7 +47,7 @@
                     <span>档案导航</span>
                     <el-button size="small" class="create-btn" v-if="treeData.length" @click="add({type:'customer'})">新建公司</el-button>
                 </div>
-                <div style="height:calc(100% - 50px)">
+                <div style="height:calc(100% - 50px)" class="left-tree">
                     <tree ref="tree" v-if="showTree"  :data="treeData" @add="add" @addChild="addChild" @del="del" @edit="edit"  @clickNode="clickNode"></tree>
                 </div>
                 <!-- <el-button size="small" type="primary" @click="add">新建</el-button>
@@ -613,7 +613,8 @@ export default {
 
                 This.treeData = res.data;
                 This.showTree = true;
-                This.clickNode(res.data[0]);                            
+                let node = JSON.stringify(this.clickNodeDetailObj) == '{}'?res.data[0]:this.clickNodeDetailObj
+                This.clickNode(node);                            
             })
         },
         resetForm(val){
@@ -634,13 +635,15 @@ export default {
                         if(val=='addCompanyDialog'){
                         this.companyForm.administrative_division = this.selectAreaData
                         if(this.operateType == '新建'){
-                            file.addCompany(this.companyForm).then(res=>{
+                            file.addCompany(this.companyForm).then(res => {
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form)
                                 this.$message({type: 'success',message: '添加成功'}); 
                             })
                         }else{                                       
-                            file.editCompany({params:this.companyForm,customer_id:this.clickNodeObj.id}).then(res=>{
+                            file.editCompany({ params: this.companyForm, customer_id: this.clickNodeObj.id }).then(res => {
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '修改成功'}); 
@@ -651,13 +654,15 @@ export default {
                         this.siteForm.administrative_division = this.selectAreaData  
                         let _id = this.actionName == 'add'?this.clickNodeObj.parent_id:this.clickNodeObj.id
                         if(this.operateType == '新建'){
-                            file.addSite({parent_id: _id,params:this.siteForm}).then(res=>{
+                            file.addSite({ parent_id: _id, params: this.siteForm }).then(res => {
+                                this[val] = false;  
                                 this.getTreeData()
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '添加成功'}); 
                             })
                         }else{                                  
                             file.editSite({params:this.siteForm,customer_id:this.clickNodeObj.parent_id,site_id:this.clickNodeObj.id}).then(res=>{
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '修改成功'}); 
@@ -668,12 +673,14 @@ export default {
                         let  _id = this.actionName == 'add'?this.clickNodeObj.parent_id:this.clickNodeObj.id
                         if(this.operateType == '新建'){
                             file.addDevice({params:this.deviceForm,site_id: _id}).then(res=>{
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '添加成功'}); 
                             })
                         }else{              
                             file.editDevice({params:this.deviceForm,site_id:this.clickNodeObj.parent_id,equipment_id:this.clickNodeObj.id}).then(res=>{
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '修改成功'});                 
@@ -684,20 +691,21 @@ export default {
                         let  _id = this.actionName == 'add'?this.clickNodeObj.parent_id:this.clickNodeObj.id
                         if(this.operateType == '新建'){
                             file.addPoint({params:this.pointForm,device_id: _id}).then(res=>{
-                            this.getTreeData();
+                                this[val] = false;  
+                                this.getTreeData();
                             this.resetForm(form);
                             this.$message({type: 'success',message: '添加成功'}); 
                         })
                         }else{              
                             file.editPoint({params:this.pointForm,equipment_id:this.clickNodeObj.parent_id,point_id:this.clickNodeObj.id}).then(res=>{
+                                this[val] = false;  
                                 this.getTreeData();
                                 this.resetForm(form);
                                 this.$message({type: 'success',message: '修改成功'}); 
                             })
                         }
                         
-                    }
-                    this[val] = false;  
+                    }                    
                 } else{return false}
             })          
             
@@ -731,5 +739,16 @@ export default {
 }
 .create-btn{
     margin-left:50px;
+}
+/deep/.left-tree{
+    .tree-box .el-tree-node__content:hover {
+        background: #ccc;
+        color:#000;
+    }
+    .tree-box .el-tree-node.is-current > .el-tree-node__content{
+        font-weight: bold;
+        background-color: #fff;
+        color:#409EFF
+    }
 }
 </style>

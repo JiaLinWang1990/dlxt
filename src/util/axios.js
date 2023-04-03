@@ -83,7 +83,7 @@ axios.interceptors.response.use((response) => {
         })
     }else{
         Message({
-            message: error.response.statusText,
+            message: error.response.data.msg,
             type: 'error',
             showClose: true,
             center: true

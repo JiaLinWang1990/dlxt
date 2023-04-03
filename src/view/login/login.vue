@@ -84,7 +84,7 @@ export default {
                     Bus.$emit('logined',res.data.id)
               }              
           },err=>{
-              console.log
+              console.log(err)
           })          
       }
   }

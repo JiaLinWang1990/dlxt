@@ -280,11 +280,30 @@ export default {
             }else{
                 let params = {user_id:val.id};
                 let type = 'delete';
-                if(n==2){
-                    account.usersDelete(params,type).then(res=>{
-                        this.getUserList();
-                        return;
-                    })
+                if (n == 2) {
+                    this.$confirm('删除后将无法恢复, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (val.id == this.userInfo.id) {
+                            this.$message.error('不能自己删除自己');
+                            return 
+                        }
+                        account.usersDelete(params, type).then(res => {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                            this.getUserList();
+                            return;
+                        })}).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取消删除'
+                            });          
+                    });
+                   
                 }                
                 if(n!=2){
                     params = Object.assign(params, {is_suspend:n==3?false:true});

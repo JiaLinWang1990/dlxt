@@ -1,7 +1,7 @@
 <template>
    <div style="overflow: auto;height: 100%" class="tree-box"> <!--  :default-expanded-keys="defaultKeys"  -->
        <el-tree ref="tree" default-expand-all :data="data" :props="defaultProps" @node-click="handleNodeClick"
-       @node-contextmenu="rightClick" :expand-on-click-node="true" node-key='id' highlight-current :filter-node-method="filterNode">
+       @node-contextmenu="rightClick" :expand-on-click-node="false" node-key='id' highlight-current :filter-node-method="filterNode">
             <span class="span-ellipis" slot-scope="{node,data}">
                 <span :title="node.label">{{node.label }}</span>  <!-- v-if="data.type=='site'&&data.unprocessed_num" -->
                 <span v-if="data.unprocessed_num" style="margin-left:15px;display:inline-block;width:18px;height:18px;text-align:center;line-height:18px;border-radius:50%;color:#fff;background:#f00;">{{(data.unprocessed_num?data.unprocessed_num:'')}}</span>
@@ -110,7 +110,6 @@
                 },300)   
            },
            rightClick(MouseEvent, object, Node, element){
-               console.log( object, Node)
                if(this.type == 'site'){
                     this.operateList=[]
                     return;

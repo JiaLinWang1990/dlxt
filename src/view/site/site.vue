@@ -59,12 +59,12 @@
                                 <el-select v-model="form.sensor_type" placeholder="请选择" clearable popper-class="dark-style">
                                     <el-option label="超声波局放" value="AE"></el-option>
                                     <el-option label="暂态地电压局放" value="TEV"></el-option>
+                                    <el-option label="高频电流局放" value="HFCT"></el-option>
                                     <!-- <el-option label="TEMP" value="Temp"></el-option> -->
                                     <el-option label="特高频局放" value="UHF"></el-option>
                                     <el-option label="断路器机械特性" value="MECH"></el-option>
                                     <el-option label="振动" value="VIBRATION"></el-option>
                                     <el-option label="臭氧" value="OZONE"></el-option>
-                                    <el-option label="VIBRATION" value="VIBRATION"></el-option>
                                     <el-option label="设备温度" value="DEVTEMP"></el-option>
                                     <el-option label="环境温度" value="ENVTEMP"></el-option>
                                     <el-option label="环境湿度" value="ENVTH"></el-option>
@@ -245,7 +245,6 @@ export default {
         },       
     },
     mounted() {
-        console.log(sensorType,999);
         this.getTreeData();
        /*  if (this.$route.params.data) {
             this.details(this.$route.params.data)
