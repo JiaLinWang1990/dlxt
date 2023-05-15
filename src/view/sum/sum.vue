@@ -218,7 +218,7 @@ import Bus from "@/util/Bus.js";
 
         },
             refreshData(){
-                this.clickNode(this.currentNode);
+                this.clickNode(this.currentNode,true);
             },
             getTreeData(){
                 let This = this;
@@ -233,7 +233,7 @@ import Bus from "@/util/Bus.js";
                     this.mapData = res.data[0].children;
                 })
             },
-        clickNode(v) { 
+        clickNode(v,is_refresh) { 
             if (!v||!v.type) {
                 v = this.currentNode
             }
@@ -241,7 +241,7 @@ import Bus from "@/util/Bus.js";
             console.log(this.currentNode,'currentNode');
                if (v.type == "customer") {
                    this.mapData = v.children;
-                   this.customerStatus(v.id,v.type)
+                   this.customerStatus(v.id,v.type,is_refresh)
                    map.abnormalRatio({customer_id:v.id}).then(res => { 
                     console.log(res,'公司异常电力设备异常趋势率');
                     this.abnormalInfos = res.data;
@@ -257,7 +257,7 @@ import Bus from "@/util/Bus.js";
                     console.log(res,'公司异常情况处理统计');
                    })
                 }else if (v.type == "site") {
-                   this.siteStatus(v.id,v.type)
+                   this.siteStatus(v.id,v.type,is_refresh)
                    map.siteLatestAlarms({site_id:v.id}).then(res => { 
                     this.tableData = res.data;
                     console.log(res,'站点最新三条');
@@ -287,8 +287,8 @@ import Bus from "@/util/Bus.js";
                     sumAlarmNum:obj[type+'_month_abnormal_info'].alarm_num+obj[type+'_week_abnormal_info'].alarm_num+obj[type+'_day_abnormal_info'].alarm_num
                 };
             },
-           customerStatus(id) { 
-               map.companyStatus({ customer_id: id, data:{is_refresh: false} }).then(res => { 
+           customerStatus(id,type,is_refresh=false) { 
+               map.companyStatus({ customer_id: id, data:{is_refresh: is_refresh} }).then(res => { 
                 this.customerInfos = res.data;
                 // this.initCharts1();
                 this.initCharts2();
@@ -296,8 +296,8 @@ import Bus from "@/util/Bus.js";
                 this.initCharts5();
                })
            },
-           siteStatus(id,type) { 
-               map.siteStatus({ site_id: id, data:{is_refresh: false} }).then(res => { 
+           siteStatus(id,type,is_refresh=false) { 
+               map.siteStatus({ site_id: id, data:{is_refresh: is_refresh} }).then(res => { 
                 this.customerInfos = res.data;
                 // this.initCharts1(type);
                 this.initCharts2();
@@ -326,9 +326,10 @@ import Bus from "@/util/Bus.js";
                 })
 
                this.myChart = echarts.init(this.$refs.state);
+               let _title=this.currentNode.type=="customer"?"{A|     各站点状态统计}":"{A|     各设备状态统计}"
                 var option = {
                     title: {
-                        text: "{A|     各站点状态统计}",
+                        text: _title,
                         textStyle: {
                             color: '#fff',
                             rich: {
@@ -584,7 +585,7 @@ import Bus from "@/util/Bus.js";
                             }
                         },
                         {                       
-                            text: '电压传感器',
+                            text: '暂态地电压',
                             left:'10%',//居中显示
                             top:'56%',//底部显示
                             textStyle: {

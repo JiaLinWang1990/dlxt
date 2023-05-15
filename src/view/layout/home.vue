@@ -35,8 +35,8 @@
                 <router-view></router-view>
             </div>
         </div>        
-        <div v-if="editUserDialog">
-            <el-dialog title="修改信息" :visible.sync="editUserDialog">
+        <div v-if="editUserDialog" class="edit-user">
+            <el-dialog title="修改信息" :visible.sync="editUserDialog"  width="500px">
                 <el-form :model="form">
                     <el-form-item label="密码:" :label-width="formLabelWidth">
                         <el-input v-model="form.password" autocomplete="off"></el-input>
@@ -62,7 +62,7 @@
         data(){
             return {
                 userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
-                activeTab:'site',
+                activeTab:'sum',
                 showChart:false,
                 currentView:'file',
                 number:1,
@@ -98,8 +98,8 @@
     },
         mounted(){
             setInterval(this.timeFormat, 1000);
-            this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'site'
-            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:1
+            this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'sum'
+            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:0
         },
         methods:{
             timeFormat(){

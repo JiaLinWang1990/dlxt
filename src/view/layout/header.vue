@@ -22,7 +22,7 @@
             <button @click="logOut()"><i class="el-icon-switch-button"></i></button>
         </div>
         <div v-if="editUserDialog">
-            <el-dialog title="修改信息" :visible.sync="editUserDialog">
+            <el-dialog title="修改信息" :visible.sync="editUserDialog" width="500px">
                 <el-form :model="form">
                     <el-form-item label="密码:" :label-width="formLabelWidth">
                         <el-input v-model="form.password" autocomplete="off"></el-input>
@@ -113,7 +113,12 @@ import {MessageBox} from 'element-ui';
 </script>
 
 <style lang='less' scoped>
-    .header-box{padding: 0 20px;}
+    .header-box{padding: 0 20px;
+        /deep/.el-input__inner{height:28px;line-height: 28px;}
+        /deep/.el-dialog__header{
+            line-height: 32px;
+        }
+    }
     .header-title{font-size:22px;margin-left:20px;}
     .header-right{
         position: absolute;right:0;top:0;;
@@ -135,5 +140,9 @@ import {MessageBox} from 'element-ui';
     /deep/.el-dropdown-menu{
         padding:0;
     }
+    /deep/.el-form-item{
+        margin-bottom: 0px;
+    }
+    
 }
 </style>

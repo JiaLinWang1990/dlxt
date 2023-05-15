@@ -55,15 +55,15 @@
                         </li> <!-- :class="{active: activeTab[idx] == ite.value}" -->
                     </ul>                    
                     <div v-show="queryDetails[idx].data.tabSelect === 'point'" class="basic-point-info">
-                        <p>电池电量:{{queryDetails[idx].data.battery}}</p>
+                        <p>电池电量: {{queryDetails[idx].data.battery+'%'}}</p>
                         <div v-if="['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(queryDetails[idx].data.sensor_type)==-1">
-                            <p>报警等级:{{queryDetails[idx].data.alarm_level}}</p>
-                            <p>放电类型:{{queryDetails[idx].data.alarm_level}}</p>
-                            <p>放电频次:{{queryDetails[idx].data.DenoisingN}}</p>
-                            <p>放电类型概率:{{queryDetails[idx].data.PD_type_probability}}</p>
-                            <p>最大放电幅值:{{queryDetails[idx].data.max_limit}}</p>
-                            <p>50Hz相关性:{{queryDetails[idx].data.F50}}</p>
-                            <p>100Hz相关性:{{queryDetails[idx].data.F100}}</p>
+                            <p>报警等级: {{alarmLevel[queryDetails[idx].data.alarm_level]}}</p>
+                            <p>放电类型: {{PDType[queryDetails[idx].data.alarm_level]}}</p>
+                            <p>放电频次: {{queryDetails[idx].data.DenoisingN +'次/s'}}</p>
+                            <p>放电类型概率: {{getLabel(queryDetails[idx].data.PD_type_probability)}}</p>
+                            <p>最大放电幅值: {{queryDetails[idx].data.max_limit +sensorType[queryDetails[idx].data.unit]}}</p>
+                            <p>50Hz相关性: {{queryDetails[idx].data.F50}}</p>
+                            <p>100Hz相关性: {{queryDetails[idx].data.F100}}</p>
                         </div>
                         
 
@@ -89,6 +89,7 @@ import * as device from '@/data/device.js'
 import Bus from "@/util/Bus.js";
 import * as echarts from 'echarts';
 import { dealData } from './handle.js';
+import {sensorType,sensorTypeOptions,alarmLevel,PDType} from "@/util/sensorType.js"
 
 export default {
     name: '',
@@ -122,7 +123,10 @@ export default {
                 { label: 'PRPS&PRPD', value: 'prps' },
                 { label: '特征图谱', value: 'chart'},
             ],
-            tabSelect:'',
+            tabSelect: '',
+            alarmLevel: alarmLevel,
+            PDType: PDType,
+            sensorType:sensorType
         }
     },
     computed: {
@@ -254,6 +258,13 @@ export default {
 
              }
         },
+        getLabel(arr) {
+            let result = [];
+            arr.forEach((n,i) => {
+                result.push(PDType[i]+':'+n+'%')
+            })
+            return result.join('、')
+         },
         initChart(res) {
             let This = this;
             res.forEach((item, idx) => {
@@ -271,6 +282,9 @@ export default {
                 if (['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(item.sensor_type)>-1) {
                     data = JSON.parse(JSON.stringify(require('@/util/js/data/temperature.js').data));
                     actualType = 'temperature'
+                    
+                    data.chartBody.title = sensorTypeOptions.filter(n=>n.type==item.sensor_type)[0].label
+                    data.chartBody.axisInfo.unit = sensorType[item.unit];
                     data.chartBody.series[0].dataList = Number(item.amplitude);
                     data.chartBody.series[0].min = Number(item.min_limit)
                     data.chartBody.series[0].max = Number(item.max_limit)

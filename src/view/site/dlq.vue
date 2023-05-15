@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="pane-content">
-            <div class="content-params" v-if="Mech_Results">
+            <div class="content-params"><!-- v-if="Mech_Results" -->
                 <!-- <div class="title"><h3>特征参数</h3></div> -->
                 <div class="details">
                     <div class="details-item">
                         <div class="item-label">开关分合位置</div> <div class="item-value">{{mechState[Mech_Results.CoilA.ON_OFF_STATE]}}</div>
                     </div>
                     <div class="details-item">
-                        <div class="item-label">操作时间</div> <div class="item-value"></div>
+                        <div class="item-label">操作时间</div> <div class="item-value">{{ dataInfo.Mech_On_Coil_I.acqtime }}</div>
                     </div>
                     <div class="details-item" v-if="on!=0">
                         <el-row>
@@ -29,7 +29,7 @@
                         </el-row>                                             
                     </div>
                     <div class="details-item">
-                        <div class="item-label">线圈最大电流</div> <div class="item-value">{{Mech_Results.CoilA.t6_A}}m/s</div>
+                        <div class="item-label">线圈最大电流</div> <div class="item-value">{{Mech_Results.CoilA.t6_A}}A</div>
                     </div>
                     <div class="details-item">
                         <div class="item-label">掣子脱扣时间</div> <div class="item-value">{{Mech_Results.CoilA.t4}}ms</div>
@@ -62,7 +62,7 @@ export default {
     },
     watch: {
         dataInfo(val) {
-            this.dlqData = this.dataInfo;
+            // this.dlqData = this.dataInfo;
             this.init();
         }
     },
@@ -72,7 +72,7 @@ export default {
             switchChart: null,
             disChart: null,
             currentChart: null,
-            on:0,
+            on:1,
             option: {
                 title: {
                     left:'center',
@@ -176,6 +176,7 @@ export default {
         initSwitchChart() { 
             this.switchChart = echarts.init(this.$refs.switch);
             let _option = JSON.parse(JSON.stringify(this.option))
+            _option.color = ['#EDAE14','#57850C','#EB222D']
             _option.title.text = '主回路电流';
             _option.yAxis.name = '电流/(A)'
             _option.grid.top = '20%'
@@ -208,7 +209,7 @@ export default {
             _option.yAxis.name = '电流/(A)'
             _option.xAxis.axisLabel.show = true;
             // _option.series[1] = JSON.parse(JSON.stringify(this.seriesItem));
-            _option.series[0].data = this.dataInfo.Mech_Results.CoilA.ON_OFF_STATE == 2?this.dataInfo.Mech_Off_Coil_I.wave:this.dataInfo.Mech_On_Coil_I.wave
+            _option.series[0].data = this.dataInfo.Mech_Results.CoilA.ON_OFF_STATE == 2?this.dataInfo.Mech_On_Coil_I.wave:this.dataInfo.Mech_Off_Coil_I.wave
             // _option.series[1].data = this.dataInfo.Mech_On_Coil_I.wave;
             this.currentChart.setOption(_option);
         },

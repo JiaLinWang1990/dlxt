@@ -24,15 +24,17 @@
                     <el-input v-model="searchForm.company" placeholder="请输入公司名称"></el-input>
                 </el-form-item>
                 <el-form-item label="传感器类型：">
-                    <el-select v-model="searchForm.degree" placeholder="电压等级">
-                        <el-option label="10kV" value="10kV"></el-option>
-                        <el-option label="20kV" value="20kV"></el-option>
-                        <el-option label="35kV" value="35kV"></el-option>
-                        <el-option label="35kV" value="35kV"></el-option>
-                        <el-option label="110kV" value="110kV"></el-option>
-                        <el-option label="220kV" value="220kV"></el-option>
-                        <el-option label="330kV" value="330kV"></el-option>
-                        <el-option label="500kV" value="500kV"></el-option>
+                    <el-select v-model="searchForm.type" placeholder="传感器类型">
+                        <el-option label="AE" value="AE"></el-option>
+                            <el-option label="TEV" value="TEV"></el-option>
+                            <el-option label="UHF" value="UHF"></el-option>
+                            <el-option label="MECH" value="MECH"></el-option>
+                            <el-option label="HFCT" value="HFCT"></el-option>
+                            <el-option label="OZONE" value="OZONE"></el-option>
+                            <el-option label="VIBRATION" value="VIBRATION"></el-option>
+                            <el-option label="DEVTEMP" value="DEVTEMP"></el-option>
+                            <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
+                            <el-option label="ENVTH" value="ENVTH"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>

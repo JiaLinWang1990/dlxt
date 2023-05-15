@@ -80,7 +80,7 @@ export default {
           account.login(this.formModel).then(res=>{
               if(res.code == 0){
                     sessionStorage.setItem('userInfo',JSON.stringify(res.data))
-                  this.$router.push({ name: 'site' })
+                  this.$router.push({ name: 'sum' })
                     Bus.$emit('logined',res.data.id)
               }              
           },err=>{

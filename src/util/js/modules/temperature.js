@@ -99,7 +99,7 @@ class Temperature extends Chart {
                   detail: {
                     valueAnimation: true,
                     formatter: function (value) {
-                        return value.toFixed(2)+"°C";
+                        return value.toFixed(2)+chartBody.axisInfo.unit;
                       },
                     color: 'auto'
                   },
