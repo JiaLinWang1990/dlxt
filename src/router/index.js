@@ -93,7 +93,7 @@ function getCookieById(id){
 // }
 router.beforeEach((to,from,next)=>{
   let token = getCookieById('cloud_token');
-  let userinfo = JSON.parse(sessionStorage.getItem('userInfo'))
+  let userinfo = JSON.parse(localStorage.getItem('userInfo'))
   if(!token){
     if(from.name =='login'||to.name=='login'){
       next()
@@ -102,8 +102,8 @@ router.beforeEach((to,from,next)=>{
     MessageBox.alert('登录已失效，请重新登录','提示', {
           confirmButtonText: '确定',
           callback: function () {
-              sessionStorage.removeItem('userInfo')
-              sessionStorage.removeItem('activeTab')
+              localStorage.removeItem('userInfo')
+              localStorage.removeItem('activeTab')
             next({path:'/login'});
           }
       })   

@@ -36,11 +36,10 @@
                             </el-option>
                         </el-select>
                     </el-form-item>                 
-                    <el-form-item label="传感器类型：">
+                    <!-- <el-form-item label="传感器类型：">
                         <el-select v-model="exportForm.type" placeholder="传感器类型">
                             <el-option label="AE" value="AE"></el-option>
                             <el-option label="TEV" value="TEV"></el-option>
-                            <!-- <el-option label="TEMP" value="TEMP"></el-option> -->
                             <el-option label="UHF" value="UHF"></el-option>
 
                             <el-option label="MECH" value="MECH"></el-option>
@@ -52,7 +51,7 @@
                             <el-option label="ENVTH" value="ENVTH"></el-option>
 
                         </el-select>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item>
                         <el-button size="small" type="primary" @click="onExport">导出</el-button>
                     </el-form-item>
@@ -399,10 +398,10 @@ export default {
             let params = {
                 customer_id:customer_id,
                 site_id: site_id,
-                type:type
+                // type:type
             }
             device.exportData(params).then(res => {
-                console.log(JSON.parse(res), '导出');
+                console.log(res, '导出');
                 
             })
         },

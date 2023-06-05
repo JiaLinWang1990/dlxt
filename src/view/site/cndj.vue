@@ -5,13 +5,13 @@
                 <!-- <div class="title"><h3>特征参数</h3></div> -->
                 <div class="details">
                     <div class="details-item">
-                        <div class="item-label">电机启动电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_FI}}A</div> 
+                        <div class="item-label">电机启动电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_FI}} A</div> 
                     </div>
                     <div class="details-item">
-                        <div class="item-label">电机最大电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_MAXI}}A</div> 
+                        <div class="item-label">电机最大电流</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_MAXI}} A</div> 
                     </div>
                     <div class="details-item">
-                        <div class="item-label">电机运行时间</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_dt/1000}}s</div>  
+                        <div class="item-label">电机运行时间</div> <div class="item-value">{{cndjInfo.Mech_Results.Motor.MO_dt/1000}} s</div>  
                     </div>
                     <div class="details-item">
                         <div class="item-label">操作时间</div> <div class="item-value">{{cndjInfo.Mech_Motor_I.acqtime}}</div>  

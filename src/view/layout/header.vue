@@ -50,7 +50,7 @@ import {MessageBox} from 'element-ui';
        name:'',
        data(){
            return {
-               userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+               userInfo:JSON.parse(localStorage.getItem('userInfo')),
                language:1,
                options:[
                     {value:1,label:'简体中文'}
@@ -87,7 +87,7 @@ import {MessageBox} from 'element-ui';
                 }).then(() => {
                     account.logout().then(res=>{
                         if(res.code==0){
-                            sessionStorage.removeItem('userInfo')
+                            localStorage.removeItem('userInfo')
                             This.$router.push('login')
                         }
                     }) 

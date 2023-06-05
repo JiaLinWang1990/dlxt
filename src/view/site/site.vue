@@ -177,7 +177,7 @@ export default {
     },
     data() {
         return {
-            userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+            userInfo:JSON.parse(localStorage.getItem('userInfo')),
             isFold:false,
             isFoldClass:'el-icon-s-fold',
              showChart:false,

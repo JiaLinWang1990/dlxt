@@ -29,14 +29,14 @@
                         </el-row>                                             
                     </div>
                     <div class="details-item">
-                        <div class="item-label">线圈最大电流</div> <div class="item-value">{{Mech_Results.CoilA.t6_A}}A</div>
+                        <div class="item-label">线圈最大电流</div> <div class="item-value">{{Mech_Results.CoilA.t6_A}} A</div>
                     </div>
                     <div class="details-item">
-                        <div class="item-label">掣子脱扣时间</div> <div class="item-value">{{Mech_Results.CoilA.t4}}ms</div>
+                        <div class="item-label">掣子脱扣时间</div> <div class="item-value">{{Mech_Results.CoilA.t4}} ms</div>
                     </div>
 
                     <div class="details-item">
-                        <div class="item-label">线圈通电时间</div> <div class="item-value">{{Mech_Results.CoilA.t7}}ms</div>
+                        <div class="item-label">线圈通电时间</div> <div class="item-value">{{Mech_Results.CoilA.t7}} ms</div>
                     </div>
                 </div>
             </div>

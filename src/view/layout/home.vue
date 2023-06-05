@@ -61,7 +61,7 @@
     export default {
         data(){
             return {
-                userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+                userInfo:JSON.parse(localStorage.getItem('userInfo')),
                 activeTab:'sum',
                 showChart:false,
                 currentView:'file',
@@ -98,8 +98,8 @@
     },
         mounted(){
             setInterval(this.timeFormat, 1000);
-            this.activeTab = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).id:'sum'
-            this.number = sessionStorage.getItem('activeTab')?JSON.parse(sessionStorage.getItem('activeTab')).number:0
+            this.activeTab = localStorage.getItem('activeTab')?JSON.parse(localStorage.getItem('activeTab')).id:'sum'
+            this.number = localStorage.getItem('activeTab')?JSON.parse(localStorage.getItem('activeTab')).number:0
         },
         methods:{
             timeFormat(){
@@ -114,7 +114,7 @@
                         type: 'warning'
                     });
                 } else {
-                    sessionStorage.setItem('activeTab',JSON.stringify({id:'site',number:1}))
+                    localStorage.setItem('activeTab',JSON.stringify({id:'site',number:1}))
                     this.$router.push('file')
                 }                
             },
@@ -127,8 +127,8 @@
                 }).then(() => {
                     account.logout().then(res=>{
                         if(res.code==0){
-                            sessionStorage.removeItem('userInfo')
-                            sessionStorage.removeItem('activeTab')
+                            localStorage.removeItem('userInfo')
+                            localStorage.removeItem('activeTab')
                             This.$router.push('login')
                         }
                     }) 
@@ -141,7 +141,7 @@
             },
             users(){},
             handleClickTab(tab,idx){
-                sessionStorage.setItem('activeTab',JSON.stringify({id:tab.id,number:idx}))
+                localStorage.setItem('activeTab',JSON.stringify({id:tab.id,number:idx}))
                 // this.activeTab = tab.id;
                 this.number = idx;
                 this.$router.push(tab.id)

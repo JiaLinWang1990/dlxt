@@ -22,7 +22,7 @@ export default {
     },
     data() { 
         return {
-            userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+            userInfo:JSON.parse(localStorage.getItem('userInfo')),
             socket:  null,
             lockReconnect: false,
             showDetails: false,
@@ -128,7 +128,7 @@ export default {
                                     },
                                     on: {
                                         click() {                                           
-                                            sessionStorage.setItem('activeTab', JSON.stringify({ id: 'site', number: 1 }))
+                                            localStorage.setItem('activeTab', JSON.stringify({ id: 'site', number: 1 }))
                                             This.$router.replace({ name: 'site', params: {data:testObj.sensor_data} });                                        
                                             msg.close()
                                         }

@@ -150,7 +150,7 @@ export default {
     name: "",
     data() {
         return {
-            userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+            userInfo:JSON.parse(localStorage.getItem('userInfo')),
             searchForm: {
                 username: "",
                 customer: "", 

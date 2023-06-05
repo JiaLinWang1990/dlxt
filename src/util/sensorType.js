@@ -1,4 +1,4 @@
-export const sensorType = [,
+export const sensorType = ['',
 "dB",
 "dBm",
 "dBmV",

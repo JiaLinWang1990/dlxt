@@ -157,3 +157,13 @@ export function queryUnbindSensor(params={},callback){
       "params":params.data
     },callback)
 }
+
+/* 档案导出 */
+export function fileExport(params={},callback){
+    return axios.request({
+      "url" : baseUrl+'/cloud_file_export/',
+        "method": "get",
+        "responseType": "blob",
+      "params":params
+    },callback)
+}

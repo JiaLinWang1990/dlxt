@@ -59,11 +59,11 @@
                         <div v-if="['DEVTEMP','OZONE','ENVTEMP','ENVTH'].indexOf(queryDetails[idx].data.sensor_type)==-1">
                             <p>报警等级: {{alarmLevel[queryDetails[idx].data.alarm_level]}}</p>
                             <p>放电类型: {{PDType[queryDetails[idx].data.alarm_level]}}</p>
-                            <p>放电频次: {{queryDetails[idx].data.DenoisingN +'次/s'}}</p>
+                            <p>放电频次: {{(queryDetails[idx].data.DenoisingN||'0') +'次/s'}}</p>
                             <p>放电类型概率: {{getLabel(queryDetails[idx].data.PD_type_probability)}}</p>
-                            <p>最大放电幅值: {{queryDetails[idx].data.max_limit +sensorType[queryDetails[idx].data.unit]}}</p>
-                            <p>50Hz相关性: {{queryDetails[idx].data.F50}}</p>
-                            <p>100Hz相关性: {{queryDetails[idx].data.F100}}</p>
+                            <p>最大放电幅值: {{(queryDetails[idx].data.max_limit||'0') +sensorType[queryDetails[idx].data.unit]}}</p>
+                            <p>50Hz相关性: {{(queryDetails[idx].data.F50)*100+'%'}}</p>
+                            <p>100Hz相关性: {{queryDetails[idx].data.F100*100+'%'}}</p>
                         </div>
                         
 
@@ -259,6 +259,7 @@ export default {
              }
         },
         getLabel(arr) {
+            if (!arr) return;
             let result = [];
             arr.forEach((n,i) => {
                 result.push(PDType[i]+':'+n+'%')

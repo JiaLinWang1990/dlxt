@@ -17,13 +17,28 @@
             </div>
             <el-form :inline="true" ref="form" :model="searchForm" label-width="80px" style="margin-top:15px;">
                 <span style="height:40px;line-height: 40px;display:inline-block;">档案导出</span>
-                <el-form-item label="站点名称：">
-                    <el-input v-model="searchForm.siteName" placeholder="请输入站点名称"></el-input>
-                </el-form-item>
                 <el-form-item label="公司名称：">
-                    <el-input v-model="searchForm.company" placeholder="请输入公司名称"></el-input>
+                    <el-select v-model="searchForm.customer_id" placeholder="请选择" @change="setValue">
+                        <el-option
+                            v-for="item in customerList"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="传感器类型：">
+                <el-form-item label="站点名称">
+                    <el-select v-model="searchForm.site_id" placeholder="请选择">
+                       <el-option
+                            v-for="item in siteList"
+                            :key="item._id"
+                            :label="item.name"
+                            :value="item._id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+               
+                <!-- <el-form-item label="传感器类型：">
                     <el-select v-model="searchForm.type" placeholder="传感器类型">
                         <el-option label="AE" value="AE"></el-option>
                             <el-option label="TEV" value="TEV"></el-option>
@@ -36,7 +51,7 @@
                             <el-option label="ENVTEMP" value="ENVTEMP"></el-option>
                             <el-option label="ENVTH" value="ENVTH"></el-option>
                     </el-select>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item>
                     <!-- <el-button size="small" type="primary" @click="onSubmit">查询</el-button> -->
                     <el-button size="small" type="primary" @click="onSubmit">导出</el-button>
@@ -278,7 +293,7 @@
                         <el-option label="ENVTH" value="ENVTH"></el-option>
                     </el-select>
                 </el-form-item>  
-                <el-form-item label="传感器编号" prop="sensor_number">
+                <el-form-item label="传感器编号">
                     <el-select v-model="pointForm.sensor_number" placeholder="请选择" filterable  allow-create default-first-option
                     @blur="onTypeBlur($event)">
                         <el-option v-for="i in sensorNumberArr" :key="i" :value="i">{{ i }}</el-option>
@@ -303,7 +318,8 @@
 import tree from "@/components/tree.vue";
 import * as device from '@/data/device.js'
 import * as file from '@/data/file.js'
-import {allData} from '@/util/china.js'
+import { allData } from '@/util/china.js'
+import * as account from '@/data/api.js'
 export default {
     name: "file",
     components: {
@@ -326,12 +342,11 @@ export default {
             }
         }
         return {
-            userInfo:JSON.parse(sessionStorage.getItem('userInfo')),
+            userInfo:JSON.parse(localStorage.getItem('userInfo')),
             showTree:false,
             searchForm: {
-                siteName: "",
-                company: "",
-                degree: "",
+                site_id: "",
+                customer_id: "",
             },
             addCompanyDialog: false,
             addSitetDialog: false,
@@ -407,10 +422,25 @@ export default {
             },
             contentDetails:{},
             divisionArr: [],
-            sensorNumberArr:[],//未绑定的传感器编号数组
+            sensorNumberArr: [],//未绑定的传感器编号数组
+            customerList: [],
+            siteList:[]
         };
     },
     methods: {
+        getCustomerList(){
+            account.getCustomerList(this.userForm).then(res=>{
+                this.customerList = res.data.customers;
+            })
+        },
+        setValue(v){
+            this.getSiteList(v)
+        },
+         getSiteList(id){
+            account.siteRequest(id,'get').then(res=>{
+                this.siteList = res.data.sites;
+            })
+        },
         submitUpload(){
             this.$refs.upload.submit();
         },
@@ -424,7 +454,12 @@ export default {
                 this.getTreeData();
             })
         },
-        onSubmit() {},
+        onSubmit() {
+            //导出
+            file.fileExport(this.searchForm).then(res => {
+                console.log(res,'res');
+            })
+        },
         handleOperate(){
             this.edit(this.clickNodeDetailObj)
         },
@@ -584,23 +619,26 @@ export default {
         delActhon(obj,n){
             if(obj.type=='customer'){
                 file.delCompany({customer_id:obj.id,isClear:n}).then(res=>{
-                    this.delSuccess()
+                    this.delSuccess(obj)
                 })
             }else if(obj.type=='site'){
                 file.delSite({customer_id:obj.parent_id,site_id:obj.id,isClear:n}).then(res=>{
-                    this.delSuccess()
+                    this.delSuccess(obj)
                 })
             }else if(obj.type=='equipment'){
                 file.delDevice({site_id:obj.parent_id,equipment_id:obj.id,isClear:n}).then(res=>{
-                    this.delSuccess()
+                    this.delSuccess(obj)
                 })
             }else if(obj.type=='point'){
                 file.delPoint({equipment_id:obj.parent_id,point_id:obj.id,isClear:n}).then(res=>{
-                    this.delSuccess()
+                    this.delSuccess(obj)
                 })
             }
         },
-        delSuccess(){
+        delSuccess(obj) {
+            if (obj.id == this.clickNodeDetailObj.id) {
+                this.clickNodeDetailObj = {}//当前点击的节点被删除后，将当前节点置空
+            }
              this.$message({message: '删除成功',type: 'success'});
              this.getTreeData()
         },  
@@ -716,6 +754,7 @@ export default {
     },
     mounted(){
         this.getTreeData();
+        this.getCustomerList()
     }
 };
 </script>
@@ -744,7 +783,7 @@ export default {
 }
 /deep/.left-tree{
     .tree-box .el-tree-node__content:hover {
-        background: #ccc;
+        // background: #ccc;
         color:#000;
     }
     .tree-box .el-tree-node.is-current > .el-tree-node__content{

@@ -79,7 +79,7 @@ export default {
       login(){
           account.login(this.formModel).then(res=>{
               if(res.code == 0){
-                    sessionStorage.setItem('userInfo',JSON.stringify(res.data))
+                    localStorage.setItem('userInfo',JSON.stringify(res.data))
                   this.$router.push({ name: 'sum' })
                     Bus.$emit('logined',res.data.id)
               }              

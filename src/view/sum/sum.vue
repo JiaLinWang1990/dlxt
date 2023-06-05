@@ -8,7 +8,7 @@
                         <div ref="property" id="property" class="property">
                             <div class="notify-title"><img src="../../assets/u212.png" />资产统计</div>
                             <div class="property-content">
-                                <div class="content-title">东区变电站</div>
+                                <div class="content-title">{{ currentNode.label }}</div>
                                 <div class="b-content-box">
                                     <div class="content-item" v-if="currentNode.type=='customer'">
                                         <div><img src="../../assets/bdz.png" /></div>
@@ -1108,6 +1108,11 @@ import Bus from "@/util/Bus.js";
         }
     }
 }
-
+/deep/.map-tree{
+    .tree-box .el-tree-node__content:hover {
+        background-color: #F5F7FA;
+        color:#409EFF;
+    }
+}
 
 </style>
