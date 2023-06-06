@@ -28,7 +28,7 @@
                     </el-form-item>
                     <el-form-item label="站点名称">
                         <el-select v-model="exportForm.site_id" placeholder="请选择" multiple>
-                        <el-option
+                            <el-option
                                 v-for="item in siteList"
                                 :key="item._id"
                                 :label="item.name"

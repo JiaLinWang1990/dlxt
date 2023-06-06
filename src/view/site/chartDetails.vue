@@ -69,12 +69,12 @@
 
                     </div>
                     
-                    <div v-show="queryDetails[idx].data.tabSelect ==='prps'||queryDetails[idx].data.tabSelect ==='chart'">
+                    <div v-show="queryDetails[idx].data.tabSelect ==='prps'"><!-- ||queryDetails[idx].data.tabSelect ==='chart' -->
                         <div :id="item.data.point_id" class="chart-3d" ></div>
                     </div>
-                    <!-- <div v-show="queryDetails[idx].data.tabSelect ==='chart'">
-                        <div :id="item.data.point_id" class="chart-3d" ></div>
-                    </div> -->
+                    <div v-show="queryDetails[idx].data.tabSelect ==='chart'">
+                        <div :id="item.data.point_id+'1'" class="chart-3d" ></div>
+                    </div>
                 </div>
 
             </div>
@@ -190,7 +190,7 @@ export default {
                     if (item.data.sensor_type == 'UHF') {
                         item.data.tabSelect = 'prps'
                     } else {
-                        item.data.tabSelect = 'chart'
+                        item.data.tabSelect = 'point'
                     }
                     
                 })
@@ -308,49 +308,16 @@ export default {
                     var _data = item.prps;
                     dealData(item);
                     return
-                    var temp = JSON.parse(JSON.stringify(data.chartBody.series[0].dataList));
-                    for (var i = 0; i < _data.length-1; i++) {
-                        if (!temp[i]) {
-                            temp[i] = [0,0,0]
-                        }
-                        temp[i][2] = _data[i];
-                    }
-                    let n = 60
-                    data.chartBody.series[0].dataList = [];
-                    this.timer = setInterval(function () {
-                        /*if (n >= 60) {
-                            clearInterval(this.timer);
-                            return;
-                        }
-                        for (var i = 0; i < 50; i++) {
-                            temp[i+50*n][2] = _data[i+50*n];
-                        }
-                        n++
-                        */
-                        if (n == 0) {
-                            clearInterval(this.timer);
-                            return;
-                        }
-                        let temp1 = temp.slice(n * 50 - 50, n * 50)
-                        // data.chartBody.series[0].dataList = data.chartBody.series[0].dataList.concat(temp1);
-                        data.chartBody.series[0].dataList = temp1.concat(data.chartBody.series[0].dataList);
-                        n--
-                        pdcharts.draw(document.getElementById(item.point_id), {
-                            width: '352px',
-                            height: '352px',
-                            type: pdcharts.chartType[actualType],
-                            // type:14,
-                            data: data.chartBody,
-                            background: "#141414",
-                            //  autoCycle:true
-                        });
-                    }, 20)
-                    return;
-                } else {
-                    return;
                 }
+                // else {
+                    data = JSON.parse(JSON.stringify(require('@/util/js/data/prps.js').data));
+                    data.chartBody.axisInfo.zMaxValue = "最大放电幅值：" + item.ampmax + 'dBm'
+                    actualType = 'prps3d';
+                    var _data = item.prps;
+                    dealData(item);
+                // }
 
-                pdcharts.draw(document.getElementById(item.point_id), {
+                pdcharts.draw(document.getElementById(item.point_id+'1'), {
                     width: '350px',
                     height: '343px',
                     type: pdcharts.chartType[actualType],
